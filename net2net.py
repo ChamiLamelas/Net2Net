@@ -45,8 +45,9 @@ def wider(m1, m2, new_width, bnorm=None, out_size=None, noise=True,
         assert new_width > w1.size(0), "New size should be larger"
 
         old_width = w1.size(0)
-        nw1 = m1.weight.data.clone()
-        nw2 = w2.clone()
+
+        nw1 = m1.weight.data.clone().cpu()
+        nw2 = w2.clone().cpu()
 
         if nw1.dim() == 4:
             nw1.resize_(new_width, nw1.size(1), nw1.size(2), nw1.size(3))
