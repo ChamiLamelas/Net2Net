@@ -1,8 +1,23 @@
 # Change log 
 
+## Description
+
 This has a list of the changes I have made to the original code to get it to run with. Overall,
 this code does not seem to have been tested on CUDA GPU. It also has issues because PyTorch
 is not backwards compatible.
+
+## System Information
+
+```
+Operating System:
+        Windows 10
+Python version:
+        3.9.6 (tags/v3.9.6:db3ff76, Jun 28 2021, 15:26:21) [MSC v.1929 64 bit (AMD64)]
+PyTorch version:
+        1.13.0+cu117
+```
+
+## Log 
 
 **9/30/2023**
 - Replace all instances of `.data[0]` with `.item()` on 1-element tensors (errors) in example code.
