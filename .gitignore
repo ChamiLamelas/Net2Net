@@ -1,6 +1,8 @@
 # Custom
-test.py 
 examples/data/MNIST
+examples/data/cifar-10*
+test.py 
+test.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -55,7 +57,7 @@ coverage.xml
 *.pot
 
 # Django stuff:
-*.log
+# *.log
 .static_storage/
 .media/
 local_settings.py

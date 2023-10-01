@@ -10,6 +10,13 @@ import sys
 sys.path.append('../')
 from net2net import *
 import copy
+from logger import ML_Logger, MyTimer
+import os
+
+TOTAL_TIMER = MyTimer()
+TOTAL_TIMER.start('train_mnist')
+
+LOGGER = ML_Logger(log_folder=os.path.join('logs', 'mnist'), persist=False)
 
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
@@ -74,14 +81,12 @@ class Net(nn.Module):
     def net2net_wider(self):
         self.conv1, self.conv2, _ = wider(self.conv1, self.conv2, 15, noise=True)
         self.conv2, self.fc1, _ = wider(self.conv2, self.fc1, 30, noise=True)
-        print(self)
 
     def net2net_deeper(self):
         s = deeper(self.conv1, nn.ReLU, bnorm_flag=False)
         self.conv1 = s
         s = deeper(self.conv2, nn.ReLU, bnorm_flag=False)
         self.conv2 = s
-        print(self)
 
     def define_wider(self):
         self.conv1 = nn.Conv2d(1, 15, kernel_size=5)
@@ -107,6 +112,7 @@ optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 
 def train(epoch):
     model.train()
+    total_loss = 0
     for batch_idx, (data, target) in enumerate(train_loader):
         if args.cuda:
             data, target = data.cuda(), target.cuda()
@@ -117,9 +123,11 @@ def train(epoch):
         loss.backward()
         optimizer.step()
         if batch_idx % args.log_interval == 0:
-            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+            LOGGER.debug('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader), loss.item()))
+        total_loss += loss.item()
+    LOGGER.log_metrics({'epoch': epoch, 'train_loss': total_loss})
 
 
 def test():
@@ -136,20 +144,21 @@ def test():
             correct += pred.eq(target.data.view_as(pred)).cpu().sum()
 
     test_loss /= len(test_loader.dataset)
-    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
-        test_loss, correct, len(test_loader.dataset),
-        100. * correct / len(test_loader.dataset)))
-    return 100. * correct / len(test_loader.dataset)
+    accuracy = (100. * correct / len(test_loader.dataset)).item()
+    LOGGER.debug('Test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)'.format(
+        test_loss, correct, len(test_loader.dataset), accuracy))
+    LOGGER.log_metrics({'epoch': epoch, 'test_acc': accuracy})
+    return accuracy
 
-print("\n\n > Teacher training ... ")
+LOGGER.start(log_file='teacher_training', task='Teacher Training')
 # treacher training
 for epoch in range(1, args.epochs + 1):
     train(epoch)
     teacher_accu = test()
-
+LOGGER.stop()
 
 # wider student training
-print("\n\n > Wider Student training ... ")
+LOGGER.start(log_file='wider_student', task="Wider Student training ... ")
 model_ = Net()
 model_ = copy.deepcopy(model)
 
@@ -161,10 +170,11 @@ optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 for epoch in range(1, args.epochs + 1):
     train(epoch)
     wider_accu = test()
+LOGGER.stop()
 
 
 # wider + deeper student training
-print("\n\n > Wider+Deeper Student training ... ")
+LOGGER.start(log_file='wider_deeper_student', task="Wider+Deeper Student training ... ")
 model_ = Net()
 model_ = copy.deepcopy(model)
 
@@ -176,10 +186,10 @@ optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 for epoch in range(1, args.epochs + 1):
     train(epoch)
     deeper_accu = test()
-
+LOGGER.stop()
 
 # wider teacher training
-print("\n\n > Wider teacher training ... ")
+LOGGER.start(log_file='wider_teacher', task="Wider teacher training ... ")
 model_ = Net()
 
 del model
@@ -190,10 +200,10 @@ optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 for epoch in range(1, 2*(args.epochs) + 1):
     train(epoch)
     wider_teacher_accu = test()
-
+LOGGER.stop()
 
 # wider deeper teacher training
-print("\n\n > Wider+Deeper teacher training ... ")
+LOGGER.start(log_file='wider_deeper_teacher', task="Wider+Deeper teacher training ... ")
 model_ = Net()
 
 del model
@@ -204,10 +214,6 @@ optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 for epoch in range(1, 3*(args.epochs) + 1):
     train(epoch)
     wider_deeper_teacher_accu = test()
+LOGGER.stop()
 
-
-print(" -> Teacher:\t{}".format(teacher_accu))
-print(" -> Wider model:\t{}".format(wider_accu))
-print(" -> Deeper-Wider model:\t{}".format(deeper_accu))
-print(" -> Wider teacher:\t{}".format(wider_teacher_accu))
-print(" -> Deeper-Wider teacher:\t{}".format(wider_deeper_teacher_accu))
+TOTAL_TIMER.stop()

@@ -5,14 +5,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
-from torch.autograd import Variable
 import sys
 sys.path.append('../')
 from net2net import wider, deeper
 import copy
 import numpy as np
 
-from utils import NLL_loss_instance
 from utils import PlotLearning
 
 
@@ -55,13 +53,12 @@ test_transform = transforms.Compose(
               transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
 
-kwargs = {'num_workers': 8, 'pin_memory': True} if args.cuda else {}
 train_loader = torch.utils.data.DataLoader(
     datasets.CIFAR10('./data', train=True, download=True, transform=train_transform),
-    batch_size=args.batch_size, shuffle=True, **kwargs)
+    batch_size=args.batch_size, shuffle=True)
 test_loader = torch.utils.data.DataLoader(
     datasets.CIFAR10('./data', train=False, transform=test_transform),
-    batch_size=args.test_batch_size, shuffle=True, **kwargs)
+    batch_size=args.test_batch_size, shuffle=True)
 
 
 class Net(nn.Module):
@@ -101,7 +98,7 @@ class Net(nn.Module):
             x = self.pool3(x)
             x = x.view(-1, x.size(1) * x.size(2) * x.size(3))
             x = self.fc1(x)
-            return F.log_softmax(x)
+            return F.log_softmax(x, dim=1)
         except RuntimeError:
             print(x.size())
 
@@ -182,7 +179,6 @@ def train(epoch):
     for batch_idx, (data, target) in enumerate(train_loader):
         if args.cuda:
             data, target = data.cuda(), target.cuda()
-        data, target = Variable(data), Variable(target)
         optimizer.zero_grad()
         output = model(data)
         loss = criterion(output, target)
@@ -204,14 +200,14 @@ def test():
     model.eval()
     test_loss = 0
     correct = 0
-    for data, target in test_loader:
-        if args.cuda:
-            data, target = data.cuda(), target.cuda()
-        data, target = Variable(data, volatile=True), Variable(target)
-        output = model(data)
-        test_loss += F.nll_loss(output, target, size_average=False).item()  # sum up batch loss
-        pred = output.data.max(1, keepdim=True)[1]  # get the index of the max log-probability
-        correct += pred.eq(target.data.view_as(pred)).cpu().sum()
+    with torch.no_grad():
+        for data, target in test_loader:
+            if args.cuda:
+                data, target = data.cuda(), target.cuda()
+            output = model(data)
+            test_loss += F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
+            pred = output.data.max(1, keepdim=True)[1]  # get the index of the max log-probability
+            correct += pred.eq(target.data.view_as(pred)).cpu().sum()
 
     test_loss /= len(test_loader.dataset)
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
@@ -245,6 +241,7 @@ if __name__ == "__main__":
     model.cuda()
     criterion = nn.NLLLoss()
     plot = run_training(model, 'Teacher_', (args.epochs + 1) // 3)
+
 
     # wider student training
     print("\n\n > Wider Student training ... ")
