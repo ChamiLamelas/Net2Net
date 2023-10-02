@@ -13,6 +13,15 @@ import numpy as np
 
 from utils import PlotLearning
 
+from logger import ML_Logger, MyTimer
+import os
+
+TOTAL_TIMER = MyTimer()
+TOTAL_TIMER.start('train_cifar10')
+
+LOGGER = ML_Logger(log_folder=os.path.join('logs', 'cifar10'), persist=False)
+
+
 
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
@@ -20,8 +29,8 @@ parser.add_argument('--batch-size', type=int, default=64, metavar='N',
                     help='input batch size for training (default: 64)')
 parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
                     help='input batch size for testing (default: 1000)')
-parser.add_argument('--epochs', type=int, default=10, metavar='N',
-                    help='number of epochs to train (default: 10)')
+parser.add_argument('--epochs', type=int, default=40, metavar='N',
+                    help='number of epochs to train (default: 40)')
 parser.add_argument('--lr', type=float, default=0.01, metavar='LR',
                     help='learning rate (default: 0.01)')
 parser.add_argument('--momentum', type=float, default=0.9, metavar='M',
@@ -109,7 +118,6 @@ class Net(nn.Module):
                                           self.bn2, noise=args.noise)
         self.conv3, self.fc1, _ = wider(self.conv3, self.fc1, 48,
                                         self.bn3, noise=args.noise)
-        print(self)
 
     def net2net_deeper(self):
         s = deeper(self.conv1, nn.ReLU, bnorm_flag=True, weight_norm=args.weight_norm, noise=args.noise)
@@ -118,7 +126,6 @@ class Net(nn.Module):
         self.conv2 = s
         s = deeper(self.conv3, nn.ReLU, bnorm_flag=True, weight_norm=args.weight_norm, noise=args.noise)
         self.conv3 = s
-        print(self)
 
     def net2net_deeper_nononline(self):
         s = deeper(self.conv1, None, bnorm_flag=True, weight_norm=args.weight_norm, noise=args.noise)
@@ -127,7 +134,6 @@ class Net(nn.Module):
         self.conv2 = s
         s = deeper(self.conv3, None, bnorm_flag=True, weight_norm=args.weight_norm, noise=args.noise)
         self.conv3 = s
-        print(self)
 
     def define_wider(self):
         self.conv1 = nn.Conv2d(3, 12, kernel_size=3, padding=1)
@@ -155,7 +161,6 @@ class Net(nn.Module):
                                    nn.Conv2d(48, 48, kernel_size=3, padding=1))
         self.bn3 = nn.BatchNorm2d(48)
         self.fc1 = nn.Linear(48*3*3, 10)
-        print(self)
 
 
 def net2net_deeper_recursive(model):
@@ -176,6 +181,7 @@ def train(epoch):
     model.train()
     avg_loss = 0
     avg_accu = 0
+    total_loss = 0
     for batch_idx, (data, target) in enumerate(train_loader):
         if args.cuda:
             data, target = data.cuda(), target.cuda()
@@ -188,15 +194,17 @@ def train(epoch):
         avg_accu += pred.eq(target.data.view_as(pred)).cpu().sum()
         avg_loss += loss.item()
         if batch_idx % args.log_interval == 0:
-            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+            LOGGER.debug('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader), loss.item()))
+        total_loss += loss.item()
     avg_loss /= batch_idx + 1
     avg_accu = avg_accu / len(train_loader.dataset)
+    LOGGER.log_metrics({'epoch': epoch, 'train_loss': total_loss})
     return avg_accu, avg_loss
 
 
-def test():
+def test(epoch):
     model.eval()
     test_loss = 0
     correct = 0
@@ -210,9 +218,11 @@ def test():
             correct += pred.eq(target.data.view_as(pred)).cpu().sum()
 
     test_loss /= len(test_loader.dataset)
-    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
+    accuracy = (100. * correct / len(test_loader.dataset)).item()
+    LOGGER.debug('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
         test_loss, correct, len(test_loader.dataset),
-        100. * correct / len(test_loader.dataset)))
+        accuracy))
+    LOGGER.log_metrics({'epoch': epoch, 'test_acc': accuracy})
     return correct / len(test_loader.dataset), test_loss
 
 
@@ -224,7 +234,7 @@ def run_training(model, run_name, epochs, plot=None):
         plot = PlotLearning('./plots/cifar/', 10, prefix=run_name)
     for epoch in range(1, epochs + 1):
         accu_train, loss_train = train(epoch)
-        accu_test, loss_test = test()
+        accu_test, loss_test = test(epoch)
         logs = {}
         logs['acc'] = accu_train
         logs['val_acc'] = accu_test
@@ -236,25 +246,28 @@ def run_training(model, run_name, epochs, plot=None):
 
 if __name__ == "__main__":
     start_t = time.time()
-    print("\n\n > Teacher training ... ")
+    LOGGER.start(log_file='teacher_training', task='Teacher Training')
     model = Net()
     model.cuda()
     criterion = nn.NLLLoss()
-    plot = run_training(model, 'Teacher_', (args.epochs + 1) // 3)
+    plot = run_training(model, 'Teacher_', args.epochs + 1)
+    LOGGER.stop()
 
 
     # wider student training
-    print("\n\n > Wider Student training ... ")
+    LOGGER.start(log_file='wider_student', task="Wider Student training ... ")
     model_ = Net()
     model_ = copy.deepcopy(model)
 
     del model
     model = model_
     model.net2net_wider()
-    plot = run_training(model, 'Wider_student_', (args.epochs + 1) // 3, plot)
+    plot = run_training(model, 'Wider_student_', args.epochs + 1, plot)
+    LOGGER.stop()
+
 
     # wider + deeper student training
-    print("\n\n > Wider+Deeper Student training ... ")
+    LOGGER.start(log_file='wider_deeper_student', task="Wider+Deeper Student training ... ")
     model_ = Net()
     model_.net2net_wider()
     model_ = copy.deepcopy(model)
@@ -262,12 +275,14 @@ if __name__ == "__main__":
     del model
     model = model_
     model.net2net_deeper_nononline()
-    run_training(model, 'WiderDeeper_student_', (args.epochs + 1) // 3, plot)
-    print(" >> Time tkaen by whole net2net training  {}".format(time.time() - start_t))
+    run_training(model, 'WiderDeeper_student_', args.epochs + 1, plot)
+    LOGGER.stop()
+
+
 
     # wider teacher training
     start_t = time.time()
-    print("\n\n > Wider teacher training ... ")
+    LOGGER.start(log_file='wider_teacher', task="Wider teacher training ... ")
     model_ = Net()
 
     del model
@@ -275,10 +290,12 @@ if __name__ == "__main__":
     model.define_wider()
     model.cuda()
     run_training(model, 'Wider_teacher_', args.epochs + 1)
-    print(" >> Time taken  {}".format(time.time() - start_t))
+    LOGGER.stop()
+
 
     # wider deeper teacher training
-    print("\n\n > Wider+Deeper teacher training ... ")
+    LOGGER.start(log_file='wider_deeper_teacher', task="Wider+Deeper teacher training ... ")
+
     start_t = time.time()
     model_ = Net()
 
@@ -286,4 +303,6 @@ if __name__ == "__main__":
     model = model_
     model.define_wider_deeper()
     run_training(model, 'Wider_Deeper_teacher_', args.epochs + 1)
-    print(" >> Time taken  {}".format(time.time() - start_t))
+    LOGGER.stop()
+    
+    TOTAL_TIMER.stop()

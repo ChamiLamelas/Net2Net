@@ -86,12 +86,14 @@ def plot(metric_lists):
 
 
 def plot_train_loss(train_loss_lists, dataset):
-    make_plot_nice(plot(train_loss_lists), 'epoch', 'train loss', 0, 900)
+    ymin, ymax = (0, 900) if dataset == 'mnist' else (0, 2000)
+    make_plot_nice(plot(train_loss_lists), 'epoch', 'train loss', ymin, ymax)
     save(os.path.join('plots', dataset, 'train_loss.png'))
 
 
 def plot_test_acc(test_acc_lists, dataset):
-    make_plot_nice(plot(test_acc_lists), 'epoch', 'test accuracy', 94, 100)
+    ymin, ymax = (94, 100) if dataset == 'mnist' else (50, 80)
+    make_plot_nice(plot(test_acc_lists), 'epoch', 'test accuracy', ymin, ymax)
     save(os.path.join('plots', dataset, 'test_acc.png'))
 
 

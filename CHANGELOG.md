@@ -1,4 +1,4 @@
-# Change log 
+# Change Log 
 
 ## Description
 
@@ -15,21 +15,27 @@ Python version:
         3.9.6 (tags/v3.9.6:db3ff76, Jun 28 2021, 15:26:21) [MSC v.1929 64 bit (AMD64)]
 PyTorch version:
         1.13.0+cu117
+GPU:
+        NVIDIA GeForce RTX 3060
+CUDA Version:
+        12.2
 ```
 
 ## Log 
 
 **10/1/2023**
-- Instrumented `train_mnist.py` with [my logging utilities](https://github.com/ChamiLamelas/UsefulPythonLibraries) so we can record learning and times.
-- `train_mnist.py` runs in 20 minutes on 1 NVIDIA GeForce RTX 3060.
-- Added `plot.py` to make plots. See `python plot.py -h` for usage. Note, `plots/cifar` is from the original repository. 
-- Made similar compatibility fixes to `train_cifar10.py` as done with `train_mnist.py`.
+- Instrumented [train_mnist.py](examples/train_mnist.py) and [train_cifar10.py](examples/train_cifar10.py) with [my logging utilities](https://github.com/ChamiLamelas/UsefulPythonLibraries) so we can record learning and timings.
+- [train_mnist.py](examples/train_mnist.py) runs in ?? minutes and [train_cifar10.py](examples/train_cifar10.py) runs in ?? minutes (concurrently).
+- Added [plot.py](examples/plot.py) to make plots. See `python plot.py -h` for usage. Note, [the cifar plots](examples/plots/cifar) is from the original repository. 
+- Made similar compatibility fixes to [train_cifar10.py](examples/train_cifar10.py) as done with [train_mnist.py](examples/train_mnist.py).
+- Increase number of epochs for both MNIST and CIFAR10 learning to allow models to actually learn to convergence. 
+- Add observations and notes in [NOTES.md](NOTES.md).
 
 **9/30/2023**
 - Replace all instances of `.data[0]` with `.item()` on 1-element tensors (errors) in example code.
 - Removed use of `pin_memory` for dataset transfer, caused a crash when running with CUDA GPU.
-- Replaced use of `noise_var` with `noise=True` in `train_mnist.py` (caused a `TypeError`).
+- Replaced use of `noise_var` with `noise=True` in [train_mnist.py](examples/train_mnist.py) (caused a `TypeError`).
 - Transferred `nw1` and `nw2` to CPU before further NumPy computation.
 - Fix up other PyTorch versioning warnings (e.g. `dim` in `log_softmax`).
-- Modify `.gitignore` to not track things we don't want.
+- Modify [.gitignore](.gitignore) to not track things we don't want.
 - Checked that with above changes the loss (accuracy) seems to decrease (increase) for MNIST learning.

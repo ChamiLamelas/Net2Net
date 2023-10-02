@@ -1,0 +1,31 @@
+# Notes 
+
+## Description 
+
+This document collects the observations I have made based on the models presented in the repository
+and their performance logged in [logs](examples/logs/) and shown in [plots](examples/plots/). 
+
+## Legend 
+
+The following is a legend of the plot and log labels taken from the original code. These are how
+I interpret the meaning of these models. 
+
+- `teacher_training`: this is the original (smaller) model that is trained originally. 
+- `wider_student`: this is a wider version of `teacher_training` that is then *further trained*.
+- `wider_deeper_student`: this is a wider and deeper version of `teacher_training` that is then *further trained*.
+- `wider_teacher`: this is a wider version of `teacher_training` that is *trained from scratch*.
+- `wider_deeper_teacher`: this is a wider and deeper version of `teacher_training` that is *trained from scratch*.
+
+## Observations on MNIST 
+
+See the [training loss](examples/plots/mnist/train_loss.png) and [test accuracy](examples/plots/mnist/test_acc.png) plots.
+
+- `teacher_training` performs the worst, this makes sense as this is the smallest model. 
+- `wider_teacher` and `wider_student` perform the same in the long term. This is not surprising, given that we give the models extensive time to learn. However, it is important to note that, as expected, `wider_student` reaches high accuracy much faster. 
+- `wider_deeper_teacher` and `wider_deeper_student` exhibit a similar relationship.
+
+## Observations on CIFAR10
+
+See the [training loss](examples/plots/cifar10/train_loss.png) and [test accuracy](examples/plots/cifar10/test_acc.png) plots.
+
+- 

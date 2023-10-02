@@ -152,7 +152,7 @@ def test():
 
 LOGGER.start(log_file='teacher_training', task='Teacher Training')
 # treacher training
-for epoch in range(1, args.epochs + 1):
+for epoch in range(1, 3*(args.epochs) + 1):
     train(epoch)
     teacher_accu = test()
 LOGGER.stop()
@@ -167,7 +167,7 @@ model = model_
 model.net2net_wider()
 model.cuda()
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
-for epoch in range(1, args.epochs + 1):
+for epoch in range(1, 3*(args.epochs) + 1):
     train(epoch)
     wider_accu = test()
 LOGGER.stop()
@@ -183,7 +183,7 @@ model = model_
 model.net2net_deeper()
 model.cuda()
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
-for epoch in range(1, args.epochs + 1):
+for epoch in range(1, 3*(args.epochs) + 1):
     train(epoch)
     deeper_accu = test()
 LOGGER.stop()
@@ -197,7 +197,7 @@ model = model_
 model.define_wider()
 model.cuda()
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
-for epoch in range(1, 2*(args.epochs) + 1):
+for epoch in range(1, 3*(args.epochs) + 1):
     train(epoch)
     wider_teacher_accu = test()
 LOGGER.stop()
