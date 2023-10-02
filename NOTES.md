@@ -28,4 +28,7 @@ See the [training loss](examples/plots/mnist/train_loss.png) and [test accuracy]
 
 See the [training loss](examples/plots/cifar10/train_loss.png) and [test accuracy](examples/plots/cifar10/test_acc.png) plots.
 
-- 
+- `teacher_training` performs the worst as in the MNIST experiment. 
+- Similar to above, `wider_teacher` and `wider_student` again perform similarly in the long term. However, `wider_student` is faster to reach higher accuracy.
+- Interestingly enough, `wider_deeper_teacher` is noticeably better in the long term. However, `wider_deeper_student` does again reach higher accuracy faster. 
+- This experiment is a bit jumpy, so it may be better to run for a longer period.  
