@@ -25,7 +25,7 @@ CUDA Version:
 
 **10/1/2023**
 - Instrumented [train_mnist.py](examples/train_mnist.py) and [train_cifar10.py](examples/train_cifar10.py) with [my logging utilities](https://github.com/ChamiLamelas/UsefulPythonLibraries) so we can record learning and timings.
-- [train_mnist.py](examples/train_mnist.py) runs in ?? minutes and [train_cifar10.py](examples/train_cifar10.py) runs in ?? minutes (concurrently).
+- [train_mnist.py](examples/train_mnist.py) runs in 50 minutes and [train_cifar10.py](examples/train_cifar10.py) runs in 35 minutes.
 - Added [plot.py](examples/plot.py) to make plots. See `python plot.py -h` for usage. Note, [the cifar plots](examples/plots/cifar) is from the original repository. 
 - Made similar compatibility fixes to [train_cifar10.py](examples/train_cifar10.py) as done with [train_mnist.py](examples/train_mnist.py).
 - Increase number of epochs for both MNIST and CIFAR10 learning to allow models to actually learn to convergence. 
