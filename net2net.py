@@ -197,7 +197,7 @@ def deeper(m, nonlin, bnorm_flag=False, weight_norm=True, noise=True):
             m2 = th.nn.Conv2d(m.out_channels, m.out_channels,
                               kernel_size=m.kernel_size, padding=pad_h)
             m2.weight.data.zero_()
-            c = m.kernel_size[0] // 2 + 1
+            c = m.kernel_size[0] // 2 + 1 # someone in the issues claims the +1 is a bug
 
         elif m.weight.dim() == 5:
             pad_hw = int((m.kernel_size[1] - 1) / 2)  # pad height and width

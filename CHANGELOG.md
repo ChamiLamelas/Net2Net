@@ -23,6 +23,9 @@ CUDA Version:
 
 ## Log 
 
+**10/2/2023**
+- Try rerunning the experiment with the bug fix recommended in GitHub issues.
+
 **10/1/2023**
 - Instrumented [train_mnist.py](examples/train_mnist.py) and [train_cifar10.py](examples/train_cifar10.py) with [my logging utilities](https://github.com/ChamiLamelas/UsefulPythonLibraries) so we can record learning and timings.
 - [train_mnist.py](examples/train_mnist.py) runs in ?? minutes and [train_cifar10.py](examples/train_cifar10.py) runs in ?? minutes (concurrently).

@@ -23,6 +23,7 @@ See the [training loss](examples/plots/mnist/train_loss.png) and [test accuracy]
 - `teacher_training` performs the worst, this makes sense as this is the smallest model. 
 - `wider_teacher` and `wider_student` perform the same in the long term. This is not surprising, given that we give the models extensive time to learn. However, it is important to note that, as expected, `wider_student` reaches high accuracy much faster. 
 - `wider_deeper_teacher` and `wider_deeper_student` exhibit a similar relationship.
+- It doesn't seem that `wider_deeper_student` starts at instantaneously as good as `teacher_training`, which according to the paper, it should.
 
 ## Observations on CIFAR10
 
@@ -31,4 +32,5 @@ See the [training loss](examples/plots/cifar10/train_loss.png) and [test accurac
 - `teacher_training` performs the worst as in the MNIST experiment. 
 - Similar to above, `wider_teacher` and `wider_student` again perform similarly in the long term. However, `wider_student` is faster to reach higher accuracy.
 - Interestingly enough, `wider_deeper_teacher` is noticeably better in the long term. However, `wider_deeper_student` does again reach higher accuracy faster. 
-- This experiment is a bit jumpy, so it may be better to run for a longer period.  
+- This experiment is a bit jumpy, so it may be better to run for a longer period. 
+- It doesn't seem that `wider_deeper_student` and `wider_student` start as instanteously as good as `teacher_training`, which according to the paper, they should.
