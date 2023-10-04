@@ -23,8 +23,14 @@ CUDA Version:
 
 ## Log 
 
+**10/3/2023** 
+- Implemented into `train_mnist.py` and `train_cifar10.py` the ability for a model
+to adapt in the middle of training. This is basically letting a teacher train half
+of time then expand and train from there.
+
 **10/2/2023**
-- Try rerunning the experiment with [the bug fix](https://github.com/erogol/Net2Net/issues/3) recommended in GitHub issues.
+- Reran the experiment with [the bug fix](https://github.com/erogol/Net2Net/issues/3) recommended in GitHub issues.
+- The above fix did improve performance of Net2Net. For MNIST, both student models start instantaneously closer to the teacher in performance. For CIFAR10, one of the student models still starts instantaneously lower than the teacher. 
 
 **10/1/2023**
 - Instrumented [train_mnist.py](examples/train_mnist.py) and [train_cifar10.py](examples/train_cifar10.py) with [my logging utilities](https://github.com/ChamiLamelas/UsefulPythonLibraries) so we can record learning and timings.

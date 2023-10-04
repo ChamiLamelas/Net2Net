@@ -1,4 +1,6 @@
 from __future__ import print_function
+import os
+import copy
 import argparse
 import torch
 import torch.nn as nn
@@ -8,10 +10,9 @@ from torchvision import datasets, transforms
 from torch.autograd import Variable
 import sys
 sys.path.append('../')
-from net2net import *
-import copy
 from logger import ML_Logger, MyTimer
-import os
+from net2net import *
+
 
 TOTAL_TIMER = MyTimer()
 TOTAL_TIMER.start('train_mnist')
@@ -54,9 +55,9 @@ train_loader = torch.utils.data.DataLoader(
     batch_size=args.batch_size, shuffle=True)
 test_loader = torch.utils.data.DataLoader(
     datasets.MNIST('./data', train=False, transform=transforms.Compose([
-                       transforms.ToTensor(),
-                       transforms.Normalize((0.1307,), (0.3081,))
-                   ])),
+        transforms.ToTensor(),
+        transforms.Normalize((0.1307,), (0.3081,))
+    ])),
     batch_size=args.test_batch_size, shuffle=True)
 
 
@@ -79,7 +80,8 @@ class Net(nn.Module):
         return F.log_softmax(x, dim=1)
 
     def net2net_wider(self):
-        self.conv1, self.conv2, _ = wider(self.conv1, self.conv2, 15, noise=True)
+        self.conv1, self.conv2, _ = wider(
+            self.conv1, self.conv2, 15, noise=True)
         self.conv2, self.fc1, _ = wider(self.conv2, self.fc1, 30, noise=True)
 
     def net2net_deeper(self):
@@ -95,11 +97,11 @@ class Net(nn.Module):
 
     def define_wider_deeper(self):
         self.conv1 = nn.Sequential(nn.Conv2d(1, 15, kernel_size=5),
-                                      nn.ReLU(),
-                                      nn.Conv2d(15, 15, kernel_size=5, padding=2))
+                                   nn.ReLU(),
+                                   nn.Conv2d(15, 15, kernel_size=5, padding=2))
         self.conv2 = nn.Sequential(nn.Conv2d(15, 30, kernel_size=5),
-                                      nn.ReLU(),
-                                      nn.Conv2d(30, 30, kernel_size=5, padding=2))
+                                   nn.ReLU(),
+                                   nn.Conv2d(30, 30, kernel_size=5, padding=2))
         self.fc1 = nn.Linear(480, 50)
 
 
@@ -139,8 +141,10 @@ def test():
             if args.cuda:
                 data, target = data.cuda(), target.cuda()
             output = model(data)
-            test_loss += F.nll_loss(output, target, reduction='sum').item() # sum up batch loss
-            pred = output.data.max(1, keepdim=True)[1] # get the index of the max log-probability
+            # sum up batch loss
+            test_loss += F.nll_loss(output, target, reduction='sum').item()
+            # get the index of the max log-probability
+            pred = output.data.max(1, keepdim=True)[1]
             correct += pred.eq(target.data.view_as(pred)).cpu().sum()
 
     test_loss /= len(test_loader.dataset)
@@ -150,15 +154,87 @@ def test():
     LOGGER.log_metrics({'epoch': epoch, 'test_acc': accuracy})
     return accuracy
 
-LOGGER.start(log_file='teacher_training', task='Teacher Training')
-# treacher training
-for epoch in range(1, 3*(args.epochs) + 1):
+# LOGGER.start(log_file='teacher_training', task='Teacher Training')
+# # treacher training
+# for epoch in range(1, 3*(args.epochs) + 1):
+#     train(epoch)
+#     teacher_accu = test()
+# LOGGER.stop()
+
+# # wider student training
+# LOGGER.start(log_file='wider_student', task="Wider Student training ... ")
+# model_ = Net()
+# model_ = copy.deepcopy(model)
+
+# del model
+# model = model_
+# model.net2net_wider()
+# model.cuda()
+# optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
+# for epoch in range(1, 3*(args.epochs) + 1):
+#     train(epoch)
+#     wider_accu = test()
+# LOGGER.stop()
+
+
+# # wider + deeper student training
+# LOGGER.start(log_file='wider_deeper_student', task="Wider+Deeper Student training ... ")
+# model_ = Net()
+# model_ = copy.deepcopy(model)
+
+# del model
+# model = model_
+# model.net2net_deeper()
+# model.cuda()
+# optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
+# for epoch in range(1, 3*(args.epochs) + 1):
+#     train(epoch)
+#     deeper_accu = test()
+# LOGGER.stop()
+
+# # wider teacher training
+# LOGGER.start(log_file='wider_teacher', task="Wider teacher training ... ")
+# model_ = Net()
+
+# del model
+# model = model_
+# model.define_wider()
+# model.cuda()
+# optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
+# for epoch in range(1, 3*(args.epochs) + 1):
+#     train(epoch)
+#     wider_teacher_accu = test()
+# LOGGER.stop()
+
+# # wider deeper teacher training
+# LOGGER.start(log_file='wider_deeper_teacher', task="Wider+Deeper teacher training ... ")
+# model_ = Net()
+
+# del model
+# model = model_
+# model.define_wider_deeper()
+# model.cuda()
+# optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
+# for epoch in range(1, 3*(args.epochs) + 1):
+#     train(epoch)
+#     wider_deeper_teacher_accu = test()
+# LOGGER.stop()
+
+
+LOGGER.start(log_file='dynamic_wider_training', task='Dynamic Wider Training')
+
+model = Net()
+model.cuda()
+
+optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
+
+total = 3 * (args.epochs) + 1
+mid = total // 2
+
+for epoch in range(1, mid):
     train(epoch)
     teacher_accu = test()
-LOGGER.stop()
 
-# wider student training
-LOGGER.start(log_file='wider_student', task="Wider Student training ... ")
 model_ = Net()
 model_ = copy.deepcopy(model)
 
@@ -167,14 +243,26 @@ model = model_
 model.net2net_wider()
 model.cuda()
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
-for epoch in range(1, 3*(args.epochs) + 1):
+for epoch in range(mid, total):
     train(epoch)
     wider_accu = test()
 LOGGER.stop()
 
+LOGGER.start(log_file='dynamic_wider_deeper_training',
+             task='Dynamic Wider Deeper Training')
 
-# wider + deeper student training
-LOGGER.start(log_file='wider_deeper_student', task="Wider+Deeper Student training ... ")
+model = Net()
+model.cuda()
+
+optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
+
+total = 3 * (args.epochs) + 1
+mid = total // 2
+
+for epoch in range(1, mid):
+    train(epoch)
+    teacher_accu = test()
+
 model_ = Net()
 model_ = copy.deepcopy(model)
 
@@ -183,37 +271,9 @@ model = model_
 model.net2net_deeper()
 model.cuda()
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
-for epoch in range(1, 3*(args.epochs) + 1):
+for epoch in range(mid, total):
     train(epoch)
-    deeper_accu = test()
-LOGGER.stop()
-
-# wider teacher training
-LOGGER.start(log_file='wider_teacher', task="Wider teacher training ... ")
-model_ = Net()
-
-del model
-model = model_
-model.define_wider()
-model.cuda()
-optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
-for epoch in range(1, 3*(args.epochs) + 1):
-    train(epoch)
-    wider_teacher_accu = test()
-LOGGER.stop()
-
-# wider deeper teacher training
-LOGGER.start(log_file='wider_deeper_teacher', task="Wider+Deeper teacher training ... ")
-model_ = Net()
-
-del model
-model = model_
-model.define_wider_deeper()
-model.cuda()
-optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
-for epoch in range(1, 3*(args.epochs) + 1):
-    train(epoch)
-    wider_deeper_teacher_accu = test()
+    wider_accu = test()
 LOGGER.stop()
 
 TOTAL_TIMER.stop()
