@@ -160,71 +160,41 @@ def do_single_forward(model):
         data, _ = next(iter(test_loader))
         return model(data.cuda())
 
-# LOGGER.start(log_file='teacher_training', task='Teacher Training')
-# # treacher training
-# for epoch in range(1, 3*(args.epochs) + 1):
-#     train(epoch)
-#     teacher_accu = test()
-# LOGGER.stop()
-
-# # wider student training
-# LOGGER.start(log_file='wider_student', task="Wider Student training ... ")
-# model_ = Net()
-# model_ = copy.deepcopy(model)
-
-# del model
-# model = model_
-# model.net2net_wider()
-# model.cuda()
-# optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
-# for epoch in range(1, 3*(args.epochs) + 1):
-#     train(epoch)
-#     wider_accu = test()
-# LOGGER.stop()
+LOGGER.start(log_file='teacher_training', task='Teacher Training')
+# treacher training
+for epoch in range(1, 3*(args.epochs) + 1):
+    train(epoch)
+    teacher_accu = test()
+LOGGER.stop()
 
 
-# # wider + deeper student training
-# LOGGER.start(log_file='wider_deeper_student', task="Wider+Deeper Student training ... ")
-# model_ = Net()
-# model_ = copy.deepcopy(model)
+# wider teacher training
+LOGGER.start(log_file='wider_teacher', task="Wider teacher training ... ")
+model_ = Net()
 
-# del model
-# model = model_
-# model.net2net_deeper()
-# model.cuda()
-# optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
-# for epoch in range(1, 3*(args.epochs) + 1):
-#     train(epoch)
-#     deeper_accu = test()
-# LOGGER.stop()
+del model
+model = model_
+model.define_wider()
+model.cuda()
+optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
+for epoch in range(1, 3*(args.epochs) + 1):
+    train(epoch)
+    wider_teacher_accu = test()
+LOGGER.stop()
 
-# # wider teacher training
-# LOGGER.start(log_file='wider_teacher', task="Wider teacher training ... ")
-# model_ = Net()
+# wider deeper teacher training
+LOGGER.start(log_file='wider_deeper_teacher', task="Wider+Deeper teacher training ... ")
+model_ = Net()
 
-# del model
-# model = model_
-# model.define_wider()
-# model.cuda()
-# optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
-# for epoch in range(1, 3*(args.epochs) + 1):
-#     train(epoch)
-#     wider_teacher_accu = test()
-# LOGGER.stop()
-
-# # wider deeper teacher training
-# LOGGER.start(log_file='wider_deeper_teacher', task="Wider+Deeper teacher training ... ")
-# model_ = Net()
-
-# del model
-# model = model_
-# model.define_wider_deeper()
-# model.cuda()
-# optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
-# for epoch in range(1, 3*(args.epochs) + 1):
-#     train(epoch)
-#     wider_deeper_teacher_accu = test()
-# LOGGER.stop()
+del model
+model = model_
+model.define_wider_deeper()
+model.cuda()
+optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
+for epoch in range(1, 3*(args.epochs) + 1):
+    train(epoch)
+    wider_deeper_teacher_accu = test()
+LOGGER.stop()
 
 
 LOGGER.start(log_file='dynamic_wider_training', task='Dynamic Wider Training')
@@ -252,7 +222,6 @@ model.net2net_wider()
 model.cuda()
 
 after_transfer = do_single_forward(model)
-
 print(f"MSE: {F.mse_loss(before_transfer, after_transfer).item()}")
 
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
@@ -287,7 +256,6 @@ model.net2net_deeper()
 model.cuda()
 
 after_transfer = do_single_forward(model)
-
 print(f"MSE: {F.mse_loss(before_transfer, after_transfer).item()}")
 
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)

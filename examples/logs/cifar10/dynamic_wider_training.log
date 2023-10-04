@@ -1,162 +1,102 @@
-2023-10-03 23:38:34,587 | [INFO] : Dynamic Wider Training start time: 10/03/2023 11:38:34 PM
-2023-10-03 23:38:37,517 | [DEBUG] : Train Epoch: 1 [0/50000 (0%)]	Loss: 2.329237
-2023-10-03 23:38:49,729 | [DEBUG] : 
-Test set: Average loss: 1.3288, Accuracy: 5072/10000 (51%)
+2023-10-04 11:23:47,376 | [INFO] : Dynamic Wider Training start time: 10/04/2023 12:23:47 PM
+2023-10-04 11:23:48,812 | [DEBUG] : Train Epoch: 1 [0/50000 (0%)]	Loss: 2.329224
+2023-10-04 11:24:02,782 | [DEBUG] : 
+Test set: Average loss: 1.3312, Accuracy: 5117/10000 (51%)
 
-2023-10-03 23:38:49,928 | [DEBUG] : Train Epoch: 2 [0/50000 (0%)]	Loss: 1.175669
-2023-10-03 23:39:02,240 | [DEBUG] : 
-Test set: Average loss: 1.2158, Accuracy: 5676/10000 (57%)
+2023-10-04 11:24:03,125 | [DEBUG] : Train Epoch: 2 [0/50000 (0%)]	Loss: 1.143495
+2023-10-04 11:24:17,008 | [DEBUG] : 
+Test set: Average loss: 1.1946, Accuracy: 5773/10000 (58%)
 
-2023-10-03 23:39:02,389 | [DEBUG] : Train Epoch: 3 [0/50000 (0%)]	Loss: 1.009233
-2023-10-03 23:39:14,757 | [DEBUG] : 
-Test set: Average loss: 1.2650, Accuracy: 5417/10000 (54%)
+2023-10-04 11:24:17,222 | [DEBUG] : Train Epoch: 3 [0/50000 (0%)]	Loss: 0.946662
+2023-10-04 11:24:31,162 | [DEBUG] : 
+Test set: Average loss: 1.2160, Accuracy: 5637/10000 (56%)
 
-2023-10-03 23:39:14,913 | [DEBUG] : Train Epoch: 4 [0/50000 (0%)]	Loss: 0.787570
-2023-10-03 23:39:27,566 | [DEBUG] : 
-Test set: Average loss: 1.2784, Accuracy: 5575/10000 (56%)
+2023-10-04 11:24:31,394 | [DEBUG] : Train Epoch: 4 [0/50000 (0%)]	Loss: 0.792538
+2023-10-04 11:24:45,181 | [DEBUG] : 
+Test set: Average loss: 1.4524, Accuracy: 5124/10000 (51%)
 
-2023-10-03 23:39:27,716 | [DEBUG] : Train Epoch: 5 [0/50000 (0%)]	Loss: 1.284017
-2023-10-03 23:39:39,946 | [DEBUG] : 
-Test set: Average loss: 1.0451, Accuracy: 6352/10000 (64%)
+2023-10-04 11:24:45,399 | [DEBUG] : Train Epoch: 5 [0/50000 (0%)]	Loss: 1.312738
+2023-10-04 11:24:59,220 | [DEBUG] : 
+Test set: Average loss: 1.0492, Accuracy: 6365/10000 (64%)
 
-2023-10-03 23:39:40,096 | [DEBUG] : Train Epoch: 6 [0/50000 (0%)]	Loss: 0.851396
-2023-10-03 23:39:52,631 | [DEBUG] : 
-Test set: Average loss: 1.0385, Accuracy: 6345/10000 (63%)
+2023-10-04 11:24:59,446 | [DEBUG] : Train Epoch: 6 [0/50000 (0%)]	Loss: 0.827006
+2023-10-04 11:25:13,383 | [DEBUG] : 
+Test set: Average loss: 1.0490, Accuracy: 6315/10000 (63%)
 
-2023-10-03 23:39:52,773 | [DEBUG] : Train Epoch: 7 [0/50000 (0%)]	Loss: 0.991837
-2023-10-03 23:40:05,115 | [DEBUG] : 
-Test set: Average loss: 1.0104, Accuracy: 6438/10000 (64%)
+2023-10-04 11:25:13,594 | [DEBUG] : Train Epoch: 7 [0/50000 (0%)]	Loss: 1.045324
+2023-10-04 11:25:27,487 | [DEBUG] : 
+Test set: Average loss: 1.0157, Accuracy: 6452/10000 (65%)
 
-2023-10-03 23:40:05,258 | [DEBUG] : Train Epoch: 8 [0/50000 (0%)]	Loss: 0.915722
-2023-10-03 23:40:17,559 | [DEBUG] : 
-Test set: Average loss: 0.9515, Accuracy: 6729/10000 (67%)
+2023-10-04 11:25:27,705 | [DEBUG] : Train Epoch: 8 [0/50000 (0%)]	Loss: 0.900366
+2023-10-04 11:25:41,528 | [DEBUG] : 
+Test set: Average loss: 0.9607, Accuracy: 6702/10000 (67%)
 
-2023-10-03 23:40:17,705 | [DEBUG] : Train Epoch: 9 [0/50000 (0%)]	Loss: 0.655988
-2023-10-03 23:40:30,056 | [DEBUG] : 
-Test set: Average loss: 1.0177, Accuracy: 6545/10000 (65%)
+2023-10-04 11:25:41,750 | [DEBUG] : Train Epoch: 9 [0/50000 (0%)]	Loss: 0.744669
+2023-10-04 11:25:55,613 | [DEBUG] : 
+Test set: Average loss: 1.0235, Accuracy: 6511/10000 (65%)
 
-2023-10-03 23:40:30,209 | [DEBUG] : Train Epoch: 10 [0/50000 (0%)]	Loss: 0.956287
-2023-10-03 23:40:42,884 | [DEBUG] : 
-Test set: Average loss: 0.9056, Accuracy: 6852/10000 (69%)
+2023-10-04 11:25:55,841 | [DEBUG] : Train Epoch: 10 [0/50000 (0%)]	Loss: 0.950894
+2023-10-04 11:26:09,717 | [DEBUG] : 
+Test set: Average loss: 0.8866, Accuracy: 6928/10000 (69%)
 
-2023-10-03 23:40:43,024 | [DEBUG] : Train Epoch: 11 [0/50000 (0%)]	Loss: 0.932790
-2023-10-03 23:40:55,625 | [DEBUG] : 
-Test set: Average loss: 0.8811, Accuracy: 6940/10000 (69%)
+2023-10-04 11:26:09,926 | [DEBUG] : Train Epoch: 11 [0/50000 (0%)]	Loss: 0.950770
+2023-10-04 11:26:22,719 | [DEBUG] : 
+Test set: Average loss: 0.9003, Accuracy: 6889/10000 (69%)
 
-2023-10-03 23:40:55,774 | [DEBUG] : Train Epoch: 12 [0/50000 (0%)]	Loss: 0.886310
-2023-10-03 23:41:08,390 | [DEBUG] : 
-Test set: Average loss: 0.9253, Accuracy: 6767/10000 (68%)
+2023-10-04 11:26:22,931 | [DEBUG] : Train Epoch: 12 [0/50000 (0%)]	Loss: 0.915022
+2023-10-04 11:26:35,844 | [DEBUG] : 
+Test set: Average loss: 0.9088, Accuracy: 6821/10000 (68%)
 
-2023-10-03 23:41:08,532 | [DEBUG] : Train Epoch: 13 [0/50000 (0%)]	Loss: 0.990316
-2023-10-03 23:41:21,118 | [DEBUG] : 
-Test set: Average loss: 0.8877, Accuracy: 6905/10000 (69%)
+2023-10-04 11:26:36,051 | [DEBUG] : Train Epoch: 13 [0/50000 (0%)]	Loss: 1.028676
+2023-10-04 11:26:48,844 | [DEBUG] : 
+Test set: Average loss: 0.9020, Accuracy: 6839/10000 (68%)
 
-2023-10-03 23:41:21,260 | [DEBUG] : Train Epoch: 14 [0/50000 (0%)]	Loss: 0.645366
-2023-10-03 23:41:33,504 | [DEBUG] : 
-Test set: Average loss: 0.9234, Accuracy: 6856/10000 (69%)
+2023-10-04 11:26:49,059 | [DEBUG] : Train Epoch: 14 [0/50000 (0%)]	Loss: 0.659864
+2023-10-04 11:27:01,817 | [DEBUG] : 
+Test set: Average loss: 0.9257, Accuracy: 6831/10000 (68%)
 
-2023-10-03 23:41:33,677 | [DEBUG] : Train Epoch: 15 [0/50000 (0%)]	Loss: 0.969095
-2023-10-03 23:41:46,105 | [DEBUG] : 
-Test set: Average loss: 0.9793, Accuracy: 6590/10000 (66%)
+2023-10-04 11:27:02,037 | [DEBUG] : Train Epoch: 15 [0/50000 (0%)]	Loss: 0.934306
+2023-10-04 11:27:14,795 | [DEBUG] : 
+Test set: Average loss: 0.9122, Accuracy: 6840/10000 (68%)
 
-2023-10-03 23:41:46,249 | [DEBUG] : Train Epoch: 16 [0/50000 (0%)]	Loss: 0.773081
-2023-10-03 23:41:58,467 | [DEBUG] : 
-Test set: Average loss: 0.9019, Accuracy: 6857/10000 (69%)
+2023-10-04 11:27:15,016 | [DEBUG] : Train Epoch: 16 [0/50000 (0%)]	Loss: 0.767097
+2023-10-04 11:27:27,737 | [DEBUG] : 
+Test set: Average loss: 0.9536, Accuracy: 6743/10000 (67%)
 
-2023-10-03 23:41:58,610 | [DEBUG] : Train Epoch: 17 [0/50000 (0%)]	Loss: 0.732232
-2023-10-03 23:42:10,980 | [DEBUG] : 
-Test set: Average loss: 0.8375, Accuracy: 7084/10000 (71%)
+2023-10-04 11:27:27,959 | [DEBUG] : Train Epoch: 17 [0/50000 (0%)]	Loss: 0.665037
+2023-10-04 11:27:41,747 | [DEBUG] : 
+Test set: Average loss: 0.8592, Accuracy: 7046/10000 (70%)
 
-2023-10-03 23:42:11,127 | [DEBUG] : Train Epoch: 18 [0/50000 (0%)]	Loss: 0.868756
-2023-10-03 23:42:23,411 | [DEBUG] : 
-Test set: Average loss: 0.8804, Accuracy: 6949/10000 (69%)
+2023-10-04 11:27:41,974 | [DEBUG] : Train Epoch: 18 [0/50000 (0%)]	Loss: 0.860602
+2023-10-04 11:27:55,898 | [DEBUG] : 
+Test set: Average loss: 0.8744, Accuracy: 7013/10000 (70%)
 
-2023-10-03 23:42:23,564 | [DEBUG] : Train Epoch: 19 [0/50000 (0%)]	Loss: 0.697986
-2023-10-03 23:42:35,936 | [DEBUG] : 
-Test set: Average loss: 0.8452, Accuracy: 7043/10000 (70%)
+2023-10-04 11:27:56,122 | [DEBUG] : Train Epoch: 19 [0/50000 (0%)]	Loss: 0.647231
+2023-10-04 11:28:10,002 | [DEBUG] : 
+Test set: Average loss: 0.8621, Accuracy: 7030/10000 (70%)
 
-2023-10-03 23:42:36,140 | [DEBUG] : Train Epoch: 20 [0/50000 (0%)]	Loss: 3.397872
-2023-10-03 23:42:48,720 | [DEBUG] : 
-Test set: Average loss: 0.9100, Accuracy: 6796/10000 (68%)
+2023-10-04 11:28:10,226 | [DEBUG] : Train Epoch: 20 [0/50000 (0%)]	Loss: 0.675785
+2023-10-04 11:28:24,079 | [DEBUG] : 
+Test set: Average loss: 0.8831, Accuracy: 6934/10000 (69%)
 
-2023-10-03 23:42:48,876 | [DEBUG] : Train Epoch: 21 [0/50000 (0%)]	Loss: 0.649376
-2023-10-03 23:43:01,221 | [DEBUG] : 
-Test set: Average loss: 0.8478, Accuracy: 7009/10000 (70%)
+2023-10-04 11:28:24,300 | [DEBUG] : Train Epoch: 21 [0/50000 (0%)]	Loss: 0.738114
+2023-10-04 11:28:38,058 | [DEBUG] : 
+Test set: Average loss: 0.8688, Accuracy: 7108/10000 (71%)
 
-2023-10-03 23:43:01,369 | [DEBUG] : Train Epoch: 22 [0/50000 (0%)]	Loss: 0.703669
-2023-10-03 23:43:13,697 | [DEBUG] : 
-Test set: Average loss: 0.8691, Accuracy: 7000/10000 (70%)
+2023-10-04 11:28:38,286 | [DEBUG] : Train Epoch: 22 [0/50000 (0%)]	Loss: 0.678472
+2023-10-04 11:28:52,113 | [DEBUG] : 
+Test set: Average loss: 0.8564, Accuracy: 7078/10000 (71%)
 
-2023-10-03 23:43:13,853 | [DEBUG] : Train Epoch: 23 [0/50000 (0%)]	Loss: 0.816194
-2023-10-03 23:43:26,060 | [DEBUG] : 
-Test set: Average loss: 0.9010, Accuracy: 6927/10000 (69%)
+2023-10-04 11:28:52,321 | [DEBUG] : Train Epoch: 23 [0/50000 (0%)]	Loss: 0.666740
+2023-10-04 11:29:06,015 | [DEBUG] : 
+Test set: Average loss: 0.8864, Accuracy: 6916/10000 (69%)
 
-2023-10-03 23:43:26,242 | [DEBUG] : Train Epoch: 24 [0/50000 (0%)]	Loss: 0.786093
-2023-10-03 23:43:38,534 | [DEBUG] : 
-Test set: Average loss: 0.8527, Accuracy: 7071/10000 (71%)
+2023-10-04 11:29:06,224 | [DEBUG] : Train Epoch: 24 [0/50000 (0%)]	Loss: 0.731542
+2023-10-04 11:29:19,651 | [DEBUG] : 
+Test set: Average loss: 0.8511, Accuracy: 7060/10000 (71%)
 
-2023-10-03 23:43:38,690 | [DEBUG] : Train Epoch: 25 [0/50000 (0%)]	Loss: 0.723118
-2023-10-03 23:43:50,764 | [DEBUG] : 
-Test set: Average loss: 0.8387, Accuracy: 7111/10000 (71%)
+2023-10-04 11:29:19,855 | [DEBUG] : Train Epoch: 25 [0/50000 (0%)]	Loss: 0.919134
+2023-10-04 11:29:33,769 | [DEBUG] : 
+Test set: Average loss: 0.8890, Accuracy: 6934/10000 (69%)
 
-2023-10-03 23:43:50,900 | [DEBUG] : Train Epoch: 26 [0/50000 (0%)]	Loss: 0.867444
-2023-10-03 23:44:02,691 | [DEBUG] : 
-Test set: Average loss: 0.8568, Accuracy: 7115/10000 (71%)
-
-2023-10-03 23:44:02,831 | [DEBUG] : Train Epoch: 27 [0/50000 (0%)]	Loss: 0.851981
-2023-10-03 23:44:14,893 | [DEBUG] : 
-Test set: Average loss: 0.8104, Accuracy: 7189/10000 (72%)
-
-2023-10-03 23:44:15,039 | [DEBUG] : Train Epoch: 28 [0/50000 (0%)]	Loss: 0.765585
-2023-10-03 23:44:27,034 | [DEBUG] : 
-Test set: Average loss: 0.8379, Accuracy: 7100/10000 (71%)
-
-2023-10-03 23:44:27,179 | [DEBUG] : Train Epoch: 29 [0/50000 (0%)]	Loss: 0.652324
-2023-10-03 23:44:39,334 | [DEBUG] : 
-Test set: Average loss: 0.8252, Accuracy: 7119/10000 (71%)
-
-2023-10-03 23:44:39,462 | [DEBUG] : Train Epoch: 30 [0/50000 (0%)]	Loss: 0.557449
-2023-10-03 23:44:51,560 | [DEBUG] : 
-Test set: Average loss: 0.7839, Accuracy: 7301/10000 (73%)
-
-2023-10-03 23:44:51,692 | [DEBUG] : Train Epoch: 31 [0/50000 (0%)]	Loss: 0.555866
-2023-10-03 23:45:03,755 | [DEBUG] : 
-Test set: Average loss: 0.7868, Accuracy: 7283/10000 (73%)
-
-2023-10-03 23:45:03,893 | [DEBUG] : Train Epoch: 32 [0/50000 (0%)]	Loss: 0.619944
-2023-10-03 23:45:15,815 | [DEBUG] : 
-Test set: Average loss: 0.7776, Accuracy: 7315/10000 (73%)
-
-2023-10-03 23:45:15,959 | [DEBUG] : Train Epoch: 33 [0/50000 (0%)]	Loss: 0.675887
-2023-10-03 23:45:28,145 | [DEBUG] : 
-Test set: Average loss: 0.7914, Accuracy: 7260/10000 (73%)
-
-2023-10-03 23:45:28,290 | [DEBUG] : Train Epoch: 34 [0/50000 (0%)]	Loss: 0.643223
-2023-10-03 23:45:40,291 | [DEBUG] : 
-Test set: Average loss: 0.7768, Accuracy: 7352/10000 (74%)
-
-2023-10-03 23:45:40,438 | [DEBUG] : Train Epoch: 35 [0/50000 (0%)]	Loss: 0.632168
-2023-10-03 23:45:52,638 | [DEBUG] : 
-Test set: Average loss: 0.7691, Accuracy: 7383/10000 (74%)
-
-2023-10-03 23:45:52,778 | [DEBUG] : Train Epoch: 36 [0/50000 (0%)]	Loss: 0.522964
-2023-10-03 23:46:04,821 | [DEBUG] : 
-Test set: Average loss: 0.7615, Accuracy: 7409/10000 (74%)
-
-2023-10-03 23:46:04,964 | [DEBUG] : Train Epoch: 37 [0/50000 (0%)]	Loss: 0.723855
-2023-10-03 23:46:16,829 | [DEBUG] : 
-Test set: Average loss: 0.7731, Accuracy: 7371/10000 (74%)
-
-2023-10-03 23:46:16,973 | [DEBUG] : Train Epoch: 38 [0/50000 (0%)]	Loss: 0.631069
-2023-10-03 23:46:28,990 | [DEBUG] : 
-Test set: Average loss: 0.7808, Accuracy: 7338/10000 (73%)
-
-2023-10-03 23:46:29,132 | [DEBUG] : Train Epoch: 39 [0/50000 (0%)]	Loss: 0.542453
-2023-10-03 23:46:41,010 | [DEBUG] : 
-Test set: Average loss: 0.7651, Accuracy: 7393/10000 (74%)
-
-2023-10-03 23:46:41,152 | [DEBUG] : Train Epoch: 40 [0/50000 (0%)]	Loss: 0.817840
-2023-10-03 23:46:53,326 | [DEBUG] : 
-Test set: Average loss: 0.7840, Accuracy: 7343/10000 (73%)
-
-2023-10-03 23:46:53,449 | [INFO] : Dynamic Wider Training runtime (h:mm:ss): 0:08:19
+2023-10-04 11:29:33,979 | [DEBUG] : Train Epoch: 26 [0/50000 (0%)]	Loss: 0.811181

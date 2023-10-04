@@ -262,62 +262,40 @@ if __name__ == "__main__":
 
     LOGGER = ML_Logger(log_folder=os.path.join('logs', 'cifar10'), persist=False)
 
-    # start_t = time.time()
-    # LOGGER.start(log_file='teacher_training', task='Teacher Training')
-    # model = Net()
-    # model.cuda()
     criterion = nn.NLLLoss()
-    # plot = run_training(model, 'Teacher_', args.epochs + 1)
-    # LOGGER.stop()
 
-    # # wider student training
-    # LOGGER.start(log_file='wider_student', task="Wider Student training ... ")
-    # model_ = Net()
-    # model_ = copy.deepcopy(model)
+    start_t = time.time()
+    LOGGER.start(log_file='teacher_training', task='Teacher Training')
+    model = Net()
+    model.cuda()
+    
+    plot = run_training(model, 'Teacher_', args.epochs + 1)
+    LOGGER.stop()
 
-    # del model
-    # model = model_
-    # model.net2net_wider()
-    # plot = run_training(model, 'Wider_student_', args.epochs + 1, plot)
-    # LOGGER.stop()
+    # wider teacher training
+    start_t = time.time()
+    LOGGER.start(log_file='wider_teacher', task="Wider teacher training ... ")
+    model_ = Net()
 
-    # # wider + deeper student training
-    # LOGGER.start(log_file='wider_deeper_student',
-    #              task="Wider+Deeper Student training ... ")
-    # model_ = Net()
-    # model_.net2net_wider()
-    # model_ = copy.deepcopy(model)
+    del model
+    model = model_
+    model.define_wider()
+    model.cuda()
+    run_training(model, 'Wider_teacher_', args.epochs + 1)
+    LOGGER.stop()
 
-    # del model
-    # model = model_
-    # model.net2net_deeper_nononline()
-    # run_training(model, 'WiderDeeper_student_', args.epochs + 1, plot)
-    # LOGGER.stop()
+    # wider deeper teacher training
+    LOGGER.start(log_file='wider_deeper_teacher',
+                 task="Wider+Deeper teacher training ... ")
 
-    # # wider teacher training
-    # start_t = time.time()
-    # LOGGER.start(log_file='wider_teacher', task="Wider teacher training ... ")
-    # model_ = Net()
+    start_t = time.time()
+    model_ = Net()
 
-    # del model
-    # model = model_
-    # model.define_wider()
-    # model.cuda()
-    # run_training(model, 'Wider_teacher_', args.epochs + 1)
-    # LOGGER.stop()
-
-    # # wider deeper teacher training
-    # LOGGER.start(log_file='wider_deeper_teacher',
-    #              task="Wider+Deeper teacher training ... ")
-
-    # start_t = time.time()
-    # model_ = Net()
-
-    # del model
-    # model = model_
-    # model.define_wider_deeper()
-    # run_training(model, 'Wider_Deeper_teacher_', args.epochs + 1)
-    # LOGGER.stop()
+    del model
+    model = model_
+    model.define_wider_deeper()
+    run_training(model, 'Wider_Deeper_teacher_', args.epochs + 1)
+    LOGGER.stop()
 
     LOGGER.start(log_file='dynamic_wider_training', task='Dynamic Wider Training')
 
