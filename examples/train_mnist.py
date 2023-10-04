@@ -154,6 +154,12 @@ def test():
     LOGGER.log_metrics({'epoch': epoch, 'test_acc': accuracy})
     return accuracy
 
+def do_single_forward(model):
+    model.eval()
+    with torch.no_grad():
+        data, _ = next(iter(test_loader))
+        return model(data.cuda())
+
 # LOGGER.start(log_file='teacher_training', task='Teacher Training')
 # # treacher training
 # for epoch in range(1, 3*(args.epochs) + 1):
@@ -235,6 +241,8 @@ for epoch in range(1, mid):
     train(epoch)
     teacher_accu = test()
 
+before_transfer = do_single_forward(model)
+
 model_ = Net()
 model_ = copy.deepcopy(model)
 
@@ -242,6 +250,11 @@ del model
 model = model_
 model.net2net_wider()
 model.cuda()
+
+after_transfer = do_single_forward(model)
+
+print(f"MSE: {F.mse_loss(before_transfer, after_transfer).item()}")
+
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 for epoch in range(mid, total):
     train(epoch)
@@ -263,6 +276,8 @@ for epoch in range(1, mid):
     train(epoch)
     teacher_accu = test()
 
+before_transfer = do_single_forward(model)
+
 model_ = Net()
 model_ = copy.deepcopy(model)
 
@@ -270,6 +285,11 @@ del model
 model = model_
 model.net2net_deeper()
 model.cuda()
+
+after_transfer = do_single_forward(model)
+
+print(f"MSE: {F.mse_loss(before_transfer, after_transfer).item()}")
+
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 for epoch in range(mid, total):
     train(epoch)

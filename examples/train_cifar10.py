@@ -24,7 +24,7 @@ parser.add_argument('--batch-size', type=int, default=64, metavar='N',
                     help='input batch size for training (default: 64)')
 parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
                     help='input batch size for testing (default: 1000)')
-parser.add_argument('--epochs', type=int, default=40, metavar='N',
+parser.add_argument('--epochs', type=int, default=80, metavar='N',
                     help='number of epochs to train (default: 40)')
 parser.add_argument('--lr', type=float, default=0.01, metavar='LR',
                     help='learning rate (default: 0.01)')
@@ -249,6 +249,12 @@ def run_training(model, run_name,  epoch_end, epoch_start=1, plot=None):
         plot.plot(logs)
     return plot
 
+def do_single_forward(model):
+    model.eval()
+    with torch.no_grad():
+        data, _ = next(iter(test_loader))
+        return model(data.cuda())
+
 
 if __name__ == "__main__":
     TOTAL_TIMER = MyTimer()
@@ -324,6 +330,8 @@ if __name__ == "__main__":
 
     run_training(model, 'dynamic_wider_training', mid)
 
+    before_transfer = do_single_forward(model)
+
     model_ = Net()
     model_ = copy.deepcopy(model)
 
@@ -331,7 +339,13 @@ if __name__ == "__main__":
     model = model_
     model.net2net_wider()
     model.cuda()
+
+    after_transfer = do_single_forward(model)
+
+    print(f"MSE: {F.mse_loss(before_transfer, after_transfer).item()}")
+
     run_training(model, 'dynamic_wider_training', total, mid)
+
     LOGGER.stop()
 
     LOGGER.start(log_file='dynamic_wider_deeper_training', task='Dynamic Wider Deeper Training')
@@ -345,6 +359,8 @@ if __name__ == "__main__":
 
     run_training(model, 'dynamic_wider_deeper_training', mid)
 
+    before_transfer = do_single_forward(model)
+
     model_ = Net()
     model_.net2net_wider()
     model_ = copy.deepcopy(model)
@@ -353,6 +369,11 @@ if __name__ == "__main__":
     model = model_
     model.net2net_deeper_nononline()
     model.cuda()
+
+    after_transfer = do_single_forward(model)
+
+    print(f"MSE: {F.mse_loss(before_transfer, after_transfer).item()}")
+
     run_training(model, 'dynamic_wider_deeper_training', total, mid)
     LOGGER.stop()
 
