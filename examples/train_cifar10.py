@@ -14,8 +14,8 @@ from torchvision import datasets, transforms
 import sys
 sys.path.append('../')
 
-from logger import ML_Logger, MyTimer
-from net2net import wider, deeper
+from src.logger import ML_Logger, MyTimer
+from src.net2net import wider, deeper
 
 
 # Training settings

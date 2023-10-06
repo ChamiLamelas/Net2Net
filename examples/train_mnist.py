@@ -10,8 +10,8 @@ from torchvision import datasets, transforms
 from torch.autograd import Variable
 import sys
 sys.path.append('../')
-from logger import ML_Logger, MyTimer
-from net2net import *
+from src.logger import ML_Logger, MyTimer
+from src.net2net import *
 
 
 TOTAL_TIMER = MyTimer()

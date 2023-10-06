@@ -2,7 +2,7 @@ import unittest
 import torch as th
 import torch.nn as nn
 import torch.nn.functional as F
-from net2net import wider, deeper
+from src.net2net import wider, deeper
 
 
 class Net(nn.Module):

@@ -4,7 +4,7 @@ from pathlib import Path
 import os
 import sys
 sys.path.append("../")
-from logger import read_json
+from src.logger import read_json
 
 
 MODELS = {'teacher_training': 'small', 'wider_deeper_teacher':
