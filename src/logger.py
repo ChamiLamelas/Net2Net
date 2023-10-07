@@ -106,7 +106,7 @@ class TimedLogger:
 
     def start(self, log_file=None, task=None):
         if log_file is None:
-            log_file = curr_time_est('%Y%m%d_%H%M%S')
+            log_file = curr_time_est('%Y%m%d_%H%M%S') if task is None else task
         self.log_file = add_extension(
             os.path.join(self.log_folder, log_file), '.log')
         if not self.persist:

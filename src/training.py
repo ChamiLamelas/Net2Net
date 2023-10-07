@@ -4,8 +4,7 @@ import os
 import numpy as np 
 import random 
 import torch
-
-LOGS_FOLDER = os.path.join("..", "logs")
+import prediction
 
 def set_seed(seed=None):
     torch.manual_seed(seed)
@@ -13,10 +12,11 @@ def set_seed(seed=None):
     np.random.seed(seed)
     random.seed(seed)
 
-def train(model, train_loader, total_epochs, scale_up_epochs, scale_down_epochs, folder):
-    logger = ML_Logger(log_folder=os.path.join(LOGS_FOLDER, folder), persist=False)
-    logger.start(f'training')
+def train(model, train_loader, test_loader, total_epochs, scale_up_epochs, scale_down_epochs, folder, init_optimizer, **optim_args):
+    logger = ML_Logger(log_folder=folder, persist=False)
+    logger.start(task='training', log_file='training', metrics_file='training')
     model = model.cuda()
+    optimizer = init_optimizer(model.parameters(), **optim_args)
     scale_up_epochs = sorted(set(scale_up_epochs))
     scale_down_epochs = sorted(set(scale_down_epochs))
     i = 0
@@ -28,7 +28,8 @@ def train(model, train_loader, total_epochs, scale_up_epochs, scale_down_epochs,
         elif j < len(scale_down_epochs) and epoch == scale_down_epochs[j]:
             # scale down 
             j += 1
-        train_epoch(model, train_loader, epoch)    
+        train_epoch(model, train_loader, epoch, optimizer, logger)    
+        prediction.predict(model, test_loader, epoch, logger)
     logger.stop()
 
 def train_epoch(model, train_loader, epoch, optimizer, logger):

@@ -1,0 +1,62 @@
+[
+    {
+        "epoch": 0,
+        "train_loss": -Infinity
+    },
+    {
+        "epoch": 0,
+        "test_acc": 0.098
+    },
+    {
+        "epoch": 0,
+        "test_loss": -Infinity
+    },
+    {
+        "epoch": 1,
+        "train_loss": NaN
+    },
+    {
+        "epoch": 1,
+        "test_acc": 0.098
+    },
+    {
+        "epoch": 1,
+        "test_loss": NaN
+    },
+    {
+        "epoch": 2,
+        "train_loss": NaN
+    },
+    {
+        "epoch": 2,
+        "test_acc": 0.098
+    },
+    {
+        "epoch": 2,
+        "test_loss": NaN
+    },
+    {
+        "epoch": 3,
+        "train_loss": NaN
+    },
+    {
+        "epoch": 3,
+        "test_acc": 0.098
+    },
+    {
+        "epoch": 3,
+        "test_loss": NaN
+    },
+    {
+        "epoch": 4,
+        "train_loss": NaN
+    },
+    {
+        "epoch": 4,
+        "test_acc": 0.098
+    },
+    {
+        "epoch": 4,
+        "test_loss": NaN
+    }
+]

@@ -20,9 +20,7 @@ def predict(model, data_loader, epoch, logger):
             output = model(data)
             test_loss += F.nll_loss(output, target, reduction='sum').item()
             pred = output.data.max(1, keepdim=True)[1]
-            correct += pred.eq(target.data.view_as(pred)).cpu().sum()
+            correct += pred.eq(target.data.view_as(pred)).cpu().sum().item()
             total += data.size()[0]
-    accuracy = correct / total
-    logger.log_metrics({'epoch': epoch, 'test_acc': accuracy})
+    logger.log_metrics({'epoch': epoch, 'test_acc': correct / total})
     logger.log_metrics({'epoch': epoch, 'test_loss': test_loss})
-    return accuracy
