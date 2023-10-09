@@ -1,0 +1,1 @@
+Simple environment just to make sure we can train a network on a dataset

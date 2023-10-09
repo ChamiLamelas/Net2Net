@@ -29,7 +29,8 @@ def train(model, train_loader, test_loader, total_epochs, scale_up_epochs, scale
             # scale down 
             j += 1
         train_epoch(model, train_loader, epoch, optimizer, logger)    
-        prediction.predict(model, test_loader, epoch, logger)
+        prediction.predict(model, train_loader, epoch, logger, 'train')
+        prediction.predict(model, test_loader, epoch, logger, 'test')
     logger.stop()
 
 def train_epoch(model, train_loader, epoch, optimizer, logger):
@@ -40,7 +41,7 @@ def train_epoch(model, train_loader, epoch, optimizer, logger):
         target = target.cuda()
         optimizer.zero_grad()
         output = model(data)
-        loss = F.nll_loss(output, target)
+        loss = F.cross_entropy(output, target)
         loss.backward()
         optimizer.step()
         total_loss += loss.item()

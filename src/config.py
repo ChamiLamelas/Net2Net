@@ -27,12 +27,16 @@ def load_config(configfile):
     config['trainloader'] = load_fn(train=True, batch_size=batch_size)
     config['testloader'] = load_fn(train=False, batch_size=batch_size)
 
-    config['optimizer'] = getattr(optim, config.get('optimizer', 'SGD'))
+    config['optimizer'] = getattr(optim, config.get('optimizer', 'Adam'))
 
     config['folder'] = os.path.join(RESULTS, config['folder'])
     if os.path.isdir(config['folder']):
         shutil.rmtree(config['folder'])
     Path(config['folder']).mkdir(exist_ok=True, parents=True)
+
+    if 'desc' in config:
+        Path(os.path.join(config['folder'], 'description.txt')).write_text(
+            config['desc'])
 
     config['scaleupepochs'] = config.get('scaleupepochs', list())
     config['scaledownepochs'] = config.get('scaledownepochs', list())

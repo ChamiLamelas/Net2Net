@@ -1,6 +1,10 @@
 import torch.nn as nn
 import torch
 
+def get_layers(model):
+    pass 
+
+
 class SmallFeedForward(nn.Module):
     def __init__(self, in_features, out_features):
         super().__init__()
