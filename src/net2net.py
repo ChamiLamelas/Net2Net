@@ -2,6 +2,33 @@ import torch as th
 import numpy as np
 import tf_and_torch
 
+
+def _conv_only_wider_tf_numpy(teacher_w1, teacher_b1, teacher_w2, new_width):
+    rand = np.random.randint(
+        teacher_w1.shape[3], size=(new_width-teacher_w1.shape[3]))
+    replication_factor = np.bincount(rand)
+    student_w1 = teacher_w1.copy()
+    student_w2 = teacher_w2.copy()
+    student_b1 = teacher_b1.copy()
+    # target layer update (i)
+    for i in range(len(rand)):
+        teacher_index = rand[i]
+        new_weight = teacher_w1[:, :, :, teacher_index]
+        new_weight = new_weight[:, :, :, np.newaxis]
+        student_w1 = np.concatenate((student_w1, new_weight), axis=3)
+        student_b1 = np.append(student_b1, teacher_b1[teacher_index])
+    # next layer update (i+1)
+    for i in range(len(rand)):
+        teacher_index = rand[i]
+        factor = replication_factor[teacher_index] + 1
+        assert factor > 1, 'Error in Net2Wider'
+        new_weight = teacher_w2[:, :, teacher_index, :]*(1./factor)
+        new_weight_re = new_weight[:, :, np.newaxis, :]
+        student_w2 = np.concatenate((student_w2, new_weight_re), axis=2)
+        student_w2[:, :, teacher_index, :] = new_weight
+    return student_w1, student_b1, student_w2
+
+
 # taken straight from abdullah's repo
 def _fc_only_wider_tf_numpy(teacher_w1, teacher_b1, teacher_w2, new_width):
     rand = np.random.randint(
@@ -45,6 +72,16 @@ def _fc_only_wider(layer1, layer2, new_width):
     layer2.in_features = new_width
 
     return layer1, layer2, None
+
+def _conv_only_wider(layer1, layer2, new_width):
+    # NEEDSWORK have to convert between torch and tensorflow conv parameters
+
+    # student_w1, student_b1, student_w2 = _conv_only_wider_tf_numpy(
+    #     teacher_w1, teacher_b1, teacher_w2, new_width)
+
+
+    return layer1, layer2, None
+
 
 
 def wider(m1, m2, new_width, bnorm=None, out_size=None, noise=True,
