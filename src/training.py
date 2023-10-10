@@ -1,10 +1,11 @@
 import torch.nn.functional as F
 from logger import ML_Logger
-import os
-import numpy as np 
-import random 
+import numpy as np
+import random
 import torch
 import prediction
+import device
+
 
 def set_seed(seed=None):
     torch.manual_seed(seed)
@@ -12,10 +13,11 @@ def set_seed(seed=None):
     np.random.seed(seed)
     random.seed(seed)
 
+
 def train(model, train_loader, test_loader, total_epochs, scale_up_epochs, scale_down_epochs, folder, init_optimizer, **optim_args):
     logger = ML_Logger(log_folder=folder, persist=False)
     logger.start(task='training', log_file='training', metrics_file='training')
-    model = model.cuda()
+    model = model.to(device.get_device())
     optimizer = init_optimizer(model.parameters(), **optim_args)
     scale_up_epochs = sorted(set(scale_up_epochs))
     scale_down_epochs = sorted(set(scale_down_epochs))
@@ -26,19 +28,19 @@ def train(model, train_loader, test_loader, total_epochs, scale_up_epochs, scale
             # scale up
             i += 1
         elif j < len(scale_down_epochs) and epoch == scale_down_epochs[j]:
-            # scale down 
+            # scale down
             j += 1
-        train_epoch(model, train_loader, epoch, optimizer, logger)    
+        train_epoch(model, train_loader, epoch, optimizer, logger)
         prediction.predict(model, train_loader, epoch, logger, 'train')
         prediction.predict(model, test_loader, epoch, logger, 'test')
     logger.stop()
+
 
 def train_epoch(model, train_loader, epoch, optimizer, logger):
     model.train()
     total_loss = 0
     for (data, target) in train_loader:
-        data = data.cuda()
-        target = target.cuda()
+        data, target = device.move(device.get_device(), data, target)
         optimizer.zero_grad()
         output = model(data)
         loss = F.cross_entropy(output, target)

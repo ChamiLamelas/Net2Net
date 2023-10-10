@@ -1,6 +1,10 @@
 import torch as th
 import numpy as np
 
+def fc_only_wider():
+    # NEEDSWORK
+    pass 
+
 
 def wider(m1, m2, new_width, bnorm=None, out_size=None, noise=True,
           random_init=True, weight_norm=True):
@@ -21,6 +25,9 @@ def wider(m1, m2, new_width, bnorm=None, out_size=None, noise=True,
         weight_norm (optional, True) - If True, weights are normalized before
             transfering.
     """
+
+    if "Linear" in m1.__class__.__name__ and "Linear" in m2.__class__.__name__:
+        return fc_only_wider()
 
     w1 = m1.weight.data
     w2 = m2.weight.data

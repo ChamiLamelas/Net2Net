@@ -23,6 +23,10 @@ CUDA Version:
 
 ## Log 
 
+**10/5/2023 - Present** 
+- Cleaning up code into my own implementation and setup. Will document once updates are
+more stable.
+
 **10/3/2023** 
 - Implemented into `train_mnist.py` and `train_cifar10.py` the ability for a model
 to adapt in the middle of training. This is basically letting a teacher train half

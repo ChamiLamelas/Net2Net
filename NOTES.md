@@ -1,5 +1,7 @@
 # Notes 
 
+**DEPRECATED WITH CLEANUP** 
+
 ## Description 
 
 This document collects the observations I have made based on the models presented in the repository
