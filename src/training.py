@@ -7,14 +7,18 @@ import prediction
 import device
 
 
-def set_seed(seed=None):
+def set_seed(seed):
+    # Seeds all RNGs used by torch and its dependencies
+
     torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
     np.random.seed(seed)
     random.seed(seed)
 
 
-def train(model, train_loader, test_loader, total_epochs, scale_up_epochs, scale_down_epochs, folder, init_optimizer, **optim_args):
+def train(seed, model, train_loader, test_loader, total_epochs, scale_up_epochs, scale_down_epochs, folder, init_optimizer, **optim_args):
+    set_seed(seed)
     logger = ML_Logger(log_folder=folder, persist=False)
     logger.start(task='training', log_file='training', metrics_file='training')
     model = model.to(device.get_device())
@@ -25,10 +29,10 @@ def train(model, train_loader, test_loader, total_epochs, scale_up_epochs, scale
     j = 0
     for epoch in range(total_epochs):
         if i < len(scale_up_epochs) and epoch == scale_up_epochs[i]:
-            # scale up
+            # NEEDSWORK implement scale up
             i += 1
         elif j < len(scale_down_epochs) and epoch == scale_down_epochs[j]:
-            # scale down
+            # NEEDSWORK implement scale down
             j += 1
         train_epoch(model, train_loader, epoch, optimizer, logger)
         prediction.predict(model, train_loader, epoch, logger, 'train')

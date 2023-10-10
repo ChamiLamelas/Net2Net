@@ -40,6 +40,7 @@ def load_config(configfile):
 
     config['scaleupepochs'] = config.get('scaleupepochs', list())
     config['scaledownepochs'] = config.get('scaledownepochs', list())
+    config['seed'] = config.get('seed', 42)
 
     del config['dataset']
     del config['model_args']

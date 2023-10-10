@@ -1,9 +1,50 @@
 import torch as th
 import numpy as np
+import tf_and_torch
 
-def fc_only_wider():
-    # NEEDSWORK
-    pass 
+# taken straight from abdullah's repo
+def _fc_only_wider_tf_numpy(teacher_w1, teacher_b1, teacher_w2, new_width):
+    rand = np.random.randint(
+        teacher_w1.shape[1], size=(new_width-teacher_w1.shape[1]))
+    replication_factor = np.bincount(rand)
+    student_w1 = teacher_w1.copy()
+    student_w2 = teacher_w2.copy()
+    student_b1 = teacher_b1.copy()
+    # target layer update (i)
+    for i in range(len(rand)):
+        teacher_index = rand[i]
+        new_weight = teacher_w1[:, teacher_index]
+        new_weight = new_weight[:, np.newaxis]
+        student_w1 = np.concatenate((student_w1, new_weight), axis=1)
+        student_b1 = np.append(student_b1, teacher_b1[teacher_index])
+    # next layer update (i+1)
+    for i in range(len(rand)):
+        teacher_index = rand[i]
+        factor = replication_factor[teacher_index] + 1
+        assert factor > 1, 'Error in Net2Wider'
+        new_weight = teacher_w2[teacher_index, :]*(1./factor)
+        new_weight = new_weight[np.newaxis, :]
+        student_w2 = np.concatenate((student_w2, new_weight), axis=0)
+        student_w2[teacher_index, :] = new_weight
+    return student_w1, student_b1, student_w2
+
+
+def _fc_only_wider(layer1, layer2, new_width):
+    teacher_w1 = tf_and_torch.params_torch_to_tf_ndarr(layer1, 'weight')
+    teacher_w2 = tf_and_torch.params_torch_to_tf_ndarr(layer2, 'weight')
+    teacher_b1 = tf_and_torch.params_torch_to_tf_ndarr(layer1, 'bias')
+
+    student_w1, student_b1, student_w2 = _fc_only_wider_tf_numpy(
+        teacher_w1, teacher_b1, teacher_w2, new_width)
+
+    tf_and_torch.params_tf_ndarr_to_torch(student_w1, layer1, 'weight')
+    tf_and_torch.params_tf_ndarr_to_torch(student_w2, layer2, 'weight')
+    tf_and_torch.params_tf_ndarr_to_torch(student_b1, layer1, 'bias')
+
+    layer1.out_features = new_width
+    layer2.in_features = new_width
+
+    return layer1, layer2, None
 
 
 def wider(m1, m2, new_width, bnorm=None, out_size=None, noise=True,
@@ -27,7 +68,7 @@ def wider(m1, m2, new_width, bnorm=None, out_size=None, noise=True,
     """
 
     if "Linear" in m1.__class__.__name__ and "Linear" in m2.__class__.__name__:
-        return fc_only_wider()
+        return _fc_only_wider(m1, m2, new_width)
 
     w1 = m1.weight.data
     w2 = m2.weight.data
@@ -36,18 +77,20 @@ def wider(m1, m2, new_width, bnorm=None, out_size=None, noise=True,
     if "Conv" in m1.__class__.__name__ or "Linear" in m1.__class__.__name__:
         # Convert Linear layers to Conv if linear layer follows target layer
         if "Conv" in m1.__class__.__name__ and "Linear" in m2.__class__.__name__:
-            assert w2.size(1) % w1.size(0) == 0, "Linear units need to be multiple"
+            assert w2.size(1) % w1.size(
+                0) == 0, "Linear units need to be multiple"
             if w1.dim() == 4:
                 factor = int(np.sqrt(w2.size(1) // w1.size(0)))
                 w2 = w2.view(w2.size(0), w2.size(1)//factor**2, factor, factor)
             elif w1.dim() == 5:
                 assert out_size is not None,\
-                       "For conv3d -> linear out_size is necessary"
+                    "For conv3d -> linear out_size is necessary"
                 factor = out_size[0] * out_size[1] * out_size[2]
                 w2 = w2.view(w2.size(0), w2.size(1)//factor, out_size[0],
                              out_size[1], out_size[2])
         else:
-            assert w1.size(0) == w2.size(1), "Module weights are not compatible"
+            assert w1.size(0) == w2.size(
+                1), "Module weights are not compatible"
         assert new_width > w1.size(0), "New size should be larger"
 
         old_width = w1.size(0)
@@ -59,8 +102,10 @@ def wider(m1, m2, new_width, bnorm=None, out_size=None, noise=True,
             nw1.resize_(new_width, nw1.size(1), nw1.size(2), nw1.size(3))
             nw2.resize_(nw2.size(0), new_width, nw2.size(2), nw2.size(3))
         elif nw1.dim() == 5:
-            nw1.resize_(new_width, nw1.size(1), nw1.size(2), nw1.size(3), nw1.size(4))
-            nw2.resize_(nw2.size(0), new_width, nw2.size(2), nw2.size(3), nw2.size(4))
+            nw1.resize_(new_width, nw1.size(1), nw1.size(2),
+                        nw1.size(3), nw1.size(4))
+            nw2.resize_(nw2.size(0), new_width, nw2.size(2),
+                        nw2.size(3), nw2.size(4))
         else:
             nw1.resize_(new_width, nw1.size(1))
             nw2.resize_(nw2.size(0), new_width)
@@ -110,9 +155,11 @@ def wider(m1, m2, new_width, bnorm=None, out_size=None, noise=True,
             if random_init:
                 n = m1.kernel_size[0] * m1.kernel_size[1] * m1.out_channels
                 if m2.weight.dim() == 4:
-                    n2 = m2.kernel_size[0] * m2.kernel_size[1] * m2.out_channels
+                    n2 = m2.kernel_size[0] * \
+                        m2.kernel_size[1] * m2.out_channels
                 elif m2.weight.dim() == 5:
-                    n2 = m2.kernel_size[0] * m2.kernel_size[1] * m2.kernel_size[2] * m2.out_channels
+                    n2 = m2.kernel_size[0] * m2.kernel_size[1] * \
+                        m2.kernel_size[2] * m2.out_channels
                 elif m2.weight.dim() == 2:
                     n2 = m2.out_features * m2.in_features
                 nw1.select(0, i).normal_(0, np.sqrt(2./n))
@@ -150,7 +197,8 @@ def wider(m1, m2, new_width, bnorm=None, out_size=None, noise=True,
 
         if "Conv" in m1.__class__.__name__ and "Linear" in m2.__class__.__name__:
             if w1.dim() == 4:
-                m2.weight.data = nw2.view(m2.weight.size(0), new_width*factor**2)
+                m2.weight.data = nw2.view(
+                    m2.weight.size(0), new_width*factor**2)
                 m2.in_features = new_width*factor**2
             elif w2.dim() == 5:
                 m2.weight.data = nw2.view(m2.weight.size(0), new_width*factor)
@@ -203,7 +251,8 @@ def deeper(m, nonlin, bnorm_flag=False, weight_norm=True, noise=True):
             m2 = th.nn.Conv2d(m.out_channels, m.out_channels,
                               kernel_size=m.kernel_size, padding=pad_h)
             m2.weight.data.zero_()
-            c = m.kernel_size[0] // 2 # + 1 someone in the issues claims the +1 is a bug
+            # + 1 someone in the issues claims the +1 is a bug
+            c = m.kernel_size[0] // 2
 
         elif m.weight.dim() == 5:
             pad_hw = int((m.kernel_size[1] - 1) / 2)  # pad height and width
@@ -232,9 +281,11 @@ def deeper(m, nonlin, bnorm_flag=False, weight_norm=True, noise=True):
 
         for i in range(0, m.out_channels):
             if m.weight.dim() == 4:
-                m2.weight.data.narrow(0, i, 1).narrow(1, i, 1).narrow(2, c, 1).narrow(3, c, 1).fill_(1)
+                m2.weight.data.narrow(0, i, 1).narrow(
+                    1, i, 1).narrow(2, c, 1).narrow(3, c, 1).fill_(1)
             elif m.weight.dim() == 5:
-                m2.weight.data.narrow(0, i, 1).narrow(1, i, 1).narrow(2, c_d, 1).narrow(3, c_wh, 1).narrow(4, c_wh, 1).fill_(1)
+                m2.weight.data.narrow(0, i, 1).narrow(1, i, 1).narrow(
+                    2, c_d, 1).narrow(3, c_wh, 1).narrow(4, c_wh, 1).fill_(1)
 
         if noise:
             noise = np.random.normal(scale=5e-2 * m2.weight.data.std(),
@@ -260,7 +311,8 @@ def deeper(m, nonlin, bnorm_flag=False, weight_norm=True, noise=True):
             bnorm.running_var.fill_(1)
 
     else:
-        raise RuntimeError("{} Module not supported".format(m.__class__.__name__))
+        raise RuntimeError(
+            "{} Module not supported".format(m.__class__.__name__))
 
     s = th.nn.Sequential()
     s.add_module('conv', m)
