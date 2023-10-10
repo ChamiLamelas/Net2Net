@@ -57,10 +57,9 @@ def test_deepen_feedforward():
 
 
 def test_widen_convolutional():
-    #NEEDSWORK
+    # NEEDSWORK
     training.set_seed(42)
-    model = models.TinyConvolution(
-        hin=28, win=28, in_channels=1, out_features=5)
+    model = models.JustConvolution(in_channels=1)
     data = torch.randn((1, 1, 28, 28))
     pre_widen = prediction.forward(model, data)
     print(model)
@@ -73,7 +72,7 @@ def test_widen_convolutional():
 
 
 def test_deepen_convolutional():
-    #NEEDSWORK
+    # NEEDSWORK
     pass
 
 

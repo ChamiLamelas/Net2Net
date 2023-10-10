@@ -18,6 +18,21 @@ class SmallFeedForward(nn.Module):
         return x
 
 
+class JustConvolution(nn.Module):
+    def __init__(self, in_channels):
+        super().__init__()
+        self.conv1 = nn.Conv2d(in_channels=in_channels,
+                               out_channels=2, kernel_size=3, stride=1)
+        self.conv2 = nn.Conv2d(
+            in_channels=2, out_channels=4, kernel_size=3, stride=1)
+
+    def forward(self, x):
+        assert x.dim() == 4
+        x = self.conv1(x)
+        x = self.conv2(x)
+        return x
+
+
 class TinyConvolution(nn.Module):
     def __init__(self, hin, win, in_channels, out_features):
         super().__init__()
