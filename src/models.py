@@ -18,40 +18,37 @@ class SmallFeedForward(nn.Module):
         return x
 
 
-class TinyConvolution(nn.Module):
-    def __init__(self, hin, win, in_channels, out_features):
+class OneConvolution(nn.Module):
+    def __init__(self, in_channels, out_features):
         super().__init__()
         self.conv1 = nn.Conv2d(
-            in_channels=in_channels, out_channels=32, kernel_size=3, stride=1
+            in_channels=in_channels, out_channels=2, kernel_size=3, stride=1
         )
         self.relu1 = nn.ReLU()
-        # taken from here: https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html
-        hout = hin - 2
-        wout = win - 2
-        self.fc = nn.Linear(32 * hout * wout, out_features)
+        self.finalpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.fc = nn.Linear(2, out_features)
 
     def forward(self, x):
         assert x.dim() == 4
         x = self.conv1(x)
         x = self.relu1(x)
+        x = self.finalpool(x)
         x = torch.flatten(x, 1)
         x = self.fc(x)
         return x
 
 
-class SmallConvolution(nn.Module):
-    def __init__(self, hin, win, in_channels, out_features):
+class TwoConvolution(nn.Module):
+    def __init__(self, in_channels, out_features):
         super().__init__()
         self.conv1 = nn.Conv2d(
             in_channels=in_channels, out_channels=32, kernel_size=3, stride=1
         )
-        self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1)
         self.relu1 = nn.ReLU()
+        self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1)
         self.relu2 = nn.ReLU()
-        # taken from here: https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html
-        hout = (hin - 2) - 2
-        wout = (win - 2) - 2
-        self.fc = nn.Linear(64 * hout * wout, out_features)
+        self.finalpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.fc = nn.Linear(32, out_features)
 
     def forward(self, x):
         assert x.dim() == 4
@@ -59,6 +56,33 @@ class SmallConvolution(nn.Module):
         x = self.relu1(x)
         x = self.conv2(x)
         x = self.relu2(x)
+        x = self.finalpool(x)
+        x = torch.flatten(x, 1)
+        x = self.fc(x)
+        return x
+
+
+class BatchNormConvolution(nn.Module):
+    def __init__(self, in_channels, out_features):
+        super().__init__()
+        self.conv1 = nn.Conv2d(
+            in_channels=in_channels, out_channels=32, kernel_size=3, stride=1
+        )
+        self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1)
+        self.relu1 = nn.ReLU()
+        self.relu2 = nn.ReLU()
+        self.norm = nn.BatchNorm2d(32)
+        self.fc = nn.Linear(64, out_features)
+        self.finalpool = nn.AdaptiveAvgPool2d((1, 1))
+
+    def forward(self, x):
+        assert x.dim() == 4
+        x = self.conv1(x)
+        x = self.relu1(x)
+        x = self.norm(x)
+        x = self.conv2(x)
+        x = self.relu2(x)
+        x = self.finalpool(x)
         x = torch.flatten(x, 1)
         x = self.fc(x)
         return x
