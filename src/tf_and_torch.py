@@ -4,7 +4,7 @@ import torch
 
 
 def params_torch_to_tf_ndarr(torch_layer, attr):
-    torch_ndarr = getattr(torch_layer, attr).data.numpy()
+    torch_ndarr = getattr(torch_layer, attr).data.cpu().numpy()
     if attr == "bias":
         return torch_ndarr
     elif attr == "weight":
@@ -42,10 +42,12 @@ def params_tf_ndarr_to_torch(tf_ndarr, torch_layer, attr):
                     torch.Tensor(
                         np.reshape(
                             tf_ndarr,
-                            new_out_channels,
-                            new_in_channels,
-                            kernel_height,
-                            kernel_width,
+                            (
+                                new_out_channels,
+                                new_in_channels,
+                                kernel_height,
+                                kernel_width,
+                            ),
                         )
                     )
                 ),

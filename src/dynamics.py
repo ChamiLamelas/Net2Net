@@ -62,7 +62,7 @@ def widen(model, scale):
         if _is_batchnorm(curr):
             between_batchnorm = (p, n)
         elif _is_conv(curr) or _is_linear(curr):
-            if prev is not None and type(prev) == type(curr):
+            if prev is not None:#  and type(prev) == type(curr):
                 old_layer1 = table.get(*prev)
                 old_layer2 = curr
                 old_batchnorm = (
@@ -93,4 +93,4 @@ def deepen(model):
     for p, n in table:
         curr = table.get(p, n)
         if _is_conv(curr) or _is_linear(curr):
-            table.set(p, n, net2net.deeper(curr, None))
+            table.set(p, n, net2net.deeper(curr))

@@ -18,26 +18,12 @@ class SmallFeedForward(nn.Module):
         return x
 
 
-class JustConvolution(nn.Module):
-    def __init__(self, in_channels):
-        super().__init__()
-        self.conv1 = nn.Conv2d(in_channels=in_channels,
-                               out_channels=2, kernel_size=3, stride=1)
-        self.conv2 = nn.Conv2d(
-            in_channels=2, out_channels=4, kernel_size=3, stride=1)
-
-    def forward(self, x):
-        assert x.dim() == 4
-        x = self.conv1(x)
-        x = self.conv2(x)
-        return x
-
-
 class TinyConvolution(nn.Module):
     def __init__(self, hin, win, in_channels, out_features):
         super().__init__()
-        self.conv1 = nn.Conv2d(in_channels=in_channels,
-                               out_channels=32, kernel_size=3, stride=1)
+        self.conv1 = nn.Conv2d(
+            in_channels=in_channels, out_channels=32, kernel_size=3, stride=1
+        )
         self.relu1 = nn.ReLU()
         # taken from here: https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html
         hout = hin - 2
@@ -56,10 +42,10 @@ class TinyConvolution(nn.Module):
 class SmallConvolution(nn.Module):
     def __init__(self, hin, win, in_channels, out_features):
         super().__init__()
-        self.conv1 = nn.Conv2d(in_channels=in_channels,
-                               out_channels=32, kernel_size=3, stride=1)
-        self.conv2 = nn.Conv2d(
-            in_channels=32, out_channels=64, kernel_size=3, stride=1)
+        self.conv1 = nn.Conv2d(
+            in_channels=in_channels, out_channels=32, kernel_size=3, stride=1
+        )
+        self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1)
         self.relu1 = nn.ReLU()
         self.relu2 = nn.ReLU()
         # taken from here: https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html
@@ -131,4 +117,12 @@ def cifar10_squeezenet1_1():
 
     model = models.squeezenet1_1()
     model.classifier[1] = nn.Conv2d(512, 10, kernel_size=(1, 1), stride=(1, 1))
+    return model
+
+
+def cifar10_inception():
+    """27 million parameters"""
+
+    model = models.inception_v3(weights=None, init_weights=True)
+    model.fc = nn.Linear(in_features=2048, out_features=10)
     return model

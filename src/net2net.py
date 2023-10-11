@@ -1,8 +1,115 @@
+# NEEDSWORK 
+# - linear to conv
+# - conv to linear (maybe turn linear to conv?? )
+# - batchnorm between convs 
+# - they need to be implemeneting these for inception net
+
 import torch as th
 import numpy as np
 import tf_and_torch
 import torch.nn as nn
+import device
 
+class UnsupportedLayer(Exception):
+    pass
+
+
+def _fc_only_deeper_tf_numpy(weight):
+    deeper_w = np.eye(weight.shape[1])
+    deeper_b = np.zeros(weight.shape[1])
+    return deeper_w, deeper_b
+
+
+def _fc_only_deeper(layer):
+    weight = tf_and_torch.params_torch_to_tf_ndarr(layer, "weight")
+
+    new_layer_w, new_layer_b = _fc_only_deeper_tf_numpy(weight)
+
+    new_layer = nn.Linear(1, 1).to(device.get_device())
+    tf_and_torch.params_tf_ndarr_to_torch(new_layer_w, new_layer, "weight")
+    tf_and_torch.params_tf_ndarr_to_torch(new_layer_b, new_layer, "bias")
+
+    return new_layer
+
+
+def _conv_only_deeper_tf_numpy(weight):
+    deeper_w = np.zeros(
+        (weight.shape[0], weight.shape[1], weight.shape[3], weight.shape[3])
+    )
+    assert (
+        weight.shape[0] % 2 == 1 and weight.shape[1] % 2 == 1
+    ), "Kernel size should be odd"
+    center_h = (weight.shape[0] - 1) // 2
+    center_w = (weight.shape[1] - 1) // 2
+    for i in range(weight.shape[3]):
+        tmp = np.zeros((weight.shape[0], weight.shape[1], weight.shape[3]))
+        tmp[center_h, center_w, i] = 1
+        deeper_w[:, :, :, i] = tmp
+    deeper_b = np.zeros(weight.shape[3])
+    return deeper_w, deeper_b
+
+
+def _conv_only_deeper(layer):
+    weight = tf_and_torch.params_torch_to_tf_ndarr(layer, "weight")
+
+    new_layer_w, new_layer_b = _conv_only_deeper_tf_numpy(weight)
+
+    new_layer = nn.Conv2d(
+        1,
+        1,
+        kernel_size=layer.kernel_size,
+        stride=layer.stride,
+        padding=layer.padding,
+        padding_mode=layer.padding_mode,
+        dilation=layer.dilation,
+    ).to(device.get_device())
+    tf_and_torch.params_tf_ndarr_to_torch(new_layer_w, new_layer, "weight")
+    tf_and_torch.params_tf_ndarr_to_torch(new_layer_b, new_layer, "bias")
+
+    return new_layer
+
+def _conv_linear_wider_tf_numpy(teacher_w1, teacher_b1, teacher_w2, new_width):
+    rand = np.random.randint(
+        teacher_w1.shape[3], size=(new_width - teacher_w1.shape[3])
+    )
+    replication_factor = np.bincount(rand)
+    student_w1 = teacher_w1.copy()
+    student_w2 = teacher_w2.copy()
+    student_b1 = teacher_b1.copy()
+    # target layer update (i)
+    for i in range(len(rand)):
+        teacher_index = rand[i]
+        new_weight = teacher_w1[:, :, :, teacher_index]
+        new_weight = new_weight[:, :, :, np.newaxis]
+        student_w1 = np.concatenate((student_w1, new_weight), axis=3)
+        student_b1 = np.append(student_b1, teacher_b1[teacher_index])
+    
+    new_w2_in = round(new_width / teacher_w1.shape[3]) * teacher_w2.shape[0]
+    # next layer update (i+1)
+    for i in range(new_w2_in):
+        teacher_index = rand[i]
+        factor = replication_factor[teacher_index] + 1
+        assert factor > 1, "Error in Net2Wider"
+        new_weight = teacher_w2[teacher_index, :] * (1.0 / factor)
+        new_weight = new_weight[np.newaxis, :]
+        student_w2 = np.concatenate((student_w2, new_weight), axis=0)
+        student_w2[teacher_index, :] = new_weight
+    return student_w1, student_b1, student_w2
+
+def _conv_linear_wider(layer1, layer2, new_width):
+    teacher_w1 = tf_and_torch.params_torch_to_tf_ndarr(layer1, "weight")
+    teacher_w2 = tf_and_torch.params_torch_to_tf_ndarr(layer2, "weight")
+    teacher_b1 = tf_and_torch.params_torch_to_tf_ndarr(layer1, "bias")
+
+    student_w1, student_b1, student_w2 = _conv_linear_wider_tf_numpy(
+        teacher_w1, teacher_b1, teacher_w2, new_width
+    )
+
+    tf_and_torch.params_tf_ndarr_to_torch(student_w1, layer1, "weight")
+    tf_and_torch.params_tf_ndarr_to_torch(student_w2, layer2, "weight")
+    tf_and_torch.params_tf_ndarr_to_torch(student_b1, layer1, "bias")
+
+    return layer1, layer2, None
 
 def _conv_only_wider_tf_numpy(teacher_w1, teacher_b1, teacher_w2, new_width):
     rand = np.random.randint(
@@ -91,7 +198,29 @@ def _conv_only_wider(layer1, layer2, new_width):
     return layer1, layer2, None
 
 
-def wider(
+
+def wider(m1, m2, new_width, batch_norm):
+    if isinstance(m1, nn.Linear) and isinstance(m2, nn.Linear):
+        return _fc_only_wider(m1, m2, new_width)
+    elif isinstance(m1, nn.Conv2d) and isinstance(m2, nn.Conv2d):
+        return _conv_only_wider(m1, m2, new_width)
+    elif isinstance(m1, nn.Conv2d) and isinstance(m2, nn.Linear):
+        return _conv_linear_wider(m1, m2, new_width)
+    else:
+        raise UnsupportedLayer(f"m1: {type(m1)} m2: {type(m2)}")
+
+
+def deeper(m, between=nn.Sequential()):
+    if isinstance(m, nn.Linear):
+        new_layer = _fc_only_deeper(m)
+    elif isinstance(m, nn.Conv2d):
+        new_layer = _conv_only_deeper(m)
+    else:
+        raise UnsupportedLayer(str(type(m)))
+    return nn.Sequential(m, between, new_layer)
+
+
+def wider2(
     m1,
     m2,
     new_width,
@@ -119,13 +248,7 @@ def wider(
             transfering.
     """
 
-    if isinstance(m1, nn.Linear) and isinstance(m2, nn.Linear):
-        return _fc_only_wider(m1, m2, new_width)
-
-    elif isinstance(m1, nn.Conv2d) and isinstance(m2, nn.Conv2d):
-        return _conv_only_wider(m1, m2, new_width)
-    
-    # NEEDSWORK rest of code doesnt seem to work? 
+    # NEEDSWORK rest of code doesnt seem to work?
 
     w1 = m1.weight.data
     w2 = m2.weight.data
@@ -278,7 +401,7 @@ def wider(
 
 
 # TODO: Consider adding noise to new layer as wider operator.
-def deeper(m, nonlin, bnorm_flag=False, weight_norm=True, noise=True):
+def deeper2(m, nonlin, bnorm_flag=False, weight_norm=True, noise=True):
     """
     Deeper operator adding a new layer on topf of the given layer.
     Args:
