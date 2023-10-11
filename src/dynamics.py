@@ -51,7 +51,7 @@ def widen(model, scale):
     NEEDSWORK
 
     Now it just widens every layer by the scaling factor, should have a way
-    of customizing this 
+    of customizing this
     """
 
     table = _LayerTable(model)
@@ -62,7 +62,7 @@ def widen(model, scale):
         if _is_batchnorm(curr):
             between_batchnorm = (p, n)
         elif _is_conv(curr) or _is_linear(curr):
-            if prev is not None:
+            if prev is not None and type(prev) == type(curr):
                 old_layer1 = table.get(*prev)
                 old_layer2 = curr
                 old_batchnorm = (
@@ -84,7 +84,7 @@ def widen(model, scale):
 
 def deepen(model):
     """
-    NEEDSWORK 
+    NEEDSWORK
 
     Doesn't add additional batch norm layers or activation layers
     """

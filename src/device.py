@@ -7,5 +7,5 @@ def move(device, *objs):
 def get_device(device=0):
     if torch.cuda.is_available():
         assert 0 <= device < torch.cuda.device_count()
-        return torch.cuda.device(device)
+        return torch.device(f'cuda:{device}')
     return torch.device('cpu')
