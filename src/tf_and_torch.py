@@ -2,6 +2,7 @@ import numpy as np
 import torch.nn as nn
 import torch
 
+# look at comments of: https://stackoverflow.com/a/36223553 for TF weights shape 
 
 def params_torch_to_tf_ndarr(torch_layer, attr):
     torch_ndarr = getattr(torch_layer, attr).data.cpu().numpy()
