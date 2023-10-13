@@ -48,7 +48,7 @@ class TwoConvolution(nn.Module):
         self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1)
         self.relu2 = nn.ReLU()
         self.finalpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(32, out_features)
+        self.fc = nn.Linear(64, out_features)
 
     def forward(self, x):
         assert x.dim() == 4
@@ -147,6 +147,8 @@ def cifar10_squeezenet1_1():
 def cifar10_inception():
     """27 million parameters"""
 
+    # NEEDSWORK requires 75 x 75 input so not really cifar10 (just cifar10 output)
+    # https://pytorch.org/vision/0.12/generated/torchvision.models.inception_v3.html
     model = models.inception_v3(weights=None, init_weights=True)
     model.fc = nn.Linear(in_features=2048, out_features=10)
     return model

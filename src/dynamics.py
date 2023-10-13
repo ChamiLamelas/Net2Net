@@ -2,13 +2,14 @@
 # - linear to conv / conv to linear -- we could just not support these two,
 # alternative is convert linear to 1x1 convolution
 # - only widen all layers with same layer before it (of linear or conv) and
-# we duplicate all layers 
+# we duplicate all layers
 # - cant get any deepening working for more than 1 output channel
 
 import torch.nn as nn
 import numpy as np
 import tf_and_torch
 import device
+import torch
 
 
 class UnsupportedLayer(Exception):
@@ -49,19 +50,24 @@ def _conv_only_deeper_tf_numpy(weight):
     deeper_b = np.zeros(weight.shape[3])
     return deeper_w, deeper_b
 
-
+# https://discuss.pytorch.org/t/identity-convolution-weights-for-3-channel-image/155405/3
 def _conv_only_deeper(layer):
-    weight = tf_and_torch.params_torch_to_tf_ndarr(layer, "weight")
+    wts = torch.zeros(1, 1, layer.kernel_size[0], layer.kernel_size[1])
+    nn.init.dirac_(wts)
+    wts = wts.repeat(layer.out_channels, 1, 1, 1)
 
-    new_layer_w, new_layer_b = _conv_only_deeper_tf_numpy(weight)
-
-    new_layer = nn.Conv2d(1, 1, kernel_size=layer.kernel_size, padding=1).to(
-        device.get_device()
+    conv_layer = nn.Conv2d(
+        layer.out_channels,
+        layer.out_channels,
+        kernel_size=layer.kernel_size,
+        bias=False,
+        padding="same",
+        groups=layer.out_channels,
     )
-    tf_and_torch.params_tf_ndarr_to_torch(new_layer_w, new_layer, "weight")
-    tf_and_torch.params_tf_ndarr_to_torch(new_layer_b, new_layer, "bias")
+    with torch.no_grad():
+        conv_layer.weight.copy_(wts)
 
-    return new_layer
+    return conv_layer
 
 
 def _conv_only_wider_tf_numpy(teacher_w1, teacher_b1, teacher_w2, new_width):
