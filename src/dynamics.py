@@ -5,6 +5,8 @@
 # we duplicate all layers
 # - cant get any deepening working for more than 1 output channel
 
+# need support for no bias
+
 import torch.nn as nn
 import numpy as np
 import tf_and_torch
@@ -68,6 +70,7 @@ def _conv_only_deeper(layer):
 
 
 def _conv_only_wider_tf_numpy(teacher_w1, teacher_b1, teacher_w2, new_width):
+    # print("RUNNING")
     rand = np.random.randint(
         teacher_w1.shape[3], size=(new_width - teacher_w1.shape[3])
     )
@@ -138,15 +141,27 @@ def _fc_only_wider(layer1, layer2, new_width):
     return layer1, layer2, None
 
 
+def _resize_with_zeros(t, newsize):
+    newt = torch.zeros(newsize)
+    newt[:t.shape[0]] = t
+    return newt
+
+
+def _resize_with_ones(t, newsize):
+    newt = torch.ones(newsize)
+    newt[:t.shape[0]] = t
+    return newt
+
+
 def _make_new_norm_layer(layer, new_width):
     if layer is not None:
-        layer.running_mean = layer.running_mean.clone().resize_(new_width)
-        layer.running_var = layer.running_var.clone().resize_(new_width)
+        layer.running_mean = _resize_with_zeros(layer.running_mean, new_width)
+        layer.running_var = _resize_with_ones(layer.running_var, new_width)
         if layer.affine:
             layer.weight = nn.Parameter(
-                layer.weight.data.clone().resize_(new_width))
+                _resize_with_ones(layer.weight.data, new_width))
             layer.bias = nn.Parameter(
-                layer.bias.data.clone().resize_(new_width))
+                _resize_with_zeros(layer.bias.data, new_width))
     return layer
 
 
