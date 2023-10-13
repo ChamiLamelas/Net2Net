@@ -1,6 +1,28 @@
+"""
+NEEDSWORK document
+"""
+
 import torchvision.models as models
 import torch.nn as nn
 import torch
+import dynamics
+
+
+def _count_layers(model, layertype):
+    table = dynamics.LayerTable(model)
+    return sum(1 for h, n in table if isinstance(table.layer(h, n), layertype))
+
+
+def num_conv_layers(model):
+    return _count_layers(model, nn.Conv2d)
+
+
+def num_linear_layers(model):
+    return _count_layers(model, nn.Linear)
+
+
+def count_parameters(model):
+    return sum(torch.numel(p) for p in model.parameters())
 
 
 class SmallFeedForward(nn.Module):
@@ -69,13 +91,13 @@ class BatchNormConvolution(nn.Module):
         self.conv1 = nn.Conv2d(
             in_channels=in_channels, out_channels=32, kernel_size=3, stride=1
         )
-        self.relu1 = nn.ReLU()
-        self.norm = nn.BatchNorm2d(32)
         self.conv2 = nn.Conv2d(
             in_channels=32, out_channels=64, kernel_size=3, stride=1)
+        self.relu1 = nn.ReLU()
         self.relu2 = nn.ReLU()
-        self.finalpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.norm = nn.BatchNorm2d(32)
         self.fc = nn.Linear(64, out_features)
+        self.finalpool = nn.AdaptiveAvgPool2d((1, 1))
 
     def forward(self, x):
         assert x.dim() == 4
@@ -146,12 +168,9 @@ def cifar10_squeezenet1_1():
     return model
 
 
-def cifar10_inception():
+def imagenet_inception():
     """27 million parameters"""
 
-    # NEEDSWORK requires 75 x 75 input so not really cifar10 (just cifar10 output)
+    # requires 75x75 input, produces 1000-dim output!
     # https://pytorch.org/vision/0.12/generated/torchvision.models.inception_v3.html
-    model = models.inception_v3(weights=None, init_weights=True)
-    model.fc = nn.Linear(in_features=2048, out_features=10)
-    return model
-
+    return models.inception_v3(weights=None, init_weights=True)
