@@ -1,11 +1,35 @@
-# NEEDSWORK
-# - linear to conv / conv to linear -- we could just not support these two,
-# alternative is convert linear to 1x1 convolution
-# - only widen all layers with same layer before it (of linear or conv) and
-# we duplicate all layers
-# - cant get any deepening working for more than 1 output channel
+"""
+Notes: 
 
-# need support for no bias
+- This does not support linear to conv or conv to linear widening, one way 
+to potentially solve this issue is to convert a linear layer to an
+identical 1x1 convolutional layer (https://datascience.stackexchange.com/a/12833).
+
+- Widening linear-linear, convolutional-convolutional and deepening linear layers
+are taken from here: https://github.com/paengs/Net2Net
+
+BUGS: 
+
+- We are unable to handle nonsequential layer execution order, e.g. here's 
+a forward function of a InceptionNet block. Note branch3x3 isn't passed
+into following layers but is concatenated at the end. Hence, we can't 
+arbitrarily widen all layers in a network, we need to have some knowledge
+of which layers we can widen -- not sure how to determine this automatically.
+
+def _forward(self, x: Tensor) -> List[Tensor]:
+    branch3x3 = self.branch3x3(x)
+
+    branch3x3dbl = self.branch3x3dbl_1(x)
+    branch3x3dbl = self.branch3x3dbl_2(branch3x3dbl)
+    branch3x3dbl = self.branch3x3dbl_3(branch3x3dbl)
+
+    branch_pool = F.max_pool2d(x, kernel_size=3, stride=2)
+
+    outputs = [branch3x3, branch3x3dbl, branch_pool]
+    return outputs
+
+NEEDSWORK Document
+"""
 
 import torch.nn as nn
 import numpy as np
@@ -52,16 +76,19 @@ def _conv_only_deeper_tf_numpy(weight):
     deeper_b = np.zeros(weight.shape[3])
     return deeper_w, deeper_b
 
-# https://discuss.pytorch.org/t/identity-convolution-weights-for-3-channel-image/155405/3
-
 
 def _conv_only_deeper(layer):
     weight = tf_and_torch.params_torch_to_tf_ndarr(layer, "weight")
 
     deeper_w, deeper_b = _conv_only_deeper_tf_numpy(weight)
 
-    new_layer = nn.Conv2d(in_channels=layer.out_channels, out_channels=layer.out_channels,
-                          kernel_size=layer.kernel_size, stride=1, padding=(layer.kernel_size[0] // 2, layer.kernel_size[0] // 2))
+    new_layer = nn.Conv2d(
+        in_channels=layer.out_channels,
+        out_channels=layer.out_channels,
+        kernel_size=layer.kernel_size,
+        stride=1,
+        padding=(layer.kernel_size[0] // 2, layer.kernel_size[0] // 2),
+    )
 
     tf_and_torch.params_tf_ndarr_to_torch(deeper_w, new_layer, "weight")
     tf_and_torch.params_tf_ndarr_to_torch(deeper_b, new_layer, "bias")
@@ -69,22 +96,26 @@ def _conv_only_deeper(layer):
     return new_layer
 
 
-def _conv_only_wider_tf_numpy(teacher_w1, teacher_b1, teacher_w2, new_width):
-    # print("RUNNING")
+def _conv_only_wider_tf_numpy(teacher_w1, teacher_w2, new_width, teacher_b1):
+    print(teacher_w1.shape, teacher_w2.shape)
     rand = np.random.randint(
         teacher_w1.shape[3], size=(new_width - teacher_w1.shape[3])
     )
     replication_factor = np.bincount(rand)
     student_w1 = teacher_w1.copy()
     student_w2 = teacher_w2.copy()
-    student_b1 = teacher_b1.copy()
+    if teacher_b1 is not None:
+        student_b1 = teacher_b1.copy()
+    else:
+        student_b1 = None 
     # target layer update (i)
     for i in range(len(rand)):
         teacher_index = rand[i]
         new_weight = teacher_w1[:, :, :, teacher_index]
         new_weight = new_weight[:, :, :, np.newaxis]
         student_w1 = np.concatenate((student_w1, new_weight), axis=3)
-        student_b1 = np.append(student_b1, teacher_b1[teacher_index])
+        if teacher_b1 is not None:
+            student_b1 = np.append(student_b1, teacher_b1[teacher_index])
     # next layer update (i+1)
     for i in range(len(rand)):
         teacher_index = rand[i]
@@ -97,22 +128,25 @@ def _conv_only_wider_tf_numpy(teacher_w1, teacher_b1, teacher_w2, new_width):
     return student_w1, student_b1, student_w2
 
 
-# taken straight from abdullah's repo
-def _fc_only_wider_tf_numpy(teacher_w1, teacher_b1, teacher_w2, new_width):
+def _fc_only_wider_tf_numpy(teacher_w1, teacher_w2, new_width, teacher_b1):
     rand = np.random.randint(
         teacher_w1.shape[1], size=(new_width - teacher_w1.shape[1])
     )
     replication_factor = np.bincount(rand)
     student_w1 = teacher_w1.copy()
     student_w2 = teacher_w2.copy()
-    student_b1 = teacher_b1.copy()
+    if teacher_b1 is not None:
+        student_b1 = teacher_b1.copy()
+    else:
+        student_b1 = None
     # target layer update (i)
     for i in range(len(rand)):
         teacher_index = rand[i]
         new_weight = teacher_w1[:, teacher_index]
         new_weight = new_weight[:, np.newaxis]
         student_w1 = np.concatenate((student_w1, new_weight), axis=1)
-        student_b1 = np.append(student_b1, teacher_b1[teacher_index])
+        if teacher_b1 is not None:
+            student_b1 = np.append(student_b1, teacher_b1[teacher_index])
     # next layer update (i+1)
     for i in range(len(rand)):
         teacher_index = rand[i]
@@ -128,28 +162,32 @@ def _fc_only_wider_tf_numpy(teacher_w1, teacher_b1, teacher_w2, new_width):
 def _fc_only_wider(layer1, layer2, new_width):
     teacher_w1 = tf_and_torch.params_torch_to_tf_ndarr(layer1, "weight")
     teacher_w2 = tf_and_torch.params_torch_to_tf_ndarr(layer2, "weight")
-    teacher_b1 = tf_and_torch.params_torch_to_tf_ndarr(layer1, "bias")
+    if layer1.bias is not None:
+        teacher_b1 = tf_and_torch.params_torch_to_tf_ndarr(layer1, "bias")
+    else:
+        teacher_b1 = None
 
     student_w1, student_b1, student_w2 = _fc_only_wider_tf_numpy(
-        teacher_w1, teacher_b1, teacher_w2, new_width
+        teacher_w1, teacher_w2, new_width, teacher_b1
     )
 
     tf_and_torch.params_tf_ndarr_to_torch(student_w1, layer1, "weight")
     tf_and_torch.params_tf_ndarr_to_torch(student_w2, layer2, "weight")
-    tf_and_torch.params_tf_ndarr_to_torch(student_b1, layer1, "bias")
+    if layer1.bias is not None:
+        tf_and_torch.params_tf_ndarr_to_torch(student_b1, layer1, "bias")
 
     return layer1, layer2, None
 
 
 def _resize_with_zeros(t, newsize):
     newt = torch.zeros(newsize)
-    newt[:t.shape[0]] = t
+    newt[: t.shape[0]] = t
     return newt
 
 
 def _resize_with_ones(t, newsize):
     newt = torch.ones(newsize)
-    newt[:t.shape[0]] = t
+    newt[: t.shape[0]] = t
     return newt
 
 
@@ -158,31 +196,27 @@ def _make_new_norm_layer(layer, new_width):
         layer.running_mean = _resize_with_zeros(layer.running_mean, new_width)
         layer.running_var = _resize_with_ones(layer.running_var, new_width)
         if layer.affine:
-            layer.weight = nn.Parameter(
-                _resize_with_ones(layer.weight.data, new_width))
-            layer.bias = nn.Parameter(
-                _resize_with_zeros(layer.bias.data, new_width))
+            layer.weight = nn.Parameter(_resize_with_ones(layer.weight.data, new_width))
+            layer.bias = nn.Parameter(_resize_with_zeros(layer.bias.data, new_width))
     return layer
 
 
 def _conv_only_wider(layer1, layer2, norm_layer, new_width):
     teacher_w1 = tf_and_torch.params_torch_to_tf_ndarr(layer1, "weight")
     teacher_w2 = tf_and_torch.params_torch_to_tf_ndarr(layer2, "weight")
-    teacher_b1 = tf_and_torch.params_torch_to_tf_ndarr(layer1, "bias")
-
-    # print(teacher_w1.shape)
-    # print(teacher_w2.shape)
+    if layer1.bias is not None:
+        teacher_b1 = tf_and_torch.params_torch_to_tf_ndarr(layer1, "bias")
+    else:
+        teacher_b1 = None
 
     student_w1, student_b1, student_w2 = _conv_only_wider_tf_numpy(
-        teacher_w1, teacher_b1, teacher_w2, new_width
+        teacher_w1, teacher_w2, new_width, teacher_b1
     )
-
-    # print(student_w1.shape)
-    # print(student_w2.shape)
 
     tf_and_torch.params_tf_ndarr_to_torch(student_w1, layer1, "weight")
     tf_and_torch.params_tf_ndarr_to_torch(student_w2, layer2, "weight")
-    tf_and_torch.params_tf_ndarr_to_torch(student_b1, layer1, "bias")
+    if layer1.bias is not None:
+        tf_and_torch.params_tf_ndarr_to_torch(student_b1, layer1, "bias")
 
     return layer1, layer2, _make_new_norm_layer(norm_layer, new_width)
 
@@ -206,7 +240,7 @@ def _deeper(m):
     return nn.Sequential(m, new_layer)
 
 
-class _LayerTable:
+class LayerTable:
     def _helper(self, hierarchy, name, curr):
         if len(list(curr.children())) == 0:
             self.table.append((hierarchy, name))
@@ -236,32 +270,15 @@ class _LayerTable:
             setattr(parent, name, value)
 
 
-def _is_conv(layer):
-    return "Conv2d" in layer.__class__.__name__
-
-
-def _is_linear(layer):
-    return "Linear" in layer.__class__.__name__
-
-
-def _is_batchnorm(layer):
-    return "BatchNorm" in layer.__class__.__name__
-
-
-def _get_out_size(layer):
-    return layer.out_features if isinstance(layer, nn.Linear) else layer.out_channels
-
-
 def widen(model, modifier=lambda h, l: 1.5):
-    # print(model)
-    table = _LayerTable(model)
+    table = LayerTable(model)
     prev = None
     between_batchnorm = None
     for p, n in table:
         curr = table.get(p, n)
-        if _is_batchnorm(curr):
+        if isinstance(curr, nn.BatchNorm2d):
             between_batchnorm = (p, n)
-        elif _is_conv(curr) or _is_linear(curr):
+        elif isinstance(curr, nn.Conv2d) or isinstance(curr, nn.Linear):
             if prev is not None:
                 old_layer1 = table.get(*prev)
                 old_layer2 = curr
@@ -272,7 +289,13 @@ def widen(model, modifier=lambda h, l: 1.5):
                         else None
                     )
                     new_out_size = round(
-                        modifier(p, n) * _get_out_size(old_layer1))
+                        modifier(p, n)
+                        * (
+                            old_layer1.out_features
+                            if isinstance(old_layer1, nn.Linear)
+                            else old_layer1.out_channels
+                        )
+                    )
                     new_layer1, new_layer2, new_batchnorm = _wider(
                         old_layer1, old_layer2, new_out_size, old_batchnorm
                     )
@@ -282,12 +305,13 @@ def widen(model, modifier=lambda h, l: 1.5):
                         table.set(*between_batchnorm, new_batchnorm)
             prev = (p, n)
             between_batchnorm = None
-    # print(model)
 
 
-def deepen(model):
-    table = _LayerTable(model)
+def deepen(model, modifier=lambda h, n: True):
+    table = LayerTable(model)
     for p, n in table:
         curr = table.get(p, n)
-        if _is_conv(curr) or _is_linear(curr):
+        if (isinstance(curr, nn.Conv2d) or isinstance(curr, nn.Linear)) and modifier(
+            p, n
+        ):
             table.set(p, n, _deeper(curr))
