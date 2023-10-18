@@ -97,7 +97,7 @@ def _conv_only_deeper(layer):
 
 
 def _conv_only_wider_tf_numpy(teacher_w1, teacher_w2, new_width, teacher_b1):
-    print(teacher_w1.shape, teacher_w2.shape)
+    # print(teacher_w1.shape, teacher_w2.shape)
     rand = np.random.randint(
         teacher_w1.shape[3], size=(new_width - teacher_w1.shape[3])
     )
