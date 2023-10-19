@@ -38,6 +38,10 @@ import device
 import torch
 
 
+def _filterout(iterable, filterset):
+    return list(filter(lambda e: type(e).__name__ not in filterset, iterable))
+
+
 class UnsupportedLayer(Exception):
     pass
 
@@ -107,7 +111,7 @@ def _conv_only_wider_tf_numpy(teacher_w1, teacher_w2, new_width, teacher_b1):
     if teacher_b1 is not None:
         student_b1 = teacher_b1.copy()
     else:
-        student_b1 = None 
+        student_b1 = None
     # target layer update (i)
     for i in range(len(rand)):
         teacher_index = rand[i]
@@ -196,8 +200,10 @@ def _make_new_norm_layer(layer, new_width):
         layer.running_mean = _resize_with_zeros(layer.running_mean, new_width)
         layer.running_var = _resize_with_ones(layer.running_var, new_width)
         if layer.affine:
-            layer.weight = nn.Parameter(_resize_with_ones(layer.weight.data, new_width))
-            layer.bias = nn.Parameter(_resize_with_zeros(layer.bias.data, new_width))
+            layer.weight = nn.Parameter(
+                _resize_with_ones(layer.weight.data, new_width))
+            layer.bias = nn.Parameter(
+                _resize_with_zeros(layer.bias.data, new_width))
     return layer
 
 
@@ -221,7 +227,7 @@ def _conv_only_wider(layer1, layer2, norm_layer, new_width):
     return layer1, layer2, _make_new_norm_layer(norm_layer, new_width)
 
 
-def _wider(m1, m2, new_width, batch_norm):
+def wider(m1, m2, new_width, batch_norm):
     if isinstance(m1, nn.Linear) and isinstance(m2, nn.Linear):
         return _fc_only_wider(m1, m2, new_width)
     elif isinstance(m1, nn.Conv2d) and isinstance(m2, nn.Conv2d):
@@ -230,7 +236,7 @@ def _wider(m1, m2, new_width, batch_norm):
         raise UnsupportedLayer(f"m1: {type(m1)} m2: {type(m2)}")
 
 
-def _deeper(m):
+def deeper(m):
     if isinstance(m, nn.Linear):
         new_layer = _fc_only_deeper(m)
     elif isinstance(m, nn.Conv2d):
@@ -243,18 +249,48 @@ def _deeper(m):
 class LayerTable:
     def _helper(self, hierarchy, name, curr):
         if len(list(curr.children())) == 0:
-            self.table.append((hierarchy, name))
+            self.table.append({"hierarchy": hierarchy, "name": name})
         for n, child in curr.named_children():
             self._helper(hierarchy + [curr], n, child)
 
-    def __init__(self, model):
+    def _find_prev(self, ignore):
+        for i, e in enumerate(self.table):
+            curr = LayerTable.get(e["hierarchy"], e["name"])
+            j = i - 1
+            found = False
+            e["prevhierarchy"] = None
+            e["prevname"] = None
+            while j >= 0 and _filterout(self.table[j]["hierarchy"], ignore) == _filterout(e["hierarchy"], ignore) and not found:
+                # print("===")
+                # print([type(e).__name__ for e in _filterout(
+                #     self.table[j]["hierarchy"], ignore)])
+                # print(
+                #     "\t", [type(e).__name__ for e in self.table[j]["hierarchy"]])
+                # print([type(e).__name__ for e in _filterout(e["hierarchy"], ignore)])
+                # print("\t", [type(e).__name__ for e in e["hierarchy"]])
+                prevhierarchy = self.table[j]["hierarchy"]
+                prevname = self.table[j]["name"]
+                prev = LayerTable.get(prevhierarchy, prevname)
+                if type(curr) == type(prev):
+                    if isinstance(curr, nn.Linear):
+                        found = prev.out_features == curr.in_features
+                    elif isinstance(curr, nn.Conv2d):
+                        found = prev.out_channels == curr.in_channels
+                j -= 1
+            if found:
+                e["prevhierarchy"] = prevhierarchy
+                e["prevname"] = prevname
+
+    def __init__(self, model, ignore=set()):
         self.table = list()
         self._helper([], None, model)
+        self._find_prev(ignore)
 
     def __iter__(self):
         yield from self.table
 
-    def get(self, hierarchy, name):
+    @staticmethod
+    def get(hierarchy, name):
         parent = hierarchy[-1]
         return (
             parent[int(name)]
@@ -262,7 +298,8 @@ class LayerTable:
             else getattr(parent, name)
         )
 
-    def set(self, hierarchy, name, value):
+    @staticmethod
+    def set(hierarchy, name, value):
         parent = hierarchy[-1]
         if isinstance(parent, nn.Sequential):
             parent[int(name)] = value
@@ -270,48 +307,51 @@ class LayerTable:
             setattr(parent, name, value)
 
 
-def widen(model, modifier=lambda h, l: 1.5):
-    table = LayerTable(model)
-    prev = None
+def widen(model, ignore=set(), modifier=lambda _: 1.5):
+    table = LayerTable(model, ignore)
     between_batchnorm = None
-    for p, n in table:
-        curr = table.get(p, n)
+    for e in table:
+        curr = LayerTable.get(e["hierarchy"], e["name"])
         if isinstance(curr, nn.BatchNorm2d):
-            between_batchnorm = (p, n)
+            between_batchnorm = e
         elif isinstance(curr, nn.Conv2d) or isinstance(curr, nn.Linear):
-            if prev is not None:
-                old_layer1 = table.get(*prev)
+            print(e["prevname"])
+            if e["prevname"] is not None:
+                old_layer1 = LayerTable.get(e["prevhierarchy"], e["prevname"])
                 old_layer2 = curr
-                if type(old_layer1) == type(old_layer2) and modifier(p, n) > 1:
+                if (type(old_layer1) == type(old_layer2)) and modifier(e) > 1:
                     old_batchnorm = (
-                        table.get(*between_batchnorm)
+                        table.get(
+                            between_batchnorm["hierarchy"], between_batchnorm["name"])
                         if between_batchnorm is not None
                         else None
                     )
                     new_out_size = round(
-                        modifier(p, n)
+                        modifier(e)
                         * (
                             old_layer1.out_features
                             if isinstance(old_layer1, nn.Linear)
                             else old_layer1.out_channels
                         )
                     )
-                    new_layer1, new_layer2, new_batchnorm = _wider(
+                    new_layer1, new_layer2, new_batchnorm = wider(
                         old_layer1, old_layer2, new_out_size, old_batchnorm
                     )
-                    table.set(*prev, new_layer1)
-                    table.set(p, n, new_layer2)
+                    table.set(e["prevhierarchy"], e["prevname"], new_layer1)
+                    table.set(e["hierarchy"], e["name"], new_layer2)
                     if between_batchnorm is not None:
-                        table.set(*between_batchnorm, new_batchnorm)
-            prev = (p, n)
+                        table.set(
+                            between_batchnorm["hierarchy"], between_batchnorm["name"], new_batchnorm)
             between_batchnorm = None
 
 
-def deepen(model, modifier=lambda h, n: True):
-    table = LayerTable(model)
-    for p, n in table:
-        curr = table.get(p, n)
-        if (isinstance(curr, nn.Conv2d) or isinstance(curr, nn.Linear)) and modifier(
-            p, n
-        ):
-            table.set(p, n, _deeper(curr))
+def deepen(model, ignore=set(), modifier=lambda _: True):
+    table = LayerTable(model, ignore)
+    for e in table:
+        curr = table.get(e["hierarchy"], e["name"])
+        if (isinstance(curr, nn.Conv2d) or isinstance(curr, nn.Linear)) and modifier(e):
+            table.set(e["hierarchy"], e["name"], deeper(curr))
+
+
+def shrink(model, factor):
+    pass
