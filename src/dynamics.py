@@ -8,6 +8,11 @@ identical 1x1 convolutional layer (https://datascience.stackexchange.com/a/12833
 - Widening linear-linear, convolutional-convolutional and deepening linear layers
 are taken from here: https://github.com/paengs/Net2Net
 
+https://web.stanford.edu/~nanbhas/blog/forward-hooks-pytorch/
+https://github.com/pytorch/pytorch/issues/35600
+https://pytorch.org/docs/stable/generated/torch.jit.trace.html#torch.jit.trace
+
+
 BUGS: 
 
 - We are unable to handle nonsequential layer execution order, e.g. here's 
