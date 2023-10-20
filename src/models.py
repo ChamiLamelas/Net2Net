@@ -6,12 +6,16 @@ import torchvision.models as models
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
-import dynamics
+import tracing
 
 
 def _count_layers(model, layertype):
-    table = dynamics.LayerTable(model)
-    return sum(1 for e in table if isinstance(dynamics.LayerTable.get(e["hierarchy"], e["name"]), layertype))
+    table = tracing.LayerTable(model)
+    return sum(
+        1
+        for e in table
+        if isinstance(tracing.LayerTable.get(e["hierarchy"], e["name"]), layertype)
+    )
 
 
 def num_conv_layers(model):
@@ -68,8 +72,7 @@ class TwoConvolution(nn.Module):
             in_channels=in_channels, out_channels=32, kernel_size=3, stride=1
         )
         self.relu1 = nn.ReLU()
-        self.conv2 = nn.Conv2d(
-            in_channels=32, out_channels=64, kernel_size=3, stride=1)
+        self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1)
         self.relu2 = nn.ReLU()
         self.finalpool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(64, out_features)
@@ -94,8 +97,7 @@ class BatchNormConvolution(nn.Module):
         )
         self.relu1 = nn.ReLU()
         self.norm = nn.BatchNorm2d(32)
-        self.conv2 = nn.Conv2d(
-            in_channels=32, out_channels=64, kernel_size=3, stride=1)
+        self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1)
         self.relu2 = nn.ReLU()
         self.finalpool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(64, out_features)
@@ -140,7 +142,7 @@ class SequentialModel(nn.Module):
         self.seq = nn.Sequential(
             nn.Linear(in_features=in_features, out_features=512),
             nn.ReLU(),
-            nn.Linear(in_features=512, out_features=out_features)
+            nn.Linear(in_features=512, out_features=out_features),
         )
 
     def forward(self, x):
@@ -153,7 +155,8 @@ class NonSequentialConvolution(nn.Module):
         self.conv1 = nn.Conv2d(in_channels, out_channels=32, kernel_size=1)
         self.conv2 = nn.Conv2d(in_channels, out_channels=48, kernel_size=1)
         self.conv3 = nn.Conv2d(
-            in_channels=48, out_channels=64, kernel_size=5, padding=2)
+            in_channels=48, out_channels=64, kernel_size=5, padding=2
+        )
         self.finalpool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(96, out_features)
 
@@ -169,6 +172,28 @@ class NonSequentialConvolution(nn.Module):
 
         x = torch.flatten(x, 1)
 
+        x = self.fc(x)
+        return x
+
+
+class RectangularKernel(nn.Module):
+    def __init__(self, in_channels, out_features):
+        super().__init__()
+        self.conv1 = nn.Conv2d(
+            in_channels,
+            384,
+            kernel_size=(1, 7),
+            stride=(1, 1),
+            padding=(0, 3),
+            bias=False,
+        )
+        self.finalpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.fc = nn.Linear(384, out_features)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.finalpool(x)
+        x = torch.flatten(x, 1)
         x = self.fc(x)
         return x
 
@@ -238,21 +263,20 @@ def imagenet_inception():
 
 
 def widen_inception(e):
-    layer = dynamics.LayerTable.get(e["hierarchy"], e["name"])
+    layer = tracing.LayerTable.get(e["hierarchy"], e["name"])
     if not isinstance(layer, nn.Conv2d):
         return 0
     if any("Inception" in type(c).__name__ for c in e["hierarchy"]):
-        return 1 / (0.3 ** 0.5)
+        return 1 / (0.3**0.5)
 
 
 def deepen_inception(e):
-    curr_layer = dynamics.LayerTable.get(e["prevhierarchy"], e["prevname"])
+    curr_layer = tracing.LayerTable.get(e["hierarchy"], e["name"])
     if not isinstance(curr_layer, nn.Conv2d):
         return False
-    if e["prevname"] is None:
-        return False
-    prev_layer = dynamics.LayerTable.get(e["hierarchy"], e["name"])
-    return prev_layer.kernel_size[0] == curr_layer.kernel_size[1] and prev_layer.kernel_size[1] == curr_layer.kernel_size[0]
+    if type(e["hierarchy"][-2]).__name__ != "InceptionD":
+        return False 
+    return curr_layer.kernel_size[0] != curr_layer.kernel_size[1]
 
 
 def inception_ignoreset():
@@ -279,22 +303,18 @@ class InceptionSubNet(nn.Module):
         self.branch1x1 = conv_block(in_channels, 320, kernel_size=1)
 
         self.branch3x3_1 = conv_block(in_channels, 384, kernel_size=1)
-        self.branch3x3_2a = conv_block(
-            384, 384, kernel_size=(1, 3), padding=(0, 1))
-        self.branch3x3_2b = conv_block(
-            384, 384, kernel_size=(3, 1), padding=(1, 0))
+        self.branch3x3_2a = conv_block(384, 384, kernel_size=(1, 3), padding=(0, 1))
+        self.branch3x3_2b = conv_block(384, 384, kernel_size=(3, 1), padding=(1, 0))
 
         self.branch3x3dbl_1 = conv_block(in_channels, 448, kernel_size=1)
         self.branch3x3dbl_2 = conv_block(448, 384, kernel_size=3, padding=1)
-        self.branch3x3dbl_3a = conv_block(
-            384, 384, kernel_size=(1, 3), padding=(0, 1))
-        self.branch3x3dbl_3b = conv_block(
-            384, 384, kernel_size=(3, 1), padding=(1, 0))
+        self.branch3x3dbl_3a = conv_block(384, 384, kernel_size=(1, 3), padding=(0, 1))
+        self.branch3x3dbl_3b = conv_block(384, 384, kernel_size=(3, 1), padding=(1, 0))
 
         self.branch_pool = conv_block(in_channels, 192, kernel_size=1)
 
     def _forward(self, x):
-        branch1x1 = self.branch1x1(x)
+        # branch1x1 = self.branch1x1(x)
 
         branch3x3 = self.branch3x3_1(x)
         branch3x3 = [
@@ -311,10 +331,11 @@ class InceptionSubNet(nn.Module):
         ]
         branch3x3dbl = torch.cat(branch3x3dbl, 1)
 
-        branch_pool = F.avg_pool2d(x, kernel_size=3, stride=1, padding=1)
-        branch_pool = self.branch_pool(branch_pool)
+        # branch_pool = F.avg_pool2d(x, kernel_size=3, stride=1, padding=1)
+        # branch_pool = self.branch_pool(branch_pool)
 
-        outputs = [branch1x1, branch3x3, branch3x3dbl, branch_pool]
+        # outputs = [branch1x1, branch3x3, branch3x3dbl, branch_pool]
+        outputs = [branch3x3, branch3x3dbl]
         return outputs
 
     def forward(self, x):

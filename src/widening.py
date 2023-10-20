@@ -36,74 +36,12 @@ def _forward(self, x: Tensor) -> List[Tensor]:
 NEEDSWORK Document
 """
 
-import torch.nn as nn
+
 import numpy as np
 import tf_and_torch
-import device
-import torch
-
-
-def _filterout(iterable, filterset):
-    return list(filter(lambda e: type(e).__name__ not in filterset, iterable))
-
-
-class UnsupportedLayer(Exception):
-    pass
-
-
-def _fc_only_deeper_tf_numpy(weight):
-    deeper_w = np.eye(weight.shape[1])
-    deeper_b = np.zeros(weight.shape[1])
-    return deeper_w, deeper_b
-
-
-def _fc_only_deeper(layer):
-    weight = tf_and_torch.params_torch_to_tf_ndarr(layer, "weight")
-
-    new_layer_w, new_layer_b = _fc_only_deeper_tf_numpy(weight)
-
-    new_layer = nn.Linear(1, 1).to(device.get_device())
-    tf_and_torch.params_tf_ndarr_to_torch(new_layer_w, new_layer, "weight")
-    tf_and_torch.params_tf_ndarr_to_torch(new_layer_b, new_layer, "bias")
-
-    return new_layer
-
-
-def _conv_only_deeper_tf_numpy(weight):
-    deeper_w = np.zeros(
-        (weight.shape[0], weight.shape[1], weight.shape[3], weight.shape[3])
-    )
-    assert (
-        weight.shape[0] % 2 == 1 and weight.shape[1] % 2 == 1
-    ), "Kernel size should be odd"
-    center_h = (weight.shape[0] - 1) // 2
-    center_w = (weight.shape[1] - 1) // 2
-    for i in range(weight.shape[3]):
-        tmp = np.zeros((weight.shape[0], weight.shape[1], weight.shape[3]))
-        tmp[center_h, center_w, i] = 1
-        deeper_w[:, :, :, i] = tmp
-    deeper_b = np.zeros(weight.shape[3])
-    return deeper_w, deeper_b
-
-
-def _conv_only_deeper(layer):
-    weight = tf_and_torch.params_torch_to_tf_ndarr(layer, "weight")
-
-    deeper_w, deeper_b = _conv_only_deeper_tf_numpy(weight)
-
-    new_layer = nn.Conv2d(
-        in_channels=layer.out_channels,
-        out_channels=layer.out_channels,
-        kernel_size=layer.kernel_size,
-        stride=1,
-        padding=(layer.kernel_size[0] // 2, layer.kernel_size[0] // 2),
-    )
-
-    tf_and_torch.params_tf_ndarr_to_torch(deeper_w, new_layer, "weight")
-    tf_and_torch.params_tf_ndarr_to_torch(deeper_b, new_layer, "bias")
-
-    return new_layer
-
+import torch.nn as nn
+import torch 
+import tracing 
 
 def _conv_only_wider_tf_numpy(teacher_w1, teacher_w2, new_width, teacher_b1):
     # print(teacher_w1.shape, teacher_w2.shape)
@@ -205,10 +143,8 @@ def _make_new_norm_layer(layer, new_width):
         layer.running_mean = _resize_with_zeros(layer.running_mean, new_width)
         layer.running_var = _resize_with_ones(layer.running_var, new_width)
         if layer.affine:
-            layer.weight = nn.Parameter(
-                _resize_with_ones(layer.weight.data, new_width))
-            layer.bias = nn.Parameter(
-                _resize_with_zeros(layer.bias.data, new_width))
+            layer.weight = nn.Parameter(_resize_with_ones(layer.weight.data, new_width))
+            layer.bias = nn.Parameter(_resize_with_zeros(layer.bias.data, new_width))
     return layer
 
 
@@ -238,91 +174,20 @@ def wider(m1, m2, new_width, batch_norm):
     elif isinstance(m1, nn.Conv2d) and isinstance(m2, nn.Conv2d):
         return _conv_only_wider(m1, m2, batch_norm, new_width)
     else:
-        raise UnsupportedLayer(f"m1: {type(m1)} m2: {type(m2)}")
-
-
-def deeper(m):
-    if isinstance(m, nn.Linear):
-        new_layer = _fc_only_deeper(m)
-    elif isinstance(m, nn.Conv2d):
-        new_layer = _conv_only_deeper(m)
-    else:
-        raise UnsupportedLayer(str(type(m)))
-    return nn.Sequential(m, new_layer)
-
-
-class LayerTable:
-    def _helper(self, hierarchy, name, curr):
-        if len(list(curr.children())) == 0:
-            self.table.append({"hierarchy": hierarchy, "name": name})
-        for n, child in curr.named_children():
-            self._helper(hierarchy + [curr], n, child)
-
-    def _find_prev(self, ignore):
-        for i, e in enumerate(self.table):
-            curr = LayerTable.get(e["hierarchy"], e["name"])
-            j = i - 1
-            found = False
-            e["prevhierarchy"] = None
-            e["prevname"] = None
-            while j >= 0 and _filterout(self.table[j]["hierarchy"], ignore) == _filterout(e["hierarchy"], ignore) and not found:
-                # print("===")
-                # print([type(e).__name__ for e in _filterout(
-                #     self.table[j]["hierarchy"], ignore)])
-                # print(
-                #     "\t", [type(e).__name__ for e in self.table[j]["hierarchy"]])
-                # print([type(e).__name__ for e in _filterout(e["hierarchy"], ignore)])
-                # print("\t", [type(e).__name__ for e in e["hierarchy"]])
-                prevhierarchy = self.table[j]["hierarchy"]
-                prevname = self.table[j]["name"]
-                prev = LayerTable.get(prevhierarchy, prevname)
-                if type(curr) == type(prev):
-                    if isinstance(curr, nn.Linear):
-                        found = prev.out_features == curr.in_features
-                    elif isinstance(curr, nn.Conv2d):
-                        found = prev.out_channels == curr.in_channels
-                j -= 1
-            if found:
-                e["prevhierarchy"] = prevhierarchy
-                e["prevname"] = prevname
-
-    def __init__(self, model, ignore=set()):
-        self.table = list()
-        self._helper([], None, model)
-        self._find_prev(ignore)
-
-    def __iter__(self):
-        yield from self.table
-
-    @staticmethod
-    def get(hierarchy, name):
-        parent = hierarchy[-1]
-        return (
-            parent[int(name)]
-            if isinstance(parent, nn.Sequential)
-            else getattr(parent, name)
-        )
-
-    @staticmethod
-    def set(hierarchy, name, value):
-        parent = hierarchy[-1]
-        if isinstance(parent, nn.Sequential):
-            parent[int(name)] = value
-        else:
-            setattr(parent, name, value)
+        raise tracing.UnsupportedLayer(f"m1: {type(m1)} m2: {type(m2)}")
 
 
 def widen(model, ignore=set(), modifier=lambda _: 1.5):
-    table = LayerTable(model, ignore)
+    table = tracing.LayerTable(model, ignore)
     between_batchnorm = None
     for e in table:
-        curr = LayerTable.get(e["hierarchy"], e["name"])
+        curr = tracing.LayerTable.get(e["hierarchy"], e["name"])
         if isinstance(curr, nn.BatchNorm2d):
             between_batchnorm = e
         elif isinstance(curr, nn.Conv2d) or isinstance(curr, nn.Linear):
-            print(e["prevname"])
+            # print(e["prevname"])
             if e["prevname"] is not None:
-                old_layer1 = LayerTable.get(e["prevhierarchy"], e["prevname"])
+                old_layer1 = tracing.LayerTable.get(e["prevhierarchy"], e["prevname"])
                 old_layer2 = curr
                 if (type(old_layer1) == type(old_layer2)) and modifier(e) > 1:
                     old_batchnorm = (
@@ -348,15 +213,3 @@ def widen(model, ignore=set(), modifier=lambda _: 1.5):
                         table.set(
                             between_batchnorm["hierarchy"], between_batchnorm["name"], new_batchnorm)
             between_batchnorm = None
-
-
-def deepen(model, ignore=set(), modifier=lambda _: True):
-    table = LayerTable(model, ignore)
-    for e in table:
-        curr = table.get(e["hierarchy"], e["name"])
-        if (isinstance(curr, nn.Conv2d) or isinstance(curr, nn.Linear)) and modifier(e):
-            table.set(e["hierarchy"], e["name"], deeper(curr))
-
-
-def shrink(model, factor):
-    pass
