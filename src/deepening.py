@@ -56,6 +56,11 @@ def _conv_only_deeper(layer):
     tf_and_torch.params_tf_ndarr_to_torch(deeper_w, new_layer, "weight")
     tf_and_torch.params_tf_ndarr_to_torch(deeper_b, new_layer, "bias")
 
+    # import torch
+    # x = torch.randn((1, layer.out_channels, 28, 28))
+    # y = new_layer(x)
+    # print(torch.max(torch.abs(x - y)).item())
+
     return new_layer
 
 

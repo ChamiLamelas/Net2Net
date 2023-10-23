@@ -103,6 +103,7 @@ class BatchNormConvolution(nn.Module):
         self.fc = nn.Linear(64, out_features)
 
     def forward(self, x):
+        # print(x.size())
         assert x.dim() == 4
         x = self.conv1(x)
         x = self.relu1(x)
@@ -274,9 +275,16 @@ def deepen_inception(e):
     curr_layer = tracing.LayerTable.get(e["hierarchy"], e["name"])
     if not isinstance(curr_layer, nn.Conv2d):
         return False
-    if type(e["hierarchy"][-2]).__name__ != "InceptionD":
-        return False 
-    return curr_layer.kernel_size[0] != curr_layer.kernel_size[1]
+    if type(e["hierarchy"][-2]).__name__ not in {
+        "InceptionC",
+        "InceptionD",
+        "InceptionE",
+    }:
+        return False
+    if curr_layer.kernel_size[0] != curr_layer.kernel_size[1]:
+        # print("test")
+        return True
+    return False
 
 
 def inception_ignoreset():
@@ -312,32 +320,44 @@ class InceptionSubNet(nn.Module):
         self.branch3x3dbl_3b = conv_block(384, 384, kernel_size=(3, 1), padding=(1, 0))
 
         self.branch_pool = conv_block(in_channels, 192, kernel_size=1)
+        self.avgpool = nn.AdaptiveMaxPool2d((1, 1))
+        self.fc = nn.Linear(2048, 10)
 
     def _forward(self, x):
-        # branch1x1 = self.branch1x1(x)
+        branch1x1 = self.branch1x1(x)
 
         branch3x3 = self.branch3x3_1(x)
+        t1 = self.branch3x3_2a(branch3x3)
+        t2 = self.branch3x3_2b(branch3x3)
+        print(f"t1={torch.mean(t1)} t2={torch.mean(t2)}")
         branch3x3 = [
-            self.branch3x3_2a(branch3x3),
-            self.branch3x3_2b(branch3x3),
+            t1,
+            t2,
         ]
         branch3x3 = torch.cat(branch3x3, 1)
 
         branch3x3dbl = self.branch3x3dbl_1(x)
         branch3x3dbl = self.branch3x3dbl_2(branch3x3dbl)
+        t3 = self.branch3x3dbl_3a(branch3x3dbl)
+        t4 = self.branch3x3dbl_3b(branch3x3dbl)
+        print(f"t3={torch.mean(t3)} t4={torch.mean(t4)}")
         branch3x3dbl = [
-            self.branch3x3dbl_3a(branch3x3dbl),
-            self.branch3x3dbl_3b(branch3x3dbl),
+            t3,
+            t4,
         ]
         branch3x3dbl = torch.cat(branch3x3dbl, 1)
 
-        # branch_pool = F.avg_pool2d(x, kernel_size=3, stride=1, padding=1)
-        # branch_pool = self.branch_pool(branch_pool)
+        branch_pool = F.avg_pool2d(x, kernel_size=3, stride=1, padding=1)
+        branch_pool = self.branch_pool(branch_pool)
 
-        # outputs = [branch1x1, branch3x3, branch3x3dbl, branch_pool]
-        outputs = [branch3x3, branch3x3dbl]
+        outputs = [branch1x1, branch3x3, branch3x3dbl, branch_pool]
         return outputs
 
     def forward(self, x):
         outputs = self._forward(x)
-        return torch.cat(outputs, 1)
+        outputs = torch.cat(outputs, 1)
+        print(f"t5={torch.mean(outputs)},{torch.min(outputs)},{torch.max(outputs)}")
+        # outputs = self.avgpool(outputs)
+        # outputs = torch.flatten(outputs, 1)
+        # outputs = self.fc(outputs)
+        return outputs

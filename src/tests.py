@@ -316,8 +316,8 @@ def test_deepen_norm_convolutional():
     check_adaptation(
         models.BatchNormConvolution,
         {"in_channels": 1, "out_features": 5},
-        torch.randn,
-        ((1, 1, 28, 28)),
+        torch.normal,
+        (torch.ones((1, 1, 28, 28)) * 14, torch.ones((1, 1, 28, 28)) * 25),
         deepening.deepen,
     )
 
@@ -428,12 +428,12 @@ def main():
     # test_widen_and_deepen_small_convolutional()
     # test_deepen_and_widen_small_convolutional()
     # test_widen_norm_convolutional()
-    # test_deepen_norm_convolutional()
+    test_deepen_norm_convolutional()
     # test_widen_and_deepen_norm_convolutional()
     # test_deepen_and_widen_norm_convolutional()
     # test_widen_nonsequential()
     # test_widen_inception()
-    test_deepen_rectangular_kernel()
+    # test_deepen_rectangular_kernel()
     # test_deepen_concatenating()
     # test_deepen_subnet()
     test_deepen_inception()
