@@ -72,7 +72,8 @@ class TwoConvolution(nn.Module):
             in_channels=in_channels, out_channels=32, kernel_size=3, stride=1
         )
         self.relu1 = nn.ReLU()
-        self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1)
+        self.conv2 = nn.Conv2d(
+            in_channels=32, out_channels=64, kernel_size=3, stride=1)
         self.relu2 = nn.ReLU()
         self.finalpool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(64, out_features)
@@ -97,13 +98,15 @@ class BatchNormConvolution(nn.Module):
         )
         self.relu1 = nn.ReLU()
         self.norm = nn.BatchNorm2d(32)
-        self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1)
+        self.conv2 = nn.Conv2d(
+            in_channels=32, out_channels=64, kernel_size=3, stride=1)
         self.relu2 = nn.ReLU()
         self.finalpool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(64, out_features)
 
     def forward(self, x):
         # print(x.size())
+
         assert x.dim() == 4
         x = self.conv1(x)
         x = self.relu1(x)
@@ -255,12 +258,14 @@ def cifar10_squeezenet1_1():
     return model
 
 
-def imagenet_inception():
+def imagenet_inception(dropout=0.5):
     """27 million parameters"""
 
-    # requires 75x75 input, produces 1000-dim output!
+    # requires Nx3x75x75 (N>=1) input for evaluation, produces 1000-dim output!
     # https://pytorch.org/vision/0.12/generated/torchvision.models.inception_v3.html
-    return models.inception_v3(weights=None, init_weights=True)
+    # requires Nx3x299x299 (N>=1) input for training, produces 2 1000-dim logit sets
+    # https://pytorch.org/vision/main/models/generated/torchvision.models.inception_v3.html#torchvision.models.inception_v3
+    return models.inception_v3(weights=None, init_weights=True, dropout=dropout)
 
 
 def widen_inception(e):
@@ -282,7 +287,6 @@ def deepen_inception(e):
     }:
         return False
     if curr_layer.kernel_size[0] != curr_layer.kernel_size[1]:
-        # print("test")
         return True
     return False
 
@@ -303,7 +307,7 @@ class BasicConv2d(nn.Module):
         return F.relu(x, inplace=True)
 
 
-class InceptionSubNet(nn.Module):
+class InceptionE(nn.Module):
     def __init__(self, in_channels, conv_block):
         super().__init__()
         if conv_block is None:
@@ -311,13 +315,17 @@ class InceptionSubNet(nn.Module):
         self.branch1x1 = conv_block(in_channels, 320, kernel_size=1)
 
         self.branch3x3_1 = conv_block(in_channels, 384, kernel_size=1)
-        self.branch3x3_2a = conv_block(384, 384, kernel_size=(1, 3), padding=(0, 1))
-        self.branch3x3_2b = conv_block(384, 384, kernel_size=(3, 1), padding=(1, 0))
+        self.branch3x3_2a = conv_block(
+            384, 384, kernel_size=(1, 3), padding=(0, 1))
+        self.branch3x3_2b = conv_block(
+            384, 384, kernel_size=(3, 1), padding=(1, 0))
 
         self.branch3x3dbl_1 = conv_block(in_channels, 448, kernel_size=1)
         self.branch3x3dbl_2 = conv_block(448, 384, kernel_size=3, padding=1)
-        self.branch3x3dbl_3a = conv_block(384, 384, kernel_size=(1, 3), padding=(0, 1))
-        self.branch3x3dbl_3b = conv_block(384, 384, kernel_size=(3, 1), padding=(1, 0))
+        self.branch3x3dbl_3a = conv_block(
+            384, 384, kernel_size=(1, 3), padding=(0, 1))
+        self.branch3x3dbl_3b = conv_block(
+            384, 384, kernel_size=(3, 1), padding=(1, 0))
 
         self.branch_pool = conv_block(in_channels, 192, kernel_size=1)
         self.avgpool = nn.AdaptiveMaxPool2d((1, 1))
@@ -327,23 +335,17 @@ class InceptionSubNet(nn.Module):
         branch1x1 = self.branch1x1(x)
 
         branch3x3 = self.branch3x3_1(x)
-        t1 = self.branch3x3_2a(branch3x3)
-        t2 = self.branch3x3_2b(branch3x3)
-        print(f"t1={torch.mean(t1)} t2={torch.mean(t2)}")
         branch3x3 = [
-            t1,
-            t2,
+            self.branch3x3_2a(branch3x3),
+            self.branch3x3_2b(branch3x3),
         ]
         branch3x3 = torch.cat(branch3x3, 1)
 
         branch3x3dbl = self.branch3x3dbl_1(x)
         branch3x3dbl = self.branch3x3dbl_2(branch3x3dbl)
-        t3 = self.branch3x3dbl_3a(branch3x3dbl)
-        t4 = self.branch3x3dbl_3b(branch3x3dbl)
-        print(f"t3={torch.mean(t3)} t4={torch.mean(t4)}")
         branch3x3dbl = [
-            t3,
-            t4,
+            self.branch3x3dbl_3a(branch3x3dbl),
+            self.branch3x3dbl_3b(branch3x3dbl),
         ]
         branch3x3dbl = torch.cat(branch3x3dbl, 1)
 
@@ -356,8 +358,6 @@ class InceptionSubNet(nn.Module):
     def forward(self, x):
         outputs = self._forward(x)
         outputs = torch.cat(outputs, 1)
-        print(f"t5={torch.mean(outputs)},{torch.min(outputs)},{torch.max(outputs)}")
-        # outputs = self.avgpool(outputs)
-        # outputs = torch.flatten(outputs, 1)
-        # outputs = self.fc(outputs)
         return outputs
+
+

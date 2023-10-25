@@ -5,10 +5,12 @@ NEEDSWORK document
 import torch
 import device
 
-
-def forward(model, data):
+def forward(model, data, eval = False):
     model, data = device.move(device.get_device(), model, data)
-    model.eval()
+    if eval:
+        model.eval()
+    else:
+        model.train()
     with torch.no_grad():
         return model(data)
 
