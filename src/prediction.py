@@ -16,7 +16,7 @@ def forward(model, data, eval = False):
 
 
 def predict(model, data_loader, epoch, logger, split):
-    # model.eval()
+    model.eval()
     correct = 0
     total = 0
     with torch.no_grad():

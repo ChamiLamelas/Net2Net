@@ -80,13 +80,13 @@ def test_deepen_rectangular_kernel():
     )
 
 def main():
-    # test_deepen_feedforward()
-    # test_deepen_tiny_convolutional()
-    # test_deepen_small_convolutional()
-    # test_deepen_norm_convolutional()
-    # test_deepen_rectangular_kernel()
+    test_deepen_feedforward()
+    test_deepen_tiny_convolutional()
+    test_deepen_small_convolutional()
+    test_deepen_norm_convolutional()
+    test_deepen_rectangular_kernel()
     test_deepen_subnet()
-    # test_deepen_inception()
+    test_deepen_inception()
     print("ALL DEEPEN TESTS PASSED!")
 
 if __name__ == '__main__':

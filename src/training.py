@@ -9,6 +9,7 @@ import random
 import torch
 import prediction
 import device
+from torchvision.models.inception import InceptionOutputs
 
 
 def set_seed(seed):
@@ -29,15 +30,15 @@ def train(seed, model, train_loader, test_loader, total_epochs, scale_up_epochs,
     optimizer = init_optimizer(model.parameters(), **optim_args)
     scale_up_epochs = sorted(set(scale_up_epochs))
     scale_down_epochs = sorted(set(scale_down_epochs))
-    i = 0
-    j = 0
     for epoch in range(total_epochs):
-        if i < len(scale_up_epochs) and epoch == scale_up_epochs[i]:
-            # NEEDSWORK implement scale up
-            i += 1
-        elif j < len(scale_down_epochs) and epoch == scale_down_epochs[j]:
-            # NEEDSWORK implement scale down
-            j += 1
+        if epoch in scale_up_epochs:
+            config = scale_up_epochs[epoch]
+            model = config["modifier"](
+                model, config["modify_args"]["ignore"], config["modify_args"]["modifier"])
+        elif epoch in scale_down_epochs:
+            config = scale_down_epochs[epoch]
+            model = config["modifier"](
+                model, config["modify_args"]["ignore"], config["modify_args"]["modifier"])
         train_epoch(model, train_loader, epoch, optimizer, logger)
         prediction.predict(model, train_loader, epoch, logger, 'train')
         prediction.predict(model, test_loader, epoch, logger, 'test')
@@ -51,6 +52,8 @@ def train_epoch(model, train_loader, epoch, optimizer, logger):
         data, target = device.move(device.get_device(), data, target)
         optimizer.zero_grad()
         output = model(data)
+        if isinstance(output, InceptionOutputs):
+            output = output.logits
         loss = F.cross_entropy(output, target)
         loss.backward()
         optimizer.step()

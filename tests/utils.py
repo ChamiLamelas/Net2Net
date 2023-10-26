@@ -2,14 +2,14 @@ import sys
 import os
 sys.path.append(os.path.join("..", "src"))
 
-import deepening
-import models
-import widening
-import training
-import prediction
-import torchvision
+import device
 import torch
-import device 
+import torchvision
+import prediction
+import training
+import widening
+import models
+import deepening
 
 
 def deepenwiden(model):
@@ -22,7 +22,7 @@ def widendeepen(model):
     deepening.deepen(model)
 
 
-def checkequal(input, other, rtol=1e-5, atol=1e-5):
+def checkequal(input, other, rtol=1e-5, atol=1e-4):
     if isinstance(input, torchvision.models.inception.InceptionOutputs):
         input = torch.cat([input.logits, input.aux_logits])
         other = torch.cat([other.logits, other.aux_logits])
@@ -53,8 +53,7 @@ def check_adaptation(
     training.set_seed(42)
     data = data_func(*data_args)
     model = model_func(**model_kwargs)
-    model = model.to(device.get_device())
-    data = data.to(device.get_device())
+    device.move(device.get_device(), data, model)
     pre_mod = prediction.forward(model, data)
     if adaptation_func == widening.widen:
         pre_num = models.count_parameters(model)

@@ -65,11 +65,6 @@ def _conv_only_deeper(layer):
     tf_and_torch.params_tf_ndarr_to_torch(deeper_w, new_layer, "weight")
     tf_and_torch.params_tf_ndarr_to_torch(deeper_b, new_layer, "bias")
 
-    # import torch
-    # x = torch.randn((1, layer.out_channels, 28, 28))
-    # y = new_layer(x)
-    # print(torch.max(torch.abs(x - y)).item())
-
     return new_layer
 
 
@@ -104,7 +99,6 @@ def deepen(model, ignore=set(), modifier=lambda _: True):
     for e in table:
         curr = table.get(e["hierarchy"], e["name"]) 
         if (isinstance(curr, nn.Conv2d) or isinstance(curr, nn.Linear)) and modifier(e):
-            # print(deeper(curr), type(e["hierarchy"][-2]).__name__)
             table.set(e["hierarchy"], e["name"], deeper(curr))
 
 

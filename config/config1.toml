@@ -1,7 +1,8 @@
-model = "SmallFeedForward"
-model_args = { in_features = 784, out_features = 10 }
+model = "imagenet_inception"
 optimizer_args = { lr = 0.01 }
-dataset = "mnist"
-epochs = 5
+dataset = "cifar10"
+epochs = 2
 folder = "TestEnvironment"
 desc = "Simple environment just to make sure we can train a network on a dataset"
+[scaleupepochs]
+1 = { modifier = "deepen", ignore = "inception_ignoreset", modify = "deepen_inception" }
