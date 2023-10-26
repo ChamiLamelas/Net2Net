@@ -9,6 +9,7 @@ import training
 import prediction
 import torchvision
 import torch
+import device 
 
 
 def deepenwiden(model):
@@ -52,6 +53,8 @@ def check_adaptation(
     training.set_seed(42)
     data = data_func(*data_args)
     model = model_func(**model_kwargs)
+    model = model.to(device.get_device())
+    data = data.to(device.get_device())
     pre_mod = prediction.forward(model, data)
     if adaptation_func == widening.widen:
         pre_num = models.count_parameters(model)

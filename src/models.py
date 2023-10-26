@@ -72,8 +72,7 @@ class TwoConvolution(nn.Module):
             in_channels=in_channels, out_channels=32, kernel_size=3, stride=1
         )
         self.relu1 = nn.ReLU()
-        self.conv2 = nn.Conv2d(
-            in_channels=32, out_channels=64, kernel_size=3, stride=1)
+        self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1)
         self.relu2 = nn.ReLU()
         self.finalpool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(64, out_features)
@@ -98,8 +97,7 @@ class BatchNormConvolution(nn.Module):
         )
         self.relu1 = nn.ReLU()
         self.norm = nn.BatchNorm2d(32)
-        self.conv2 = nn.Conv2d(
-            in_channels=32, out_channels=64, kernel_size=3, stride=1)
+        self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1)
         self.relu2 = nn.ReLU()
         self.finalpool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(64, out_features)
@@ -304,7 +302,8 @@ class BasicConv2d(nn.Module):
     def forward(self, x):
         x = self.conv(x)
         x = self.bn(x)
-        return F.relu(x, inplace=True)
+        print("bn=", torch.mean(x), torch.std(x), torch.max(x))
+        return F.relu(x)
 
 
 class InceptionE(nn.Module):
@@ -315,17 +314,13 @@ class InceptionE(nn.Module):
         self.branch1x1 = conv_block(in_channels, 320, kernel_size=1)
 
         self.branch3x3_1 = conv_block(in_channels, 384, kernel_size=1)
-        self.branch3x3_2a = conv_block(
-            384, 384, kernel_size=(1, 3), padding=(0, 1))
-        self.branch3x3_2b = conv_block(
-            384, 384, kernel_size=(3, 1), padding=(1, 0))
+        self.branch3x3_2a = conv_block(384, 384, kernel_size=(1, 3), padding=(0, 1))
+        self.branch3x3_2b = conv_block(384, 384, kernel_size=(3, 1), padding=(1, 0))
 
         self.branch3x3dbl_1 = conv_block(in_channels, 448, kernel_size=1)
         self.branch3x3dbl_2 = conv_block(448, 384, kernel_size=3, padding=1)
-        self.branch3x3dbl_3a = conv_block(
-            384, 384, kernel_size=(1, 3), padding=(0, 1))
-        self.branch3x3dbl_3b = conv_block(
-            384, 384, kernel_size=(3, 1), padding=(1, 0))
+        self.branch3x3dbl_3a = conv_block(384, 384, kernel_size=(1, 3), padding=(0, 1))
+        self.branch3x3dbl_3b = conv_block(384, 384, kernel_size=(3, 1), padding=(1, 0))
 
         self.branch_pool = conv_block(in_channels, 192, kernel_size=1)
         self.avgpool = nn.AdaptiveMaxPool2d((1, 1))
@@ -335,19 +330,19 @@ class InceptionE(nn.Module):
         branch1x1 = self.branch1x1(x)
 
         branch3x3 = self.branch3x3_1(x)
-        branch3x3 = [
-            self.branch3x3_2a(branch3x3),
-            self.branch3x3_2b(branch3x3),
-        ]
-        branch3x3 = torch.cat(branch3x3, 1)
+        t1 = self.branch3x3_2a(branch3x3)
+        print(torch.mean(t1), torch.max(t1))
+        t2 = self.branch3x3_2b(branch3x3)
+        print(torch.mean(t2), torch.max(t2))
+        branch3x3 = torch.cat([t1, t2], 1)
 
         branch3x3dbl = self.branch3x3dbl_1(x)
         branch3x3dbl = self.branch3x3dbl_2(branch3x3dbl)
-        branch3x3dbl = [
-            self.branch3x3dbl_3a(branch3x3dbl),
-            self.branch3x3dbl_3b(branch3x3dbl),
-        ]
-        branch3x3dbl = torch.cat(branch3x3dbl, 1)
+        t3 = self.branch3x3dbl_3a(branch3x3dbl)
+        print(torch.mean(t3), torch.max(t3))
+        t4 = self.branch3x3dbl_3b(branch3x3dbl)
+        print(torch.mean(t4), torch.max(t4))
+        branch3x3dbl = torch.cat([t3, t4], 1)
 
         branch_pool = F.avg_pool2d(x, kernel_size=3, stride=1, padding=1)
         branch_pool = self.branch_pool(branch_pool)
@@ -358,6 +353,5 @@ class InceptionE(nn.Module):
     def forward(self, x):
         outputs = self._forward(x)
         outputs = torch.cat(outputs, 1)
+        print(torch.mean(outputs), torch.max(outputs))
         return outputs
-
-
