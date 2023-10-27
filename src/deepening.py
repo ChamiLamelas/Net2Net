@@ -1,10 +1,5 @@
 """
-We are unable to deal with dropout because multiple forward calls on a model using 
-dropout during training will randomly 0-out different model parameters, see 
-pytorch note: "Each channel will be zeroed out independently on every forward call."
-from here: https://pytorch.org/docs/stable/generated/torch.nn.Dropout.html
-
-For testing we can disable the dropout
+NEEDSWORK document
 """
 
 import device

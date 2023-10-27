@@ -1,34 +1,5 @@
 """
-Notes: 
-
-- This does not support linear to conv or conv to linear widening, one way 
-to potentially solve this issue is to convert a linear layer to an
-identical 1x1 convolutional layer (https://datascience.stackexchange.com/a/12833).
-
-- Widening linear-linear, convolutional-convolutional and deepening linear layers
-are taken from here: https://github.com/paengs/Net2Net
-
-BUGS: 
-
-- We are unable to handle nonsequential layer execution order, e.g. here's 
-a forward function of a InceptionNet block. Note branch3x3 isn't passed
-into following layers but is concatenated at the end. Hence, we can't 
-arbitrarily widen all layers in a network, we need to have some knowledge
-of which layers we can widen -- not sure how to determine this automatically.
-
-def _forward(self, x: Tensor) -> List[Tensor]:
-    branch3x3 = self.branch3x3(x)
-
-    branch3x3dbl = self.branch3x3dbl_1(x)
-    branch3x3dbl = self.branch3x3dbl_2(branch3x3dbl)
-    branch3x3dbl = self.branch3x3dbl_3(branch3x3dbl)
-
-    branch_pool = F.max_pool2d(x, kernel_size=3, stride=2)
-
-    outputs = [branch3x3, branch3x3dbl, branch_pool]
-    return outputs
-
-NEEDSWORK Document
+NEEDSWORK document
 """
 
 import torch.nn as nn
