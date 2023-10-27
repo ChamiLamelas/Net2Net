@@ -6,7 +6,7 @@
 sudo apt-get update
 sudo apt -y install ubuntu-drivers-common
 sudo ubuntu-drivers autoinstall
-sudo apt -y install nvidia-cuda-toolkit
+#sudo apt -y install nvidia-cuda-toolkit
 
 sudo reboot
 
