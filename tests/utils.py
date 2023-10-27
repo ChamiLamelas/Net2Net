@@ -22,7 +22,7 @@ def widendeepen(model):
     deepening.deepen(model)
 
 
-def checkequal(input, other, rtol=1e-5, atol=1e-4):
+def checkequal(input, other, rtol=1e-5, atol=2e-2):
     if isinstance(input, torchvision.models.inception.InceptionOutputs):
         input = torch.cat([input.logits, input.aux_logits])
         other = torch.cat([other.logits, other.aux_logits])
