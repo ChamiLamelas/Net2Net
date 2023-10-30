@@ -1,10 +1,11 @@
-import sys 
-import os 
+import sys
+import os
+
 sys.path.append(os.path.join("..", "src"))
 
 from utils import check_adaptation
-import models 
-import torch 
+import models
+import torch
 import deepening
 
 
@@ -37,6 +38,7 @@ def test_deepen_small_convolutional():
         deepening.deepen,
     )
 
+
 def test_deepen_norm_convolutional():
     check_adaptation(
         models.BatchNormConvolution,
@@ -45,6 +47,7 @@ def test_deepen_norm_convolutional():
         (torch.ones((1, 1, 28, 28)), torch.ones((1, 1, 28, 28))),
         deepening.deepen,
     )
+
 
 def test_deepen_inception():
     check_adaptation(
@@ -79,6 +82,7 @@ def test_deepen_rectangular_kernel():
         deepening.deepen,
     )
 
+
 def main():
     test_deepen_feedforward()
     test_deepen_tiny_convolutional()
@@ -89,5 +93,6 @@ def main():
     test_deepen_inception()
     print("ALL DEEPEN TESTS PASSED!")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

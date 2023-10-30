@@ -1,0 +1,1 @@
+Experiment where we train InceptionNet on CIFAR-10 as the teacher for a bit then adapt it

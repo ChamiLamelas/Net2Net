@@ -1,0 +1,122 @@
+[
+    {
+        "epoch": 0,
+        "train_loss": 1565.5000989437103
+    },
+    {
+        "epoch": 0,
+        "train_acc": 0.39274
+    },
+    {
+        "epoch": 0,
+        "test_acc": 0.3991
+    },
+    {
+        "epoch": 1,
+        "train_loss": 1151.1903575062752
+    },
+    {
+        "epoch": 1,
+        "train_acc": 0.52388
+    },
+    {
+        "epoch": 1,
+        "test_acc": 0.5217
+    },
+    {
+        "epoch": 2,
+        "train_loss": 910.9810419678688
+    },
+    {
+        "epoch": 2,
+        "train_acc": 0.61386
+    },
+    {
+        "epoch": 2,
+        "test_acc": 0.5987
+    },
+    {
+        "epoch": 3,
+        "train_loss": 782.2251468896866
+    },
+    {
+        "epoch": 3,
+        "train_acc": 0.68064
+    },
+    {
+        "epoch": 3,
+        "test_acc": 0.6607
+    },
+    {
+        "epoch": 4,
+        "train_loss": 678.2514505982399
+    },
+    {
+        "epoch": 4,
+        "train_acc": 0.7123
+    },
+    {
+        "epoch": 4,
+        "test_acc": 0.6817
+    },
+    {
+        "epoch": 5,
+        "train_loss": 593.2034312784672
+    },
+    {
+        "epoch": 5,
+        "train_acc": 0.77894
+    },
+    {
+        "epoch": 5,
+        "test_acc": 0.7321
+    },
+    {
+        "epoch": 6,
+        "train_loss": 519.5479278564453
+    },
+    {
+        "epoch": 6,
+        "train_acc": 0.7995
+    },
+    {
+        "epoch": 6,
+        "test_acc": 0.7394
+    },
+    {
+        "epoch": 7,
+        "train_loss": 454.20684695243835
+    },
+    {
+        "epoch": 7,
+        "train_acc": 0.83154
+    },
+    {
+        "epoch": 7,
+        "test_acc": 0.7524
+    },
+    {
+        "epoch": 8,
+        "train_loss": 393.0721832513809
+    },
+    {
+        "epoch": 8,
+        "train_acc": 0.84794
+    },
+    {
+        "epoch": 8,
+        "test_acc": 0.7539
+    },
+    {
+        "epoch": 9,
+        "train_loss": 342.2635261416435
+    },
+    {
+        "epoch": 9,
+        "train_acc": 0.8628
+    },
+    {
+        "epoch": 9,
+        "test_acc": 0.7556
+    }
+]

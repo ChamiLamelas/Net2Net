@@ -12,19 +12,23 @@ import pytz
 import sys
 import os
 import json
+import torch
+
 
 def delete_files(*files):
     for file in files:
         if os.path.isfile(file):
             os.remove(file)
 
+
 def clear_files(*files):
     for file in files:
         if os.path.isfile(file):
             Path(file).write_text("")
 
+
 def read_json(file):
-    with open(file, 'r', encoding='utf-8') as f:
+    with open(file, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -33,7 +37,7 @@ def write_json(data, file, append=False):
         raise TypeError(f"data was {type(data)}, must be dict")
     new_data = read_json(file) if append and os.path.isfile(file) else list()
     new_data.append(data)
-    with open(file, 'w+', encoding='utf-8') as f:
+    with open(file, "w+", encoding="utf-8") as f:
         json.dump(new_data, f, ensure_ascii=False, indent=4)
 
 
@@ -42,18 +46,19 @@ def add_extension(file, extension):
 
 
 def drop_extension(file):
-    return file[:file.index('.')] if '.' in file else file
+    return file[: file.index(".")] if "." in file else file
 
 
 def get_caller():
     return inspect.stack()[1].function
+
 
 def nice_seconds_string(seconds):
     return str(timedelta(seconds=ceil(seconds)))
 
 
 def curr_time_est(format):
-    dt = datetime.now(pytz.timezone('US/Eastern'))
+    dt = datetime.now(pytz.timezone("US/Eastern"))
     return dt if format is None else dt.strftime(format)
 
 
@@ -71,7 +76,7 @@ class MyTimer:
     def start(self, task=None):
         if self.start_time is not None:
             raise MyTimerException("start( ) called twice with no stop( ) in between")
-        self.task = ((task + ' ') if task is not None else '')
+        self.task = (task + " ") if task is not None else ""
         start_str = f"{self.task}start time: {curr_time_est('%m/%d/%Y %I:%M:%S %p')}"
         if self.stream is not None:
             print(start_str, file=self.stream)
@@ -97,22 +102,22 @@ class TimedLogger:
     def _check_log_ok(self):
         if self.timer.start_time is None:
             raise TimedLoggerException(
-                f"{get_caller}( ) called without calling start( )")
+                f"{get_caller}( ) called without calling start( )"
+            )
 
     def __init__(self, log_folder=os.getcwd(), persist=True):
         if not os.path.isdir(log_folder):
             Path(log_folder).mkdir(parents=True)
         self.timer = MyTimer(stream=None)
         self.log_folder = log_folder
-        self.logger = logging.getLogger('log')
+        self.logger = logging.getLogger("log")
         self.logger.setLevel(logging.DEBUG)
         self.persist = persist
 
     def start(self, log_file=None, task=None):
         if log_file is None:
-            log_file = curr_time_est('%Y%m%d_%H%M%S') if task is None else task
-        self.log_file = add_extension(
-            os.path.join(self.log_folder, log_file), '.log')
+            log_file = curr_time_est("%Y%m%d_%H%M%S") if task is None else task
+        self.log_file = add_extension(os.path.join(self.log_folder, log_file), ".log")
         if not self.persist:
             delete_files(self.log_file)
         self.logger.handlers.clear()
@@ -121,9 +126,10 @@ class TimedLogger:
         ch = logging.StreamHandler()
         ch.setLevel(logging.INFO)
         file_formatter = logging.Formatter(
-            '%(asctime)s | [%(levelname)s] : %(message)s')
+            "%(asctime)s | [%(levelname)s] : %(message)s"
+        )
         fh.setFormatter(file_formatter)
-        console_formatter = logging.Formatter('[%(levelname)s] : %(message)s')
+        console_formatter = logging.Formatter("[%(levelname)s] : %(message)s")
         ch.setFormatter(console_formatter)
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
@@ -150,20 +156,32 @@ class TimedLogger:
 
 
 class ML_Logger(TimedLogger):
+    def __init__(self, log_folder=os.getcwd(), persist=True):
+        super().__init__(log_folder, persist)
+        self.best_acc = None
 
     def start(self, log_file=None, metrics_file=None, task=None):
         super().start(log_file, task)
-        self.metrics_file = add_extension(drop_extension(
-            self.log_file) if metrics_file is None else os.path.join(self.log_folder, metrics_file), '_metrics.json')
+        self.metrics_file = add_extension(
+            drop_extension(self.log_file)
+            if metrics_file is None
+            else os.path.join(self.log_folder, metrics_file),
+            "_metrics.json",
+        )
         if not self.persist:
             delete_files(self.metrics_file)
 
     def log_metrics(self, metrics, message=None, info=False):
-        write_json(metrics, self.metrics_file, append=True)
+        timed_metrics = metrics.copy()
+        timed_metrics["time"] = time.time()
+        write_json(timed_metrics, self.metrics_file, append=True)
         if message is not None:
             if info:
                 self.info(message)
             else:
                 self.debug(message)
 
-
+    def save_model(self, model, acc):
+        if self.best_acc is None or acc > self.best_acc:
+            torch.save(model.state_dict(), os.path.join(self.log_folder, "model.pt"))
+            self.best_acc = acc

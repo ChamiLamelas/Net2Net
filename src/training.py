@@ -13,18 +13,7 @@ from torchvision.models.inception import InceptionOutputs
 from tqdm import tqdm
 
 
-def set_seed(seed):
-    # Seeds all RNGs used by torch and its dependencies
-
-    torch.manual_seed(seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed(seed)
-    np.random.seed(seed)
-    random.seed(seed)
-
-
 def train(
-    seed,
     model,
     train_loader,
     test_loader,
@@ -35,7 +24,6 @@ def train(
     init_optimizer,
     **optim_args,
 ):
-    set_seed(seed)
     logger = ML_Logger(log_folder=folder, persist=False)
     logger.start(task="training", log_file="training", metrics_file="training")
     model = model.to(device.get_device())
@@ -59,7 +47,8 @@ def train(
             )
         train_epoch(model, train_loader, epoch, optimizer, logger)
         prediction.predict(model, train_loader, epoch, logger, "train")
-        prediction.predict(model, test_loader, epoch, logger, "test")
+        test_acc = prediction.predict(model, test_loader, epoch, logger, "test")
+        logger.save_model(model, test_acc)
     logger.stop()
 
 
@@ -67,7 +56,7 @@ def train_epoch(model, train_loader, epoch, optimizer, logger):
     model.train()
     total_loss = 0
     for data, target in tqdm(
-        train_loader, total=len(train_loader), desc=f"Epoch {epoch}"
+        train_loader, total=len(train_loader), desc=f"training epoch {epoch}"
     ):
         data, target = device.move(device.get_device(), data, target)
         optimizer.zero_grad()

@@ -24,7 +24,7 @@ def get_args():
 def main():
     args = get_args()
     cfg = config.load_config(args.configfile)
-    training.train(cfg['seed'], cfg['model'], cfg['trainloader'], cfg['testloader'], cfg['epochs'], cfg['scaleupepochs'],
+    training.train(cfg['model'], cfg['trainloader'], cfg['testloader'], cfg['epochs'], cfg['scaleupepochs'],
                    cfg['scaledownepochs'], cfg['folder'], cfg['optimizer'], **cfg['optimizer_args'])
 
 

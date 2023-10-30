@@ -4,8 +4,10 @@ NEEDSWORK document
 
 import torch
 import device
+from tqdm import tqdm
 
-def forward(model, data, eval = False):
+
+def forward(model, data, eval=False):
     model, data = device.move(device.get_device(), model, data)
     if eval:
         model.eval()
@@ -20,10 +22,17 @@ def predict(model, data_loader, epoch, logger, split):
     correct = 0
     total = 0
     with torch.no_grad():
-        for (data, target) in data_loader:
+        for data, target in tqdm(
+            data_loader, total=len(data_loader), desc=f"prediction epoch {epoch}"
+        ):
             data, target = device.move(device.get_device(), data, target)
-            output = model(data)
-            pred = output.data.max(1, keepdim=True)[1]
-            correct += pred.eq(target.data.view_as(pred)).cpu().sum().item()
+            correct += num_correct(model(data), target)
             total += data.size()[0]
-    logger.log_metrics({'epoch': epoch, f'{split}_acc': correct / total})
+    acc = correct / total
+    logger.log_metrics({"epoch": epoch, f"{split}_acc": acc})
+    return acc
+
+
+def num_correct(output, target):
+    pred = output.data.max(1, keepdim=True)[1]
+    return pred.eq(target.data.view_as(pred)).cpu().sum().item()
