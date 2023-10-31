@@ -59,7 +59,7 @@ def make_plot_nice(
     titlefontsize=None,
 ):
     if legendcol is not None:
-        ax.legend(fontsize=fontsize, ncol=legendcol, frameon=False)
+        ax.legend(fontsize=fontsize, ncol=legendcol, frameon=False, loc='lower right')
     if title is not None:
         ax.suptitle(
             title, fontsize=titlefontsize if titlefontsize is not None else fontsize

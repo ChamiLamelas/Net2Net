@@ -20,6 +20,7 @@ def train_acc_plot(args):
         xs = np.arange(len(test_acc)) + 1
         ax.scatter(xs, test_acc, label=base[: base.index("Inception")], marker=m)
     plot.make_plot_nice(ax, "Epochs", "Test Accuracy", args.ymin, args.ymax)
+    # ax.legend(loc='lower right')
     plot.save(args.file)
 
 
