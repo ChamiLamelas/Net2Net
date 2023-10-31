@@ -14,6 +14,7 @@ import deepening
 import widening
 import numpy as np
 import random
+import device
 
 CONFIG = os.path.join("..", "config")
 RESULTS = os.path.join("..", "results")
@@ -33,7 +34,8 @@ def getdynamic(attr):
         return getattr(deepening, attr)
     elif hasattr(widening, attr):
         return getattr(widening, attr)
-    raise ConfigException(f"cannot find attribute {attr} in widening or deepening")
+    raise ConfigException(
+        f"cannot find attribute {attr} in widening or deepening")
 
 
 class ConfigLoader:
@@ -46,8 +48,9 @@ class ConfigLoader:
         self.loaddata()
         self.loadoptimizer()
         self.prepfolder()
-        self.loaddynamics("scaleupepochs")
-        self.loaddynamics("scaledownepochs")
+        self.loadscaleupepochs()
+        self.loadscaledownepochs()
+        self.loaddevice()
         self.cleanup()
 
     def loadmodel(self):
@@ -67,7 +70,8 @@ class ConfigLoader:
         self.config["testloader"] = load_fn(train=False, batch_size=batch_size)
 
     def loadoptimizer(self):
-        self.config["optimizer"] = getattr(optim, self.config.get("optimizer", "Adam"))
+        self.config["optimizer"] = getattr(
+            optim, self.config.get("optimizer", "Adam"))
 
     def prepfolder(self):
         self.config["folder"] = os.path.join(RESULTS, self.config["folder"])
@@ -84,25 +88,26 @@ class ConfigLoader:
             self.configfile, os.path.join(self.config["folder"], "config.toml")
         )
 
-    def loaddynamics(self, scaletype):
-        if scaletype in self.config:
-            for k in self.config[scaletype]:
-                self.config[scaletype][k]["modifier"] = getdynamic(
-                    self.config[scaletype][k]["modifier"]
-                )
-                if isinstance(self.config[scaletype][k]["ignore"], str):
-                    self.config[scaletype][k]["ignore"] = getattr(
-                        models, self.config[scaletype][k]["ignore"]
-                    )()
-                else:
-                    self.config[scaletype][k]["ignore"] = set(
-                        self.config[scaletype][k]["ignore"]
-                    )
-                self.config[scaletype][k]["modify"] = getattr(
-                    models, self.config[scaletype][k]["modify"]
-                )
-        else:
-            self.config[scaletype] = dict()
+    def loadscaleupepochs(self):
+        if "scaleupepochs" not in self.config:
+            return dict()
+        self.config["scaleupepochs"] = {
+            int(k): v for k, v in self.config["scaleupepochs"].items()}
+        for k in self.config["scaleupepochs"]:
+            self.config["scaleupepochs"][k]["modifier"] = getdynamic(
+                self.config["scaleupepochs"][k]["modifier"]
+            )
+
+            self.config["scaleupepochs"][k]["ignore"] = getattr(
+                models, self.config["scaleupepochs"][k]["ignore"]
+            )()
+            self.config["scaleupepochs"][k]["modify"] = getattr(
+                models, self.config["scaleupepochs"][k]["modify"]
+            )
+
+    def loadscaledownepochs(self):
+        self.config["scaledownepochs"] = set(
+            self.config.get("scaledownepochs", list()))
 
     def loadseed(self):
         self.config["seed"] = self.config.get("seed", 42)
@@ -111,6 +116,15 @@ class ConfigLoader:
             torch.cuda.manual_seed(self.config["seed"])
         np.random.seed(self.config["seed"])
         random.seed(self.config["seed"])
+
+    def loaddevice(self):
+        if "device" not in self.config:
+            self.config["device"] = device.get_device()
+        else:
+            self.config["device"] = device.get_device(self.config["device"])
+            if self.config["device"] is None:
+                raise ConfigException(
+                    f"Invalid device {self.config['device']}")
 
     def cleanup(self):
         del self.config["dataset"]

@@ -75,7 +75,8 @@ class MyTimer:
 
     def start(self, task=None):
         if self.start_time is not None:
-            raise MyTimerException("start( ) called twice with no stop( ) in between")
+            raise MyTimerException(
+                "start( ) called twice with no stop( ) in between")
         self.task = (task + " ") if task is not None else ""
         start_str = f"{self.task}start time: {curr_time_est('%m/%d/%Y %I:%M:%S %p')}"
         if self.stream is not None:
@@ -117,7 +118,8 @@ class TimedLogger:
     def start(self, log_file=None, task=None):
         if log_file is None:
             log_file = curr_time_est("%Y%m%d_%H%M%S") if task is None else task
-        self.log_file = add_extension(os.path.join(self.log_folder, log_file), ".log")
+        self.log_file = add_extension(
+            os.path.join(self.log_folder, log_file), ".log")
         if not self.persist:
             delete_files(self.log_file)
         self.logger.handlers.clear()
@@ -183,6 +185,8 @@ class ML_Logger(TimedLogger):
 
     def save_model(self, model, acc, epoch):
         if self.best_acc is None or acc > self.best_acc:
-            torch.save(model.state_dict(), os.path.join(self.log_folder, "bestmodel.pt"))
+            torch.save(model.state_dict(), os.path.join(
+                self.log_folder, "bestmodel.pt"))
             self.best_acc = acc
-        torch.save(model.state_dict(), os.path.join(self.log_folder, f"model{epoch}.pt"))
+        torch.save(model.state_dict(), os.path.join(
+            self.log_folder, f"model{epoch}.pt"))

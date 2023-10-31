@@ -43,6 +43,7 @@ class LayerTable:
                 e["prevname"] = prevname
 
     def __init__(self, model, ignore=set()):
+        # print("init:", type(model))
         self.table = list()
         self._helper([], None, model)
         self._find_prev(ignore)
