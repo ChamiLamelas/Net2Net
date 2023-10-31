@@ -48,7 +48,7 @@ def train(
         train_epoch(model, train_loader, epoch, optimizer, logger)
         prediction.predict(model, train_loader, epoch, logger, "train")
         test_acc = prediction.predict(model, test_loader, epoch, logger, "test")
-        logger.save_model(model, test_acc)
+        logger.save_model(model, test_acc, epoch)
     logger.stop()
 
 

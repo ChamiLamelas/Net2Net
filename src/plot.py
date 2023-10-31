@@ -26,6 +26,7 @@ def get_args():
     parser.add_argument('start', type=int)
     parser.add_argument("ymin", type=float)
     parser.add_argument("ymax", type=float)
+    parser.add_argument("file", type=str)
     parser.add_argument("folders", nargs="+", type=check_dir)
     return parser.parse_args()
 

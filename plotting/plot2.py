@@ -20,7 +20,7 @@ def train_acc_plot(args):
         xs = np.arange(start, len(train_acc)) + 1
         ax.scatter(xs, train_acc, label=base[: base.index("Inception")], marker=m)
     plot.make_plot_nice(ax, "Epochs", "Train Accuracy", args.ymin, args.ymax)
-    plot.save("plot2.png")
+    plot.save(args.file)
 
 
 def main():

@@ -181,7 +181,8 @@ class ML_Logger(TimedLogger):
             else:
                 self.debug(message)
 
-    def save_model(self, model, acc):
+    def save_model(self, model, acc, epoch):
         if self.best_acc is None or acc > self.best_acc:
-            torch.save(model.state_dict(), os.path.join(self.log_folder, "model.pt"))
+            torch.save(model.state_dict(), os.path.join(self.log_folder, "bestmodel.pt"))
             self.best_acc = acc
+        torch.save(model.state_dict(), os.path.join(self.log_folder, f"model{epoch}.pt"))

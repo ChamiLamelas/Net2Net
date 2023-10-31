@@ -20,7 +20,7 @@ def train_loss_plot(args):
         xs = np.arange(start, len(train_loss)) + 1
         ax.scatter(xs, train_loss, label=base[: base.index("Inception")], marker=m)
     plot.make_plot_nice(ax, "Epochs", "Train Loss", args.ymin, args.ymax)
-    plot.save("plot1.png")
+    plot.save(args.file)
 
 
 def main():
