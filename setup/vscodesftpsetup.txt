@@ -1,0 +1,30 @@
+JSON: 
+
+{
+    "name": "cloudlab",
+    "host": "REPLACEWITHCLOUDLABHOSTNAME",
+    "protocol": "sftp",
+    "port": 22,
+    "username": "slamel01",
+    "remotePath": "/users/slamel01",
+    "privateKeyPath": "REPLACEWITHPATHTOPRIVATEKEY",
+    "uploadOnSave": true,
+    "ignore": [
+        "miniconda3",
+        "data",
+        "model.pth",
+        ".",
+        ".state_dict",
+        "*.deb",
+        "*.pt"
+    ]
+}
+
+Example hostname: 
+    clgpu014.clemson.cloudlab.us
+
+Windows private key path: 
+    C:\\Users\\YOURWINDOWSUSERNAME\\.ssh\\id_rsa
+
+Linux private key path: 
+    /home/YOURLINUXUSERNAME/.ssh/id_rsa
