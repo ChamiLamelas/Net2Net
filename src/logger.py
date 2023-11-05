@@ -75,8 +75,7 @@ class MyTimer:
 
     def start(self, task=None):
         if self.start_time is not None:
-            raise MyTimerException(
-                "start( ) called twice with no stop( ) in between")
+            raise MyTimerException("start( ) called twice with no stop( ) in between")
         self.task = (task + " ") if task is not None else ""
         start_str = f"{self.task}start time: {curr_time_est('%m/%d/%Y %I:%M:%S %p')}"
         if self.stream is not None:
@@ -118,8 +117,7 @@ class TimedLogger:
     def start(self, log_file=None, task=None):
         if log_file is None:
             log_file = curr_time_est("%Y%m%d_%H%M%S") if task is None else task
-        self.log_file = add_extension(
-            os.path.join(self.log_folder, log_file), ".log")
+        self.log_file = add_extension(os.path.join(self.log_folder, log_file), ".log")
         if not self.persist:
             delete_files(self.log_file)
         self.logger.handlers.clear()
@@ -160,7 +158,6 @@ class TimedLogger:
 class ML_Logger(TimedLogger):
     def __init__(self, log_folder=os.getcwd(), persist=True):
         super().__init__(log_folder, persist)
-        self.best_acc = None
 
     def start(self, log_file=None, metrics_file=None, task=None):
         super().start(log_file, task)
@@ -173,20 +170,48 @@ class ML_Logger(TimedLogger):
         if not self.persist:
             delete_files(self.metrics_file)
 
-    def log_metrics(self, metrics, message=None, info=False):
-        timed_metrics = metrics.copy()
+    def log_metrics(self, metric):
+        timed_metrics = metric.copy()
         timed_metrics["time"] = time.time()
         write_json(timed_metrics, self.metrics_file, append=True)
-        if message is not None:
-            if info:
-                self.info(message)
-            else:
-                self.debug(message)
 
-    def save_model(self, model, acc, epoch):
-        if self.best_acc is None or acc > self.best_acc:
-            torch.save(model.state_dict(), os.path.join(
-                self.log_folder, "bestmodel.pt"))
-            self.best_acc = acc
-        torch.save(model.state_dict(), os.path.join(
-            self.log_folder, f"model{epoch}.pt"))
+
+class EpochLogger(ML_Logger):
+    def __init__(self, log_folder=os.getcwd(), persist=True):
+        super().__init__(log_folder, persist)
+        self.nepochs = 0
+        self.best_save_metric = None
+
+    def log_metrics(self, metric, model=None):
+        metric = metric.copy()
+        metric["epoch"] = self.nepochs
+        super().log_metrics(metric)
+        self.nepochs += 1
+        if model is not None:
+            save_metric = list(metric.values())[0]
+            if self.best_save_metric is None or save_metric > self.best_save_metric:
+                torch.save(model.state_dict(), "bestmodel.pt")
+                self.best_save_metric = save_metric
+            torch.save(
+                model.state_dict(),
+                os.path.join(self.log_folder, f"model{self.nepochs}.pt"),
+            )
+
+
+class BatchLogger(ML_Logger):
+    def __init__(self, log_folder=os.getcwd(), persist=True, windowsize=10):
+        super().__init__(log_folder, persist)
+        self.windowsize = windowsize
+        self.window = list()
+        self.nbatches = 0
+
+    def log_metrics(self, metric):
+        save_metric = list(metric.values())[0]
+        metric = metric.copy()
+        self.window.append(save_metric)
+        if len(self.window) > self.windowsize:
+            self.window.pop(0)
+        metric[list(metric.keys())[0]] = sum(self.window) / len(self.window)
+        metric["batch"] = self.nbatches
+        super().log_metrics(metric)
+        self.nbatches += 1

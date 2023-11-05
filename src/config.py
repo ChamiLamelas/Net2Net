@@ -34,11 +34,10 @@ def getdynamic(attr):
         return getattr(deepening, attr)
     elif hasattr(widening, attr):
         return getattr(widening, attr)
-    raise ConfigException(
-        f"cannot find attribute {attr} in widening or deepening")
+    raise ConfigException(f"cannot find attribute {attr} in widening or deepening")
 
 
-class ConfigLoader:
+class Config:
     def __init__(self, configfile):
         self.configfile = configfile
         self.config = toml.load(configfile)
@@ -52,6 +51,12 @@ class ConfigLoader:
         self.loadscaledownepochs()
         self.loaddevice()
         self.cleanup()
+
+    def __getitem__(self, key):
+        if key not in self.config:
+            raise ConfigException(f"cannot find configuration for {key}")
+        return self.config[key]
+    
 
     def loadmodel(self):
         self.config["model_args"] = self.config.get("model_args", dict())
@@ -70,8 +75,8 @@ class ConfigLoader:
         self.config["testloader"] = load_fn(train=False, batch_size=batch_size)
 
     def loadoptimizer(self):
-        self.config["optimizer"] = getattr(
-            optim, self.config.get("optimizer", "Adam"))
+        self.config["optimizer"] = getattr(optim, self.config.get("optimizer", "Adam"))
+        self.config["optimizer_args"] = self.config.get("optimizer_args", dict())
 
     def prepfolder(self):
         self.config["folder"] = os.path.join(RESULTS, self.config["folder"])
@@ -92,7 +97,8 @@ class ConfigLoader:
         if "scaleupepochs" not in self.config:
             return dict()
         self.config["scaleupepochs"] = {
-            int(k): v for k, v in self.config["scaleupepochs"].items()}
+            int(k): v for k, v in self.config["scaleupepochs"].items()
+        }
         for k in self.config["scaleupepochs"]:
             self.config["scaleupepochs"][k]["modifier"] = getdynamic(
                 self.config["scaleupepochs"][k]["modifier"]
@@ -106,8 +112,7 @@ class ConfigLoader:
             )
 
     def loadscaledownepochs(self):
-        self.config["scaledownepochs"] = set(
-            self.config.get("scaledownepochs", list()))
+        self.config["scaledownepochs"] = set(self.config.get("scaledownepochs", list()))
 
     def loadseed(self):
         self.config["seed"] = self.config.get("seed", 42)
@@ -123,8 +128,7 @@ class ConfigLoader:
         else:
             self.config["device"] = device.get_device(self.config["device"])
             if self.config["device"] is None:
-                raise ConfigException(
-                    f"Invalid device {self.config['device']}")
+                raise ConfigException(f"Invalid device {self.config['device']}")
 
     def cleanup(self):
         del self.config["dataset"]
@@ -134,4 +138,4 @@ class ConfigLoader:
 
 
 def load_config(configfile):
-    return ConfigLoader(configfile).config
+    return Config(configfile).config

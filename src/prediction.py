@@ -17,19 +17,32 @@ def forward(model, data, eval=False):
         return model(data)
 
 
-def predict(model, data_loader, epoch, logger, split):
+def predict_batch(model, epoch, split, batch, logger):
+    model.eval()
+    with torch.no_grad():
+        data, target = device.move(device.get_device(), *batch)
+        correct = num_correct(model(data), target)
+        total += data.size()[0]
+        if logger is None:
+            logger.log_metrics({f"{split}_acc": correct / total})
+    return correct, total
+
+
+def predict(model, data_loader, epoch, epoch_logger, batch_logger, split):
     model.eval()
     correct = 0
     total = 0
     with torch.no_grad():
-        for data, target in tqdm(
+        for batch in tqdm(
             data_loader, total=len(data_loader), desc=f"prediction epoch {epoch}"
         ):
-            data, target = device.move(device.get_device(), data, target)
-            correct += num_correct(model(data), target)
-            total += data.size()[0]
+            batch_correct, batch_total = predict_batch(
+                model, epoch, split, batch, batch_logger
+            )
+            correct += batch_correct
+            total += batch_total
     acc = correct / total
-    logger.log_metrics({"epoch": epoch, f"{split}_acc": acc})
+    epoch_logger.log_metrics({"epoch": epoch, f"{split}_acc": acc})
     return acc
 
 
