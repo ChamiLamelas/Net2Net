@@ -156,8 +156,13 @@ class TimedLogger:
 
 
 class ML_Logger(TimedLogger):
-    def __init__(self, log_folder=os.getcwd(), persist=True):
+    def __init__(self, log_folder=os.getcwd(), persist=True, windowsize=10):
         super().__init__(log_folder, persist)
+        self.nepochs = 0
+        self.best_save_metric = None
+        self.windowsize = windowsize
+        self.window = list()
+        self.nbatches = 0
 
     def start(self, log_file=None, metrics_file=None, task=None):
         super().start(log_file, task)
@@ -170,48 +175,26 @@ class ML_Logger(TimedLogger):
         if not self.persist:
             delete_files(self.metrics_file)
 
-    def log_metrics(self, metric):
-        timed_metrics = metric.copy()
-        timed_metrics["time"] = time.time()
-        write_json(timed_metrics, self.metrics_file, append=True)
-
-
-class EpochLogger(ML_Logger):
-    def __init__(self, log_folder=os.getcwd(), persist=True):
-        super().__init__(log_folder, persist)
-        self.nepochs = 0
-        self.best_save_metric = None
-
-    def log_metrics(self, metric, model=None):
-        metric = metric.copy()
-        metric["epoch"] = self.nepochs
-        super().log_metrics(metric)
-        self.nepochs += 1
-        if model is not None:
-            save_metric = list(metric.values())[0]
-            if self.best_save_metric is None or save_metric > self.best_save_metric:
-                torch.save(model.state_dict(), "bestmodel.pt")
-                self.best_save_metric = save_metric
-            torch.save(
-                model.state_dict(),
-                os.path.join(self.log_folder, f"model{self.nepochs}.pt"),
-            )
-
-
-class BatchLogger(ML_Logger):
-    def __init__(self, log_folder=os.getcwd(), persist=True, windowsize=10):
-        super().__init__(log_folder, persist)
-        self.windowsize = windowsize
-        self.window = list()
-        self.nbatches = 0
-
-    def log_metrics(self, metric):
+    def log_metrics(self, metric, granularity, model=None):
         save_metric = list(metric.values())[0]
         metric = metric.copy()
-        self.window.append(save_metric)
-        if len(self.window) > self.windowsize:
-            self.window.pop(0)
-        metric[list(metric.keys())[0]] = sum(self.window) / len(self.window)
-        metric["batch"] = self.nbatches
-        super().log_metrics(metric)
-        self.nbatches += 1
+        metric["time"] = time.time()
+        if granularity == "epoch":
+            metric["epoch"] = self.nepochs
+            self.nepochs += 1
+            if model is not None:
+                if self.best_save_metric is None or save_metric > self.best_save_metric:
+                    torch.save(model.state_dict(), "bestmodel.pt")
+                    self.best_save_metric = save_metric
+                torch.save(
+                    model.state_dict(),
+                    os.path.join(self.log_folder, f"model{self.nepochs}.pt"),
+                )
+        elif granularity == "batch":
+            self.window.append(save_metric)
+            if len(self.window) > self.windowsize:
+                self.window.pop(0)
+            metric[list(metric.keys())[0]] = sum(self.window) / len(self.window)
+            metric["batch"] = self.nbatches
+            self.nbatches += 1
+        write_json(metric, self.metrics_file, append=True)

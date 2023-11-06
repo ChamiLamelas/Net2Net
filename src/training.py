@@ -25,14 +25,16 @@ class Trainer:
         self.total_epochs = config["epochs"]
         optimizer_fn = config["optimizer"]
         optimizer_args = config["optimizer_args"]
-        self.optimizer = optimizer_fn(self.model.parameters(), optimizer_args)
+        self.optimizer = optimizer_fn(self.model.parameters(), **optimizer_args)
+        self.T = config["T"]
+        self.soft_target_loss_weight = config["soft_target_loss_weight"]
+        self.ce_loss_weight = config["ce_loss_weight"]
 
     def train(self):
         smaller = list()
         teacher = None
         logger = ML_Logger(log_folder=self.folder, persist=False)
         logger.start(task="training", log_file="training", metrics_file="training")
-        
         for epoch in range(self.total_epochs):
             if epoch in self.scale_up_epochs:
                 backup = copy.deepcopy(self.model)
@@ -55,19 +57,17 @@ class Trainer:
                 self.model = smaller[-1]
             self.train_epoch(epoch, self.optimizer, logger, teacher)
             prediction.predict(self.model, self.train_loader, epoch, logger, "train")
-            test_acc = prediction.predict(
-                self.model, self.test_loader, epoch, logger, "test"
-            )
-            logger.save_model(self.model, test_acc, epoch)
+            prediction.predict(self.model, self.test_loader, epoch, logger, "test")
         logger.stop()
-
 
     def train_epoch(self, epoch, optimizer, logger, teacher):
         self.model = self.model.to(self.device)
         self.model.train()
         total_loss = 0
         for data, target in tqdm(
-            self.train_loader, total=len(self.train_loader), desc=f"training epoch {epoch}"
+            self.train_loader,
+            total=len(self.train_loader),
+            desc=f"training epoch {epoch}",
         ):
             data, target = device.move(self.device, data, target)
             optimizer.zero_grad()
@@ -75,8 +75,7 @@ class Trainer:
             loss.backward()
             optimizer.step()
             total_loss += loss.item()
-        logger.log_metrics({"epoch": epoch, "train_loss": total_loss})
-
+        logger.log_metrics({"train_loss": total_loss}, "epcoh")
 
     def get_logits(self, data):
         output = self.model(data)
@@ -84,23 +83,24 @@ class Trainer:
             output = output.logits
         return output
 
-
     def compute_loss(self, data, target, teacher):
         output = self.get_logits(data)
         if teacher is None:
             loss = F.cross_entropy(output, target)
         else:
-            T = 2
-            soft_target_loss_weight = 0.25
-            ce_loss_weight = 0.75
             with torch.no_grad():
                 teacher_logits = teacher(data)
             student_logits = self.get_logits(data)
-            soft_targets = F.softmax(teacher_logits / T, dim=-1)
-            soft_prob = F.log_softmax(student_logits / T, dim=-1)
+            soft_targets = F.softmax(teacher_logits / self.T, dim=-1)
+            soft_prob = F.log_softmax(student_logits / self.T, dim=-1)
             soft_targets_loss = (
-                -torch.sum(soft_targets * soft_prob) / soft_prob.size()[0] * (T**2)
+                -torch.sum(soft_targets * soft_prob)
+                / soft_prob.size()[0]
+                * (self.T**2)
             )
             label_loss = F.cross_entropy(student_logits, target)
-            loss = soft_target_loss_weight * soft_targets_loss + ce_loss_weight * label_loss
+            loss = (
+                self.soft_target_loss_weight * soft_targets_loss
+                + self.ce_loss_weight * label_loss
+            )
         return loss

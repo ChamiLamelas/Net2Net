@@ -1,8 +1,8 @@
+#!/usr/bin/env python3.8
+
 """
 NEEDSWORK document
 """
-
-#!/usr/bin/env python3.8
 
 import config
 import argparse

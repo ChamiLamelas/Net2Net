@@ -10,19 +10,21 @@ def _filterout(iterable, filterset):
 
 
 class LayerTable:
-    def _helper(self, hierarchy, name, curr):
+    def _helper(self, hierarchy, curr):
         if len(list(curr.children())) == 0:
-            self.table.append({"hierarchy": hierarchy, "name": name})
+            self.table.append({"hierarchy": hierarchy})
         for n, child in curr.named_children():
-            self._helper(hierarchy + [curr], n, child)
+            self._helper(
+                hierarchy + [n],
+                child,
+            )
 
     def _find_prev(self, ignore):
         for i, e in enumerate(self.table):
-            curr = LayerTable.get(e["hierarchy"], e["name"])
+            curr = self.get(e["hierarchy"])
             j = i - 1
             found = False
             e["prevhierarchy"] = None
-            e["prevname"] = None
             while (
                 j >= 0
                 and _filterout(self.table[j]["hierarchy"], ignore)
@@ -30,8 +32,7 @@ class LayerTable:
                 and not found
             ):
                 prevhierarchy = self.table[j]["hierarchy"]
-                prevname = self.table[j]["name"]
-                prev = LayerTable.get(prevhierarchy, prevname)
+                prev = self.get(prevhierarchy)
                 if type(curr) == type(prev):
                     if isinstance(curr, nn.Linear):
                         found = prev.out_features == curr.in_features
@@ -40,30 +41,28 @@ class LayerTable:
                 j -= 1
             if found:
                 e["prevhierarchy"] = prevhierarchy
-                e["prevname"] = prevname
 
     def __init__(self, model, ignore=set()):
-        # print("init:", type(model))
         self.table = list()
-        self._helper([], None, model)
+        self._helper([], model)
+        self.model = model
         self._find_prev(ignore)
 
     def __iter__(self):
         yield from self.table
 
     @staticmethod
-    def get(hierarchy, name):
-        parent = hierarchy[-1]
-        return (
-            parent[int(name)]
-            if isinstance(parent, nn.Sequential)
-            else getattr(parent, name)
-        )
+    def followhierarchy(obj, e):
+        return obj[int(e)] if e.isdigit() else getattr(obj, e)
 
-    @staticmethod
-    def set(hierarchy, name, value):
-        parent = hierarchy[-1]
-        if isinstance(parent, nn.Sequential):
-            parent[int(name)] = value
-        else:
-            setattr(parent, name, value)
+    def get(self, hierarchy):
+        obj = self.model
+        for e in hierarchy:
+            obj = LayerTable.followhierarchy(obj, e)
+        return obj
+
+    def set(self, hierarchy, value):
+        obj = self.model
+        for e in hierarchy[:-1]:
+            obj = LayerTable.followhierarchy(obj, e)
+        setattr(obj, hierarchy[-1], value)

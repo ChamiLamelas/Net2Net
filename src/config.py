@@ -50,13 +50,13 @@ class Config:
         self.loadscaleupepochs()
         self.loadscaledownepochs()
         self.loaddevice()
+        self.load_kd_params()
         self.cleanup()
 
     def __getitem__(self, key):
         if key not in self.config:
             raise ConfigException(f"cannot find configuration for {key}")
         return self.config[key]
-    
 
     def loadmodel(self):
         self.config["model_args"] = self.config.get("model_args", dict())
@@ -94,8 +94,7 @@ class Config:
         )
 
     def loadscaleupepochs(self):
-        if "scaleupepochs" not in self.config:
-            return dict()
+        self.config["scaleupepochs"] = self.config.get("scaleupepochs", dict())
         self.config["scaleupepochs"] = {
             int(k): v for k, v in self.config["scaleupepochs"].items()
         }
@@ -135,6 +134,13 @@ class Config:
         del self.config["model_args"]
         if "batchsize" in self.config:
             del self.config["batchsize"]
+
+    def load_kd_params(self):
+        self.config["T"] = self.config.get("T", 2)
+        self.config["soft_target_loss_weight"] = self.config.get(
+            "soft_target_loss_weight", 0.25
+        )
+        self.config["ce_loss_weight"] = self.config.get("ce_loss_weight", 0.75)
 
 
 def load_config(configfile):

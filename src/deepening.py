@@ -90,18 +90,16 @@ def random_deeper(m):
 
 
 def deepen(model, ignore=set(), modifier=lambda _: True):
-    # print("deepen", type(model))
     table = tracing.LayerTable(model, ignore)
     for e in table:
-        curr = table.get(e["hierarchy"], e["name"]) 
-        # print(modifier)
+        curr = table.get(e["hierarchy"]) 
         if (isinstance(curr, nn.Conv2d) or isinstance(curr, nn.Linear)) and modifier(e):
-            table.set(e["hierarchy"], e["name"], deeper(curr))
+            table.set(e["hierarchy"], deeper(curr))
 
 
 def random_deepen(model, ignore=set(), modifier=lambda _: True):
     table = tracing.LayerTable(model, ignore)
     for e in table:
-        curr = table.get(e["hierarchy"], e["name"])
+        curr = table.get(e["hierarchy"])
         if (isinstance(curr, nn.Conv2d) or isinstance(curr, nn.Linear)) and modifier(e):
-            table.set(e["hierarchy"], e["name"], random_deeper(curr))
+            table.set(e["hierarchy"], random_deeper(curr))
