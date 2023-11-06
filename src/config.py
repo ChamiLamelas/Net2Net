@@ -15,6 +15,7 @@ import widening
 import numpy as np
 import random
 import device
+import torch.nn as nn
 
 CONFIG = os.path.join("..", "config")
 RESULTS = os.path.join("..", "results")
@@ -51,12 +52,16 @@ class Config:
         self.loadscaledownepochs()
         self.loaddevice()
         self.load_kd_params()
+        self.loadlogging()
         self.cleanup()
 
     def __getitem__(self, key):
         if key not in self.config:
             raise ConfigException(f"cannot find configuration for {key}")
         return self.config[key]
+
+    def loadlogging(self):
+        self.config["logwindowsize"] = self.config.get("logwindowsize", 10)
 
     def loadmodel(self):
         self.config["model_args"] = self.config.get("model_args", dict())
@@ -141,7 +146,16 @@ class Config:
             "soft_target_loss_weight", 0.25
         )
         self.config["ce_loss_weight"] = self.config.get("ce_loss_weight", 0.75)
+        self.config["weight_distillation"] = self.config.get(
+            "weight_distillation", True
+        )
 
+    def __repr__(self):
+        rep = list()
+        for k, v in self.config.items():
+            rep.append(str(k))
+            rep.append("\t" + (str(type(v)) if isinstance(v, nn.Module) else str(v)))
+        return "\n".join(rep)
 
-def load_config(configfile):
-    return Config(configfile).config
+    def __str__(self):
+        return repr(self)

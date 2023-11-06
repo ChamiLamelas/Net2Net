@@ -13,6 +13,7 @@ import sys
 import os
 import json
 import torch
+from collections import Counter
 
 
 def delete_files(*files):
@@ -158,11 +159,12 @@ class TimedLogger:
 class ML_Logger(TimedLogger):
     def __init__(self, log_folder=os.getcwd(), persist=True, windowsize=10):
         super().__init__(log_folder, persist)
-        self.nepochs = 0
         self.best_save_metric = None
         self.windowsize = windowsize
         self.window = list()
-        self.nbatches = 0
+        self.start_time = None
+        self.batch_counts = Counter()
+        self.epoch_counts = Counter()
 
     def start(self, log_file=None, metrics_file=None, task=None):
         super().start(log_file, task)
@@ -174,27 +176,31 @@ class ML_Logger(TimedLogger):
         )
         if not self.persist:
             delete_files(self.metrics_file)
+        self.start_time = time.time()
 
     def log_metrics(self, metric, granularity, model=None):
+        save_key = list(metric.keys())[0]
         save_metric = list(metric.values())[0]
         metric = metric.copy()
-        metric["time"] = time.time()
+        metric["time"] = time.time() - self.start_time
         if granularity == "epoch":
-            metric["epoch"] = self.nepochs
-            self.nepochs += 1
+            self.epoch_counts[save_key] += 1
+            metric["epoch"] = self.epoch_counts[save_key]
             if model is not None:
                 if self.best_save_metric is None or save_metric > self.best_save_metric:
                     torch.save(model.state_dict(), "bestmodel.pt")
                     self.best_save_metric = save_metric
                 torch.save(
                     model.state_dict(),
-                    os.path.join(self.log_folder, f"model{self.nepochs}.pt"),
+                    os.path.join(
+                        self.log_folder, f"model{self.epoch_counts[save_key]}.pt"
+                    ),
                 )
         elif granularity == "batch":
             self.window.append(save_metric)
             if len(self.window) > self.windowsize:
                 self.window.pop(0)
             metric[list(metric.keys())[0]] = sum(self.window) / len(self.window)
-            metric["batch"] = self.nbatches
-            self.nbatches += 1
+            metric["batch"] = self.batch_counts[save_key]
+            self.batch_counts[save_key] += 1
         write_json(metric, self.metrics_file, append=True)

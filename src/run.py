@@ -25,7 +25,8 @@ def get_args():
 
 def main():
     args = get_args()
-    cfg = config.load_config(args.configfile)
+    cfg = config.Config(args.configfile)
+    print(cfg)
     trainer = training.Trainer(cfg)
     trainer.train()
 
