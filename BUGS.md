@@ -33,3 +33,7 @@ def _forward(self, x: Tensor) -> List[Tensor]:
     outputs = [branch3x3, branch3x3dbl, branch_pool]
     return outputs
 ```
+
+# SETUP 
+
+* Only supported on Linux (we use chmod, shebangs, etc.)

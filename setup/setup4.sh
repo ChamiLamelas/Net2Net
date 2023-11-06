@@ -2,21 +2,23 @@
 
 echo THIS SCRIPT REQUIRES USER INPUT -- DONT LEAVE
 
-# first part taken from here: https://www.itsupportwale.com/blog/how-to-upgrade-to-python-3-8-on-ubuntu-18-04-lts/
+# 1st part taken from here: https://linuxize.com/post/how-to-install-python-3-8-on-ubuntu-18-04/
+# the default python version is 3.6
 
-#sudo add-apt-repository ppa:deadsnakes/ppa
-#sudo apt-get update
-#apt-get update
-#apt list | grep python3.8
-#sudo apt-get install python3.8
-#sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 1
-#sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 2
-#sudo update-alternatives --config python3
+sudo apt update
+sudo apt install software-properties-common
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt install python3.8
 
-sudo apt install -y python3-pip
-python3 -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-python3 -m pip install toml
-python3 -m pip install matplotlib
-python3 -m pip install tqdm
+# this I figured out was necessary because otherwise torch would appear to install then show up
+# nowhere in the system whether you run pip show/list on any of the installed pip versions
+python3.8 -m pip install -U pip
+
+# this first step is taken from here: https://pytorch.org/get-started/locally/
+python3.8 -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+python3.8 -m pip install toml
+python3.8 -m pip install matplotlib
+python3.8 -m pip install tqdm
 git config --global user.name ChamiLamelas
 git config --global user.email chami.lamelas@gmail.com
+chmod +x testsetup.py ../src/run.py ../tests/test*.py ../plotting/*.py
