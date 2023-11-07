@@ -14,7 +14,7 @@ def _count_layers(model, layertype):
     return sum(
         1
         for e in table
-        if isinstance(tracing.LayerTable.get(e["hierarchy"], e["name"]), layertype)
+        if isinstance(table.get(e["hierarchy"]), layertype)
     )
 
 
@@ -285,11 +285,10 @@ def widen_inception(e):
         return 1 / (0.3**0.5)
 
 
-def deepen_inception(e):
-    curr_layer = tracing.LayerTable.get(e["hierarchy"], e["name"])
+def deepen_inception(e, curr_layer):
     if not isinstance(curr_layer, nn.Conv2d):
         return False
-    if type(e["hierarchy"][-2]).__name__ not in {
+    if type(e["typehierarchy"][-2]).__name__ not in {
         "InceptionC",
         "InceptionD",
         "InceptionE",

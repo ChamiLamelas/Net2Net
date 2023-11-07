@@ -6,7 +6,7 @@ import device
 import torch
 import torchvision
 import prediction
-import training
+import config
 import widening
 import models
 import deepening
@@ -50,7 +50,7 @@ def check_adaptation(
     adaptation_ignore=None,
     adaptation_modifier=None,
 ):
-    training.set_seed(42)
+    config.set_seed(42)
     data = data_func(*data_args)
     model = model_func(**model_kwargs)
     device.move(device.get_device(), data, model)

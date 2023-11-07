@@ -21,6 +21,14 @@ CONFIG = os.path.join("..", "config")
 RESULTS = os.path.join("..", "results")
 
 
+def set_seed(seed):
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+    np.random.seed(seed)
+    random.seed(seed)
+
+
 def check_dict(d, *keys):
     for k in keys:
         assert k in d
@@ -120,11 +128,7 @@ class Config:
 
     def loadseed(self):
         self.config["seed"] = self.config.get("seed", 42)
-        torch.manual_seed(self.config["seed"])
-        if torch.cuda.is_available():
-            torch.cuda.manual_seed(self.config["seed"])
-        np.random.seed(self.config["seed"])
-        random.seed(self.config["seed"])
+        set_seed(self.config["seed"])
 
     def loaddevice(self):
         if "device" not in self.config:

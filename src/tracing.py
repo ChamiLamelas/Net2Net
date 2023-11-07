@@ -10,12 +10,15 @@ def _filterout(iterable, filterset):
 
 
 class LayerTable:
-    def _helper(self, hierarchy, curr):
+    def _helper(self, hierarchy, typehierarchy, curr):
         if len(list(curr.children())) == 0:
-            self.table.append({"hierarchy": hierarchy})
+            self.table.append(
+                {"hierarchy": hierarchy, "typehierarchy": typehierarchy}
+            )
         for n, child in curr.named_children():
             self._helper(
                 hierarchy + [n],
+                typehierarchy + [curr],
                 child,
             )
 
@@ -44,7 +47,7 @@ class LayerTable:
 
     def __init__(self, model, ignore=set()):
         self.table = list()
-        self._helper([], model)
+        self._helper([], [], model)
         self.model = model
         self._find_prev(ignore)
 
