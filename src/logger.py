@@ -188,7 +188,10 @@ class ML_Logger(TimedLogger):
             metric["epoch"] = self.epoch_counts[save_key]
             if model is not None:
                 if self.best_save_metric is None or save_metric > self.best_save_metric:
-                    torch.save(model.state_dict(), "bestmodel.pt")
+                    torch.save(
+                        model.state_dict(),
+                        os.path.join(self.log_folder, f"bestmodel.pt"),
+                    )
                     self.best_save_metric = save_metric
                 torch.save(
                     model.state_dict(),
