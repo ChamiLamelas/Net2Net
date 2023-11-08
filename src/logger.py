@@ -157,11 +157,9 @@ class TimedLogger:
 
 
 class ML_Logger(TimedLogger):
-    def __init__(self, log_folder=os.getcwd(), persist=True, windowsize=10):
+    def __init__(self, log_folder=os.getcwd(), persist=True):
         super().__init__(log_folder, persist)
         self.best_save_metric = None
-        self.windowsize = windowsize
-        self.window = list()
         self.start_time = None
         self.batch_counts = Counter()
         self.epoch_counts = Counter()
@@ -200,10 +198,6 @@ class ML_Logger(TimedLogger):
                     ),
                 )
         elif granularity == "batch":
-            self.window.append(save_metric)
-            if len(self.window) > self.windowsize:
-                self.window.pop(0)
-            metric[list(metric.keys())[0]] = sum(self.window) / len(self.window)
             metric["batch"] = self.batch_counts[save_key]
             self.batch_counts[save_key] += 1
         write_json(metric, self.metrics_file, append=True)

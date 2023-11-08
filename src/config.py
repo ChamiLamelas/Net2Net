@@ -60,7 +60,6 @@ class Config:
         self.loadscaledownepochs()
         self.loaddevice()
         self.load_kd_params()
-        self.loadlogging()
         self.cleanup()
 
     def __getitem__(self, key):
@@ -68,8 +67,6 @@ class Config:
             raise ConfigException(f"cannot find configuration for {key}")
         return self.config[key]
 
-    def loadlogging(self):
-        self.config["logwindowsize"] = self.config.get("logwindowsize", 10)
 
     def loadmodel(self):
         self.config["model_args"] = self.config.get("model_args", dict())

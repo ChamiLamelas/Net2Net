@@ -31,9 +31,7 @@ class Trainer:
         self.soft_target_loss_weight = config["soft_target_loss_weight"]
         self.ce_loss_weight = config["ce_loss_weight"]
         self.weight_distillation = config["weight_distillation"]
-        self.logger = ML_Logger(
-            log_folder=self.folder, persist=False, windowsize=config["logwindowsize"]
-        )
+        self.logger = ML_Logger(log_folder=self.folder, persist=False)
 
     def train(self):
         smaller = list()

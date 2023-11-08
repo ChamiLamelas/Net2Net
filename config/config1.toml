@@ -1,11 +1,7 @@
 model = "cifar10_inception"
 optimizer_args = { lr = 0.01 }
 dataset = "cifar10"
-epochs = 9
-folder = "AdaptedInceptionCIFAR107"
-desc = "Experiment where we train adapted InceptionNet from briefly trained teacher on CIFAR-10 and then downsize with weight distillation"
-model_weights = "../results/TeacherInceptionCIFAR105/model4.pth"
-scaledownepochs = [3]
-[scaleupepochs]
-0 = { modifier = "deepen", ignore = "inception_ignoreset", modify = "deepen_inception" }
+epochs = 18
+folder = "TeacherInceptionCIFAR10118"
+desc = "Experiment where we train InceptionNet briefly on CIFAR10"
 
