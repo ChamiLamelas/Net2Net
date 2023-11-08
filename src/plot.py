@@ -23,7 +23,7 @@ def check_dir(dp):
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('start', type=int)
+    parser.add_argument("start", type=int)
     parser.add_argument("ymin", type=float)
     parser.add_argument("ymax", type=float)
     parser.add_argument("file", type=str)
@@ -59,7 +59,7 @@ def make_plot_nice(
     titlefontsize=None,
 ):
     if legendcol is not None:
-        ax.legend(fontsize=fontsize, ncol=legendcol, frameon=False, loc='lower right')
+        ax.legend(fontsize=fontsize, ncol=legendcol, frameon=False, loc="lower right")
     if title is not None:
         ax.suptitle(
             title, fontsize=titlefontsize if titlefontsize is not None else fontsize
@@ -74,10 +74,30 @@ def make_plot_nice(
     ax.grid()
 
 
-def make_epoch_lists(results_folder):
+def breakdown_into_lists(results_folder):
     data = read_json(os.path.join(results_folder, "training_metrics.json"))
-    epoch_lists = defaultdict(list)
-    for e in data:
-        for k, v in e.items():
-            epoch_lists[k].append(v)
-    return epoch_lists
+    train_epoch_times = list()
+    train_epoch_accs = list()
+    test_epoch_times = list()
+    test_epoch_accs = list()
+    train_batch_times = list()
+    train_batch_accs = list()
+    for entry in data:
+        if "batch" in entry:
+            train_batch_times.append(entry["time"])
+            train_batch_accs.append(entry["train_acc"])
+        elif "epoch" in entry:
+            if "train_acc" in entry:
+                train_epoch_times.append(entry["time"])
+                train_epoch_accs.append(entry["train_acc"])
+            elif "test_acc" in entry:
+                test_epoch_times.append(entry["time"])
+                test_epoch_accs.append(entry["test_acc"])
+    return {
+        "train_epoch_times": train_epoch_times,
+        "train_epoch_accs": train_epoch_accs,
+        "test_epoch_times": test_epoch_times,
+        "test_epoch_accs": test_epoch_accs,
+        "train_batch_times": train_batch_times,
+        "train_batch_accs": train_batch_accs,
+    }
