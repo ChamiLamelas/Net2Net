@@ -10,14 +10,19 @@ Then run:
 chmod 600 ~/.kaggle/kaggle.json
 ```
 
-Then open a screen for Kaggle (the download takes about 30 minutes on c240g5): 
+Then open a screen for Kaggle (the download takes about 30 minutes on c240g5, the extraction also takes about 30 minutes): 
 
 ```bash
 screen -S kaggle
 ```
 
-Then run the download (as per [here](https://www.kaggle.com/competitions/imagenet-object-localization-challenge/data)):
+Then run the download (as per [here](https://www.kaggle.com/competitions/imagenet-object-localization-challenge/data)) using this script:
 
 ```bash
 kaggle competitions download -c imagenet-object-localization-challenge
+mkdir ImageNet
+time unzip imagenet-object-localization-challenge.zip -d ImageNet >& /dev/null
+mv ImageNet Net2Net/data
+rm imagenet-object-localization-challenge.zip
 ```
+
