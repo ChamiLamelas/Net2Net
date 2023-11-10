@@ -67,7 +67,6 @@ class Config:
             raise ConfigException(f"cannot find configuration for {key}")
         return self.config[key]
 
-
     def loadmodel(self):
         self.config["model_args"] = self.config.get("model_args", dict())
         self.config["model"] = getattr(models, self.config["model"])(
@@ -149,6 +148,9 @@ class Config:
         self.config["ce_loss_weight"] = self.config.get("ce_loss_weight", 0.75)
         self.config["weight_distillation"] = self.config.get(
             "weight_distillation", True
+        )
+        self.config["knowledge_distillation"] = self.config.get(
+            "knowledge_distillation", True
         )
 
     def __repr__(self):
