@@ -10,7 +10,7 @@ Then run:
 chmod 600 ~/.kaggle/kaggle.json
 ```
 
-Then open a screen for Kaggle: 
+Then open a screen for Kaggle (the download takes about 30 minutes on c240g5): 
 
 ```bash
 screen -S kaggle
