@@ -16,7 +16,7 @@ Then open a screen for Kaggle:
 screen -S kaggle
 ```
 
-Then run the download:
+Then run the download (as per [here](https://www.kaggle.com/competitions/imagenet-object-localization-challenge/data)):
 
 ```bash
 kaggle competitions download -c imagenet-object-localization-challenge
