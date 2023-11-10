@@ -31,6 +31,7 @@ class Trainer:
         self.soft_target_loss_weight = config["soft_target_loss_weight"]
         self.ce_loss_weight = config["ce_loss_weight"]
         self.weight_distillation = config["weight_distillation"]
+        self.knowledge_distillation = config["knowledge_distillation"]
         self.logger = ML_Logger(log_folder=self.folder, persist=False)
 
     def train(self):
@@ -55,7 +56,8 @@ class Trainer:
                     config["modify"],
                 )
             elif epoch in self.scale_down_epochs:
-                teacher = copy.deepcopy(self.model)
+                if self.knowledge_distillation:
+                    teacher = copy.deepcopy(self.model)
                 self.model = smaller[-1]
                 if self.weight_distillation:
                     distillation.deeper_weight_transfer(teacher, self.model)
