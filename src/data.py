@@ -49,7 +49,9 @@ def load_imagenet(split, batch_size):
     https://moiseevigor.github.io/software/2022/12/18/one-pager-training-resnet-on-imagenet/
     """
 
-    assert split in {"train", "val", "test"}
+    if split == "test":
+        raise NotImplementedError(f"test is not supported")
+    assert split in {"train", "val"}
     return torch.utils.data.DataLoader(
         datasets.ImageFolder(
             os.path.join(DATA_FOLDER, "ImageNet", "ILSVRC", "Data", "CLS-LOC", split),
