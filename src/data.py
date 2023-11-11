@@ -43,22 +43,20 @@ def load_cifar10(train, batch_size):
     )
 
 
-def load_imagenet(split, batch_size):
+def load_imagenet(train, batch_size):
     """
     Following:
     https://moiseevigor.github.io/software/2022/12/18/one-pager-training-resnet-on-imagenet/
     """
 
-    if split == "test":
-        raise NotImplementedError(f"test is not supported")
-    assert split in {"train", "val"}
+    split = 'train' if train else 'val'
     return torch.utils.data.DataLoader(
         datasets.ImageFolder(
             os.path.join(DATA_FOLDER, "ImageNet", "ILSVRC", "Data", "CLS-LOC", split),
             transform=transforms.Compose(
                 [
-                    transforms.Resize(256),
-                    transforms.CenterCrop(224),
+                    transforms.Resize(299),
+                    transforms.CenterCrop(299),
                     transforms.ToTensor(),
                     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
                 ]

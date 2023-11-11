@@ -1,0 +1,7 @@
+model = "imagenet_inception"
+optimizer_args = { lr = 0.01 }
+dataset = "imagenet"
+epochs = 1
+folder = "TeacherInceptionImageNet1111"
+desc = "Experiment where we train InceptionNet briefly on ImageNet"
+
