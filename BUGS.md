@@ -37,3 +37,7 @@ def _forward(self, x: Tensor) -> List[Tensor]:
 # SETUP 
 
 * Only supported on Linux (we use chmod, shebangs, etc.)
+
+# IMAGENET 
+
+* Doesn't support the test set. See comments in ImageNet setup, data.py
