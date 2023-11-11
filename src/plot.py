@@ -8,7 +8,7 @@ import argparse
 import config
 from logger import read_json
 import os
-from collections import defaultdict
+import numpy as np
 import config
 
 PLOTS = os.path.join("..", "plots")
@@ -93,6 +93,11 @@ def breakdown_into_lists(results_folder):
             elif "test_acc" in entry:
                 test_epoch_times.append(entry["time"])
                 test_epoch_accs.append(entry["test_acc"])
+    windowsize = 100
+    train_batch_times = train_batch_times[windowsize - 1 :]
+    train_batch_accs = np.convolve(
+        train_batch_accs, np.ones(windowsize) * (1 / windowsize), "valid"
+    )
     return {
         "train_epoch_times": train_epoch_times,
         "train_epoch_accs": train_epoch_accs,

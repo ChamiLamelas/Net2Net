@@ -13,16 +13,16 @@ import config
 
 def plot6():
     teacher_metrics = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "TeacherInceptionCIFAR105")
+        os.path.join(config.RESULTS, "TeacherInceptionCIFAR10118")
     )
     big_metrics = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "BigInceptionCIFAR105")
+        os.path.join(config.RESULTS, "BigInceptionCIFAR10118")
     )
     net2net_only = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "AdaptedInceptionCIFAR108")
+        os.path.join(config.RESULTS, "AdaptedInceptionCIFAR1011102")
     )
     random_deepen = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "AdaptedInceptionCIFAR109")
+        os.path.join(config.RESULTS, "AdaptedInceptionCIFAR101102")
     )
     _, ax = plt.subplots()
     ax.plot(
@@ -63,16 +63,16 @@ def plot6():
 
 def plot7():
     teacher_metrics = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "TeacherInceptionCIFAR105")
+        os.path.join(config.RESULTS, "TeacherInceptionCIFAR10118")
     )
     big_metrics = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "BigInceptionCIFAR105")
+        os.path.join(config.RESULTS, "BigInceptionCIFAR10118")
     )
     net2net_only = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "AdaptedInceptionCIFAR108")
+        os.path.join(config.RESULTS, "AdaptedInceptionCIFAR1011102")
     )
     random_deepen = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "AdaptedInceptionCIFAR109")
+        os.path.join(config.RESULTS, "AdaptedInceptionCIFAR101102")
     )
     _, ax = plt.subplots()
     ax.scatter(
@@ -111,23 +111,43 @@ def plot7():
     plot.save("plot7.png")
 
 def plot8():
-    net2net_kd_only = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "AdaptedInceptionCIFAR106")
+    kd_metrics = plot.breakdown_into_lists(
+        os.path.join(config.RESULTS, "AdaptedInceptionCIFAR101104")
     )
-    net2net_wd_kd = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "AdaptedInceptionCIFAR107")
+    kd_and_wd_metrics = plot.breakdown_into_lists(
+        os.path.join(config.RESULTS, "AdaptedInceptionCIFAR1011103")
+    )
+    no_kd_metrics = plot.breakdown_into_lists(
+        os.path.join(config.RESULTS, "AdaptedInceptionCIFAR1011106")
+    )
+    wd_metrics = plot.breakdown_into_lists(
+        os.path.join(config.RESULTS, "AdaptedInceptionCIFAR1011105")
     )
     _, ax = plt.subplots()
     ax.scatter(
-        net2net_kd_only["train_epoch_times"],
-        net2net_kd_only["train_epoch_accs"],
+        kd_metrics["train_epoch_times"],
+        kd_metrics["train_epoch_accs"],
         color="blue",
         marker="o",
         label="kd",
     )
     ax.scatter(
-        net2net_wd_kd["train_epoch_times"],
-        net2net_wd_kd["train_epoch_accs"],
+        wd_metrics["train_epoch_times"],
+        wd_metrics["train_epoch_accs"],
+        color="green",
+        marker="x",
+        label="wd",
+    )
+    ax.scatter(
+        no_kd_metrics["train_epoch_times"],
+        no_kd_metrics["train_epoch_accs"],
+        color="yellow",
+        marker="^",
+        label="baseline",
+    )
+    ax.scatter(
+        kd_and_wd_metrics["train_epoch_times"],
+        kd_and_wd_metrics["train_epoch_accs"],
         color="red",
         marker="*",
         label="kd + wd",
