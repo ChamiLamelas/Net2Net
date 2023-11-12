@@ -56,11 +56,12 @@ class Trainer:
                     config["modify"],
                 )
             elif epoch in self.scale_down_epochs:
-                if self.knowledge_distillation:
-                    teacher = copy.deepcopy(self.model)
+                teacher = copy.deepcopy(self.model)
                 self.model = smaller[-1]
                 if self.weight_distillation:
                     distillation.deeper_weight_transfer(teacher, self.model)
+                if not self.knowledge_distillation:
+                    teacher = None 
             self.train_epoch(epoch, self.optimizer, teacher)
             test_acc = prediction.predict(self.model, self.test_loader)
             self.logger.log_metrics({"test_acc": test_acc}, "epoch", self.model)

@@ -76,33 +76,33 @@ def plot7():
     )
     _, ax = plt.subplots()
     ax.scatter(
-        teacher_metrics["train_epoch_times"],
-        teacher_metrics["train_epoch_accs"],
+        teacher_metrics["test_epoch_times"],
+        teacher_metrics["test_epoch_accs"],
         color="blue",
         marker="o",
         label="teacher",
     )
     ax.scatter(
-        big_metrics["train_epoch_times"],
-        big_metrics["train_epoch_accs"],
+        big_metrics["test_epoch_times"],
+        big_metrics["test_epoch_accs"],
         color="red",
         marker="*",
         label="big",
     )
     ax.scatter(
         np.add(
-            net2net_only["train_epoch_times"], teacher_metrics["train_epoch_times"][3]
+            net2net_only["test_epoch_times"], teacher_metrics["test_epoch_times"][3]
         ),
-        net2net_only["train_epoch_accs"],
+        net2net_only["test_epoch_accs"],
         color="green",
         marker="x",
         label="net2net"
     )
     ax.scatter(
         np.add(
-            random_deepen["train_epoch_times"], teacher_metrics["train_epoch_times"][3]
+            random_deepen["test_epoch_times"], teacher_metrics["test_epoch_times"][3]
         ),
-        random_deepen["train_epoch_accs"],
+        random_deepen["test_epoch_accs"],
         color="orange",
         marker="+",
         label="random"
@@ -125,29 +125,29 @@ def plot8():
     )
     _, ax = plt.subplots()
     ax.scatter(
-        kd_metrics["train_epoch_times"],
-        kd_metrics["train_epoch_accs"],
+        kd_metrics["test_epoch_times"],
+        kd_metrics["test_epoch_accs"],
         color="blue",
         marker="o",
         label="kd",
     )
     ax.scatter(
-        wd_metrics["train_epoch_times"],
-        wd_metrics["train_epoch_accs"],
+        wd_metrics["test_epoch_times"],
+        wd_metrics["test_epoch_accs"],
         color="green",
         marker="x",
         label="wd",
     )
     ax.scatter(
-        no_kd_metrics["train_epoch_times"],
-        no_kd_metrics["train_epoch_accs"],
+        no_kd_metrics["test_epoch_times"],
+        no_kd_metrics["test_epoch_accs"],
         color="yellow",
         marker="^",
         label="baseline",
     )
     ax.scatter(
-        kd_and_wd_metrics["train_epoch_times"],
-        kd_and_wd_metrics["train_epoch_accs"],
+        kd_and_wd_metrics["test_epoch_times"],
+        kd_and_wd_metrics["test_epoch_accs"],
         color="red",
         marker="*",
         label="kd + wd",
