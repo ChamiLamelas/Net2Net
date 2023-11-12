@@ -4,6 +4,8 @@ NEEDSWORK document
 
 import torch
 from torchvision import datasets, transforms
+from torch.utils.data import Dataset
+from datasets import load_dataset
 import os
 
 DATA_FOLDER = os.path.join("..", "data")
@@ -49,7 +51,7 @@ def load_imagenet(train, batch_size):
     https://moiseevigor.github.io/software/2022/12/18/one-pager-training-resnet-on-imagenet/
     """
 
-    split = 'train' if train else 'val'
+    split = "train" if train else "val"
     return torch.utils.data.DataLoader(
         datasets.ImageFolder(
             os.path.join(DATA_FOLDER, "ImageNet", "ILSVRC", "Data", "CLS-LOC", split),
@@ -63,5 +65,41 @@ def load_imagenet(train, batch_size):
             ),
         ),
         batch_size=batch_size,
-        shuffle=split == "train",
+        shuffle=train,
+    )
+
+
+class TinyImageNetDataset(Dataset):
+    def __init__(self, train):
+        self.huggingface_dataset = load_dataset(
+            "Maysee/tiny-imagenet", split="train" if train else "valid"
+        )
+        self.transforms = transforms.Compose(
+            [
+                transforms.ToTensor(),
+                transforms.Resize((299, 299), antialias=True),
+                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+            ]
+        )
+
+    def __len__(self):
+        return len(self.huggingface_dataset)
+
+    def __getitem__(self, index):
+        huggingface_data = self.huggingface_dataset[index]
+        return self.transforms(huggingface_data["image"]), huggingface_data["label"]
+
+
+def load_tiny_imagenet(train, batch_size):
+    """
+    Following:
+    https://paperswithcode.com/dataset/tiny-imagenet (Dataset loaders)
+    https://huggingface.co/datasets/zh-plus/tiny-imagenet
+    https://pytorch.org/tutorials/beginner/basics/data_tutorial.html#creating-a-custom-dataset-for-your-files
+    """
+
+    return torch.utils.data.DataLoader(
+        TinyImageNetDataset(train),
+        batch_size=batch_size,
+        shuffle=train,
     )
