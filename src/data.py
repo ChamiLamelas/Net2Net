@@ -77,7 +77,7 @@ class TinyImageNetDataset(Dataset):
         self.transforms = transforms.Compose(
             [
                 transforms.ToTensor(),
-                transforms.Resize((299, 299), antialias=True),
+                transforms.Resize(299, antialias=True),
                 transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
             ]
         )
