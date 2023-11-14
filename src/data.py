@@ -4,6 +4,7 @@ NEEDSWORK document
 
 import torch
 from torchvision import datasets, transforms
+from PIL import Image
 from torch.utils.data import Dataset
 from datasets import load_dataset
 import os
@@ -78,7 +79,8 @@ class TinyImageNetDataset(Dataset):
             [
                 transforms.ToTensor(),
                 transforms.Resize(299, antialias=True),
-                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+                transforms.CenterCrop(299),
+                transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
             ]
         )
 
@@ -87,7 +89,7 @@ class TinyImageNetDataset(Dataset):
 
     def __getitem__(self, index):
         huggingface_data = self.huggingface_dataset[index]
-        return self.transforms(huggingface_data["image"]), huggingface_data["label"]
+        return self.transforms(huggingface_data["image"].convert("RGB")), huggingface_data["label"]
 
 
 def load_tiny_imagenet(train, batch_size):
