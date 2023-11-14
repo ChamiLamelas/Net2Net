@@ -70,7 +70,7 @@ def deeper(m):
         new_layer = _conv_only_deeper(m)
     else:
         raise tracing.UnsupportedLayer(str(type(m)))
-    return nn.Sequential(m, new_layer)
+    return nn.Sequential(m, nn.ReLU(), new_layer)
 
 
 def random_deeper(m):
@@ -86,10 +86,10 @@ def random_deeper(m):
         )
     else:
         raise tracing.UnsupportedLayer(str(type(m)))
-    return nn.Sequential(m, new_layer)
+    return nn.Sequential(m, nn.ReLU(), new_layer)
 
 
-def deepen(model, ignore=set(), modifier=lambda x,y: True):
+def deepen(model, ignore=set(), modifier=lambda x, y: True):
     table = tracing.LayerTable(model, ignore)
     for e in table:
         curr = table.get(e["hierarchy"])
@@ -99,7 +99,7 @@ def deepen(model, ignore=set(), modifier=lambda x,y: True):
             table.set(e["hierarchy"], deeper(curr))
 
 
-def random_deepen(model, ignore=set(), modifier=lambda x,y: True):
+def random_deepen(model, ignore=set(), modifier=lambda x, y: True):
     table = tracing.LayerTable(model, ignore)
     for e in table:
         curr = table.get(e["hierarchy"])

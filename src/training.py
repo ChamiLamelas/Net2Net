@@ -12,21 +12,22 @@ import models
 import device
 import copy
 import distillation
+import torch.optim as optim
 
 
 class Trainer:
     def __init__(self, config):
         self.device = config["device"]
-        self.model = config["model"]
+        self.optimizer_fn = config["optimizer"]
+        self.optimizer_args = config["optimizer_args"]
+        self.learning_rate_decay = config["learning_rate_decay"]
+        self.change_model(config["model"])
         self.train_loader = config["trainloader"]
         self.test_loader = config["testloader"]
         self.scale_up_epochs = config["scaleupepochs"]
         self.scale_down_epochs = config["scaledownepochs"]
         self.folder = config["folder"]
         self.total_epochs = config["epochs"]
-        optimizer_fn = config["optimizer"]
-        optimizer_args = config["optimizer_args"]
-        self.optimizer = optimizer_fn(self.model.parameters(), **optimizer_args)
         self.T = config["T"]
         self.soft_target_loss_weight = config["soft_target_loss_weight"]
         self.ce_loss_weight = config["ce_loss_weight"]
@@ -57,15 +58,24 @@ class Trainer:
                 )
             elif epoch in self.scale_down_epochs:
                 teacher = copy.deepcopy(self.model)
-                self.model = smaller[-1]
+                self.change_model(smaller[-1])
                 if self.weight_distillation:
                     distillation.deeper_weight_transfer(teacher, self.model)
                 if not self.knowledge_distillation:
-                    teacher = None 
+                    teacher = None
             self.train_epoch(epoch, self.optimizer, teacher)
             test_acc = prediction.predict(self.model, self.test_loader)
             self.logger.log_metrics({"test_acc": test_acc}, "epoch", self.model)
         self.logger.stop()
+
+    def change_model(self, model):
+        self.model = model
+        self.optimizer = self.optimizer_fn(
+            self.model.parameters(), **self.optimizer_args
+        )
+        self.learning_rate = optim.lr_scheduler.ExponentialLR(
+            self.optimizer, self.learning_rate_decay
+        )
 
     def train_epoch(self, epoch, optimizer, teacher):
         self.model = self.model.to(self.device)
@@ -75,17 +85,17 @@ class Trainer:
         for data, target in tqdm(
             self.train_loader,
             total=len(self.train_loader),
-            desc=f"traini56ng epoch {epoch}",
+            desc=f"training epoch {epoch}",
         ):
             data, target = device.move(self.device, data, target)
             optimizer.zero_grad()
             loss, correct = self.compute_loss(data, target, teacher)
-            self.logger.log_metrics({"train_loss": loss.item()}, "batch")
             loss.backward()
             optimizer.step()
-            self.logger.log_metrics({"train_acc": correct / data.size()[0]}, "batch")
+            # self.logger.log_metrics({"train_acc": correct / data.size()[0]}, "batch")
             total_correct += correct
             total_size += data.size()[0]
+        self.learning_rate.step()
         self.logger.log_metrics({"train_acc": total_correct / total_size}, "epoch")
 
     @staticmethod
@@ -98,9 +108,9 @@ class Trainer:
     def compute_loss(self, data, target, teacher):
         student_logits = Trainer.get_logits(self.model, data)
         correct = prediction.num_correct(student_logits, target)
-        if teacher is None:
-            loss = F.cross_entropy(student_logits, target)
-        else:
+        loss = F.cross_entropy(student_logits, target)
+        self.logger.log_metrics({"cross_entropy_loss": loss.item()}, "batch")
+        if teacher is not None:
             with torch.no_grad():
                 teacher_logits = Trainer.get_logits(teacher, data)
             soft_targets = F.softmax(teacher_logits / self.T, dim=-1)
@@ -110,9 +120,11 @@ class Trainer:
                 / soft_prob.size()[0]
                 * (self.T**2)
             )
-            label_loss = F.cross_entropy(student_logits, target)
+            self.logger.log_metrics(
+                {"soft_targets_loss": soft_targets_loss.item()}, "batch"
+            )
             loss = (
                 self.soft_target_loss_weight * soft_targets_loss
-                + self.ce_loss_weight * label_loss
+                + self.ce_loss_weight * loss
             )
         return loss, correct

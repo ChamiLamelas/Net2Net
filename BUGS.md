@@ -2,6 +2,8 @@
 
 - We are unable to deal with dropout because multiple forward calls on a model using dropout during training will randomly 0-out different model parameters, see pytorch note: "Each channel will be zeroed out independently on every forward call." from here: https://pytorch.org/docs/stable/generated/torch.nn.Dropout.html. For testing we can disable the dropout
 - There seems to be a bug with either NumPy or PyTorch on Windows because the same code works to deepen with < 10^(-5) error on Ubuntu and it has ~10^(-2) error on windows. 
+- As in the Net2Net paper, we only support expansions on models that use ReLU activation. This is because ReLU has the special property that: ReLU(ReLU(x)) = ReLU(x). This is necessary to make the justification that Net2Net adaptations 
+maintain instantaneous accuracy.
 
 # WIDENING 
 

@@ -86,6 +86,7 @@ class Config:
     def loadoptimizer(self):
         self.config["optimizer"] = getattr(optim, self.config.get("optimizer", "Adam"))
         self.config["optimizer_args"] = self.config.get("optimizer_args", dict())
+        self.config["learning_rate_decay"] = self.config.get("learning_rate_decay", 0.9)
 
     def prepfolder(self):
         self.config["folder"] = os.path.join(RESULTS, self.config["folder"])
