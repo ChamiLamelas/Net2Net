@@ -266,6 +266,14 @@ def cifar10_inception(dropout=0.5):
     model.fc = nn.Linear(2048, 10)
     return model
 
+def tiny_imagenet_inception(dropout=0.5):
+    """~27 million parameters"""
+
+    model = models.inception_v3(
+        weights=None, init_weights=True, dropout=dropout)
+    model.fc = nn.Linear(2048, 200)
+    return model
+
 
 def imagenet_inception(dropout=0.5):
     """27 million parameters"""

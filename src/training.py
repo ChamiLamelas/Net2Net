@@ -75,11 +75,12 @@ class Trainer:
         for data, target in tqdm(
             self.train_loader,
             total=len(self.train_loader),
-            desc=f"training epoch {epoch}",
+            desc=f"traini56ng epoch {epoch}",
         ):
             data, target = device.move(self.device, data, target)
             optimizer.zero_grad()
             loss, correct = self.compute_loss(data, target, teacher)
+            self.logger.log_metrics({"train_loss": loss.item()}, "batch")
             loss.backward()
             optimizer.step()
             self.logger.log_metrics({"train_acc": correct / data.size()[0]}, "batch")
