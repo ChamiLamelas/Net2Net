@@ -43,3 +43,8 @@ def _forward(self, x: Tensor) -> List[Tensor]:
 # IMAGENET 
 
 * Doesn't support the test set. See comments in ImageNet setup, data.py
+
+# TRAINING 
+
+* Learning rate could theoretically decrease to 0, need way to make sure torch learning rate scheduler puts a minimum
+bound on the learning rate.
