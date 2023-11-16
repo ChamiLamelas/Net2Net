@@ -21,7 +21,8 @@ class Trainer:
         self.optimizer_fn = config["optimizer"]
         self.optimizer_args = config["optimizer_args"]
         self.learning_rate_decay = config["learning_rate_decay"]
-        self.change_model(config["model"])
+        self.model = config["model"]
+        self.update_optimizer()
         self.train_loader = config["trainloader"]
         self.test_loader = config["testloader"]
         self.scale_up_epochs = config["scaleupepochs"]
@@ -53,12 +54,14 @@ class Trainer:
                 config = self.scale_up_epochs[epoch]
                 config["modifier"](
                     self.model,
-                    config["ignore"],
-                    config["modify"],
+                    self.train_loader,
+                    self.device
                 )
+                self.update_optimizer()
             elif epoch in self.scale_down_epochs:
                 teacher = copy.deepcopy(self.model)
-                self.change_model(smaller[-1])
+                self.model = smaller[-1]
+                self.update_optimizer()
                 if self.weight_distillation:
                     distillation.deeper_weight_transfer(teacher, self.model)
                 if not self.knowledge_distillation:
@@ -68,8 +71,7 @@ class Trainer:
             self.logger.log_metrics({"test_acc": test_acc}, "epoch", self.model)
         self.logger.stop()
 
-    def change_model(self, model):
-        self.model = model
+    def update_optimizer(self):
         self.optimizer = self.optimizer_fn(
             self.model.parameters(), **self.optimizer_args
         )

@@ -1,10 +1,39 @@
 import torch.nn as nn
 
 
+DEEPEN_BLOCK_NAME = "Net2NetDeepenBlock"
+
+
 class UnsupportedLayer(Exception):
     pass
 
 
+class PrinterLayer(nn.Module):
+    def __init__(self, label):
+        super().__init__()
+        self.label = label
+
+    def forward(self, x):
+        return x
+
+
+def get_all_deepen_blocks(module):
+    blocks = list()
+
+    def _recursive_get_all_deepen_blocks(curr, hierarchy):
+        if DEEPEN_BLOCK_NAME in type(curr).__name__:
+            blocks.append((curr, hierarchy))
+        else:
+            for child in curr.children():
+                _recursive_get_all_deepen_blocks(child, hierarchy + [curr])
+
+    _recursive_get_all_deepen_blocks(module, list())
+    return blocks
+
+
+# old tracing stuff ...
+
+"""
 def _filterout(iterable, filterset):
     return list(filter(lambda e: type(e).__name__ not in filterset, iterable))
 
@@ -12,9 +41,7 @@ def _filterout(iterable, filterset):
 class LayerTable:
     def _helper(self, hierarchy, typehierarchy, curr):
         if len(list(curr.children())) == 0:
-            self.table.append(
-                {"hierarchy": hierarchy, "typehierarchy": typehierarchy}
-            )
+            self.table.append({"hierarchy": hierarchy, "typehierarchy": typehierarchy})
         for n, child in curr.named_children():
             self._helper(
                 hierarchy + [n],
@@ -69,3 +96,4 @@ class LayerTable:
         for e in hierarchy[:-1]:
             obj = LayerTable.followhierarchy(obj, e)
         setattr(obj, hierarchy[-1], value)
+"""

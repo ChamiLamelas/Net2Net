@@ -17,7 +17,7 @@ def test_deepen_feedforward():
         {"in_features": 4, "out_features": 5},
         torch.randn,
         ((1, 4)),
-        deepening.deepen,
+        deepening.deepen_blocks,
     )
 
 
@@ -27,7 +27,8 @@ def test_deepen_tiny_convolutional():
         {"in_channels": 1, "out_features": 5},
         torch.randn,
         ((1, 1, 28, 28)),
-        deepening.deepen,
+        deepening.deepen_blocks,
+        add_batch_norm=False,
     )
 
 
@@ -37,7 +38,8 @@ def test_deepen_small_convolutional():
         {"in_channels": 1, "out_features": 5},
         torch.randn,
         ((1, 1, 28, 28)),
-        deepening.deepen,
+        deepening.deepen_blocks,
+        add_batch_norm=False,
     )
 
 
@@ -47,19 +49,23 @@ def test_deepen_norm_convolutional():
         {"in_channels": 1, "out_features": 5},
         torch.normal,
         (torch.ones((1, 1, 28, 28)), torch.ones((1, 1, 28, 28))),
-        deepening.deepen,
+        deepening.deepen_blocks,
     )
 
 
 def test_deepen_inception():
+    def make_two():
+        x = torch.randn((1, 3, 299, 299))
+        return torch.cat([x, x], dim=0)
+
     check_adaptation(
         models.imagenet_inception,
         {"dropout": 0},
-        torch.randn,
-        ((2, 3, 299, 299)),
-        deepening.deepen,
-        models.inception_ignoreset(),
-        models.deepen_inception,
+        make_two,
+        [],
+        deepening.deepen_blocks,
+        filter_function=models.inception_deepen_filter_function,
+        eval=False,
     )
 
 
@@ -69,19 +75,19 @@ def test_deepen_subnet():
         {"in_channels": 3, "conv_block": None},
         torch.randn,
         ((1, 3, 75, 75)),
-        deepening.deepen,
-        models.inception_ignoreset(),
-        models.deepen_inception,
+        deepening.deepen_blocks,
+        filter_function=models.inception_deepen_filter_function,
     )
 
 
 def test_deepen_rectangular_kernel():
     check_adaptation(
-        models.RectangularKernel,
-        {"in_channels": 1, "out_features": 5},
+        models.ConvolutionalNet2NetDeepenBlock,
+        {"in_channels": 1, "out_channels": 3, "kernel_size": (7, 1)},
         torch.randn,
         ((1, 1, 28, 28)),
-        deepening.deepen,
+        deepening.deepen_blocks,
+        add_batch_norm=False,
     )
 
 
@@ -92,8 +98,8 @@ def main():
     test_deepen_norm_convolutional()
     test_deepen_rectangular_kernel()
     test_deepen_subnet()
+    print("ALL NON-INCEPTION DEEPEN TESTS PASSED!")
     test_deepen_inception()
-    print("ALL DEEPEN TESTS PASSED!")
 
 
 if __name__ == "__main__":

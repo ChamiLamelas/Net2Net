@@ -7,7 +7,7 @@ import device
 from tqdm import tqdm
 
 
-def forward(model, data, eval=False):
+def forward(model, data, eval=True):
     model, data = device.move(device.get_device(), model, data)
     if eval:
         model.eval()

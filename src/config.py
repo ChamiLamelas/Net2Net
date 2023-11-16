@@ -112,12 +112,8 @@ class Config:
             self.config["scaleupepochs"][k]["modifier"] = getdynamic(
                 self.config["scaleupepochs"][k]["modifier"]
             )
-
-            self.config["scaleupepochs"][k]["ignore"] = getattr(
-                models, self.config["scaleupepochs"][k]["ignore"]
-            )()
-            self.config["scaleupepochs"][k]["modify"] = getattr(
-                models, self.config["scaleupepochs"][k]["modify"]
+            self.config["scaleupepochs"][k]["filter_function"] = getattr(
+                models, self.config["scaleupepochs"][k]["filter_function"]
             )
 
     def loadscaledownepochs(self):
