@@ -28,20 +28,6 @@ def clear_files(*files):
             Path(file).write_text("")
 
 
-def read_json(file):
-    with open(file, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-
-def write_json(data, file, append=False):
-    if not isinstance(data, dict):
-        raise TypeError(f"data was {type(data)}, must be dict")
-    new_data = read_json(file) if append and os.path.isfile(file) else list()
-    new_data.append(data)
-    with open(file, "w+", encoding="utf-8") as f:
-        json.dump(new_data, f, ensure_ascii=False, indent=4)
-
-
 def add_extension(file, extension):
     return (file + extension) if not file.lower().endswith(extension) else file
 
@@ -164,40 +150,29 @@ class ML_Logger(TimedLogger):
         self.batch_counts = Counter()
         self.epoch_counts = Counter()
 
-    def start(self, log_file=None, metrics_file=None, task=None):
+    def start(self, log_file, metrics_file, task=None):
         super().start(log_file, task)
-        self.metrics_file = add_extension(
-            drop_extension(self.log_file)
-            if metrics_file is None
-            else os.path.join(self.log_folder, metrics_file),
-            "_metrics.json",
-        )
-        if not self.persist:
-            delete_files(self.metrics_file)
+        self.metrics_file = os.path.join(self.log_folder, metrics_file)
         self.start_time = time.time()
 
     def log_metrics(self, metric, granularity, model=None):
         save_key = list(metric.keys())[0]
         save_metric = list(metric.values())[0]
-        metric = metric.copy()
-        metric["time"] = time.time() - self.start_time
-        if granularity == "epoch":
-            self.epoch_counts[save_key] += 1
-            metric["epoch"] = self.epoch_counts[save_key]
-            if model is not None:
-                if self.best_save_metric is None or save_metric > self.best_save_metric:
-                    torch.save(
-                        model.state_dict(),
-                        os.path.join(self.log_folder, f"bestmodel.pt"),
-                    )
-                    self.best_save_metric = save_metric
+        save_time = time.time() - self.start_time
+        with open(
+            self.metrics_file + "." + granularity + "." + save_key,
+            mode="a+",
+            encoding="utf-8",
+        ) as f:
+            f.write(f"{save_time},{save_metric}\n")
+        if granularity == "epoch" and model is not None:
+            if self.best_save_metric is None or save_metric > self.best_save_metric:
                 torch.save(
                     model.state_dict(),
-                    os.path.join(
-                        self.log_folder, f"model{self.epoch_counts[save_key]}.pt"
-                    ),
+                    os.path.join(self.log_folder, f"bestmodel.pt"),
                 )
-        elif granularity == "batch":
-            metric["batch"] = self.batch_counts[save_key]
-            self.batch_counts[save_key] += 1
-        write_json(metric, self.metrics_file, append=True)
+                self.best_save_metric = save_metric
+            torch.save(
+                model.state_dict(),
+                os.path.join(self.log_folder, f"model{self.epoch_counts[save_key]}.pt"),
+            )

@@ -4,7 +4,6 @@ NEEDSWORK document
 
 import torch
 from torchvision import datasets, transforms
-from PIL import Image
 from torch.utils.data import Dataset
 from datasets import load_dataset
 import os
@@ -24,6 +23,7 @@ def load_mnist(train, batch_size):
         ),
         batch_size=batch_size,
         shuffle=train,
+        pin_memory=True,
     )
 
 
@@ -43,6 +43,7 @@ def load_cifar10(train, batch_size):
         ),
         batch_size=batch_size,
         shuffle=train,
+        pin_memory=True,
     )
 
 
@@ -67,6 +68,7 @@ def load_imagenet(train, batch_size):
         ),
         batch_size=batch_size,
         shuffle=train,
+        pin_memory=True,
     )
 
 
@@ -89,7 +91,10 @@ class TinyImageNetDataset(Dataset):
 
     def __getitem__(self, index):
         huggingface_data = self.huggingface_dataset[index]
-        return self.transforms(huggingface_data["image"].convert("RGB")), huggingface_data["label"]
+        return (
+            self.transforms(huggingface_data["image"].convert("RGB")),
+            huggingface_data["label"],
+        )
 
 
 def load_tiny_imagenet(train, batch_size):
@@ -104,5 +109,5 @@ def load_tiny_imagenet(train, batch_size):
         TinyImageNetDataset(train),
         batch_size=batch_size,
         shuffle=train,
-        pin_memory=True
+        pin_memory=True,
     )
