@@ -104,4 +104,5 @@ def load_tiny_imagenet(train, batch_size):
         TinyImageNetDataset(train),
         batch_size=batch_size,
         shuffle=train,
+        pin_memory=True
     )
