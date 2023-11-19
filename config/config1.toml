@@ -1,7 +1,8 @@
-model = "cifar10_inception"
+model = "tiny_imagenet_inception"
 optimizer_args = { lr = 0.01 }
-dataset = "cifar10"
-epochs = 30
-folder = "TeacherInceptionCIFAR10_11_18_1"
-desc = "Experiment where we train InceptionNet briefly on CIFAR-10"
+dataset = "tiny_imagenet"
+epochs = 50
+folder = "TeacherInceptionTinyImageNet_11_19_1"
+device = 0
+desc = "Experiment where we train InceptionNet briefly on TinyImageNet"
 

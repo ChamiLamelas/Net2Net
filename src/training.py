@@ -94,7 +94,7 @@ class Trainer:
             loss, correct = self.compute_loss(data, target, teacher)
             loss.backward()
             optimizer.step()
-            # self.logger.log_metrics({"train_acc": correct / data.size()[0]}, "batch")
+            self.logger.log_metrics({"train_acc": correct / data.size()[0]}, "batch")
             total_correct += correct
             total_size += data.size()[0]
         self.learning_rate.step()

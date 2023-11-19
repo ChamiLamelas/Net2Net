@@ -13,50 +13,50 @@ import config
 
 def plot6():
     teacher_metrics = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "TeacherInceptionCIFAR10_11_11_1")
+        os.path.join(config.RESULTS, "TeacherInceptionCIFAR10_11_18_1")
     )
     big_metrics = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "BigInceptionCIFAR10_11_11_2")
+        os.path.join(config.RESULTS, "BigInceptionCIFAR10_11_18_2")
     )
-    net2net_only = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "AdaptedInceptionCIFAR10_11_11_3")
-    )
-    random_deepen = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "AdaptedInceptionCIFAR10_11_11_4")
-    )
+    # net2net_only = plot.breakdown_into_lists(
+    #     os.path.join(config.RESULTS, "AdaptedInceptionCIFAR10_11_11_3")
+    # )
+    # random_deepen = plot.breakdown_into_lists(
+    #     os.path.join(config.RESULTS, "AdaptedInceptionCIFAR10_11_11_4")
+    # )
     _, ax = plt.subplots()
     ax.plot(
-        teacher_metrics["train_batch_times"],
-        teacher_metrics["train_batch_accs"],
+        teacher_metrics["train_epoch_times"],
+        teacher_metrics["train_epoch_accs"],
         color="blue",
         linestyle="-",
         label="teacher",
     )
     ax.plot(
-        big_metrics["train_batch_times"],
-        big_metrics["train_batch_accs"],
+        big_metrics["train_epoch_times"],
+        big_metrics["train_epoch_accs"],
         color="red",
         linestyle="-",
         label="big",
     )
-    ax.plot(
-        np.add(
-            net2net_only["train_batch_times"], teacher_metrics["train_epoch_times"][3]
-        ),
-        net2net_only["train_batch_accs"],
-        color="green",
-        linestyle="-",
-        label="net2net"
-    )
-    ax.plot(
-        np.add(
-            random_deepen["train_batch_times"], teacher_metrics["train_epoch_times"][3]
-        ),
-        random_deepen["train_batch_accs"],
-        color="orange",
-        linestyle="-",
-        label="random"
-    )
+    # ax.plot(
+    #     np.add(
+    #         net2net_only["train_batch_times"], teacher_metrics["train_epoch_times"][3]
+    #     ),
+    #     net2net_only["train_batch_accs"],
+    #     color="green",
+    #     linestyle="-",
+    #     label="net2net"
+    # )
+    # ax.plot(
+    #     np.add(
+    #         random_deepen["train_batch_times"], teacher_metrics["train_epoch_times"][3]
+    #     ),
+    #     random_deepen["train_batch_accs"],
+    #     color="orange",
+    #     linestyle="-",
+    #     label="random"
+    # )
     plot.make_plot_nice(ax, "time (s)", "accuracy", 0, 1)
     plot.save("plot6.png")
 
@@ -157,5 +157,5 @@ def plot8():
 
 if __name__ == "__main__":
     plot6()
-    plot7()
-    plot8()
+    # plot7()
+    # plot8()

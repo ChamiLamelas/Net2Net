@@ -1,9 +1,9 @@
-model = "cifar10_inception"
+model = "tiny_imagenet_inception"
 optimizer_args = { lr = 0.01 }
-dataset = "cifar10"
-epochs = 30
-folder = "BigInceptionCIFAR10_11_18_2"
-desc = "Experiment where we train randomly deepened InceptionNet briefly on CIFAR10"
+dataset = "tiny_imagenet"
+epochs = 50
+folder = "BigInceptionTinyImageNet_11_19_2"
+device = 1
+desc = "Experiment where we train a bigger InceptionNet briefly on TinyImageNet"
 [scaleupepochs]
 0 = { modifier = "random_deepen_blocks", filter_function = "inception_deepen_filter_function", add_batch_norm = true }
-

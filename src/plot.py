@@ -86,7 +86,7 @@ def breakdown_into_lists(results_folder):
         if "batch" in entry:
             train_batch_times.append(entry["time"])
             train_batch_accs.append(entry["train_acc"])
-        elif "epoch" in entry:
+        if "epoch" in entry:
             if "train_acc" in entry:
                 train_epoch_times.append(entry["time"])
                 train_epoch_accs.append(entry["train_acc"])
