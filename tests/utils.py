@@ -50,7 +50,9 @@ def check_adaptation(
     data_func,
     data_args,
     adaptation_func,
-    **adaptation_kwargs,
+    filter_function = lambda b, h: True, 
+    add_batch_norm = True,
+    eval_ = True,
 ):
     config.set_seed(42)
     data = data_func(*data_args)
@@ -60,11 +62,9 @@ def check_adaptation(
     adapted_model = copy.deepcopy(model)
     adaptation_func(
         adapted_model,
-        dataloader,
-        device.get_device(),
-        **adaptation_kwargs,
+        filter_function,
+        add_batch_norm,
     )
-    eval_ = adaptation_kwargs.get("eval", True)
     device.move(device.get_device(), data, model, adapted_model)
     pre_num = models.count_parameters(model)
     pre_mod = prediction.forward(model, data, eval=eval_)

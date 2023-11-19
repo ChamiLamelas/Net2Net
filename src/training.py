@@ -53,9 +53,8 @@ class Trainer:
                     smaller[-1] = backup
                 config = self.scale_up_epochs[epoch]
                 config["modifier"](
-                    self.model,
-                    self.train_loader,
-                    self.device
+                    config["filter_function"],
+                    config["add_batch_norm"]
                 )
                 self.update_optimizer()
             elif epoch in self.scale_down_epochs:

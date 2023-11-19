@@ -1,11 +1,10 @@
 model = "cifar10_inception"
 optimizer_args = { lr = 0.01 }
 dataset = "cifar10"
-epochs = 5
-folder = "AdaptedInceptionCIFAR10_11_14_1"
-desc = "Experiment where I am trying to see why KD learning seems to stagnate"
-model_weights = "../results/TeacherInceptionCIFAR10_11_11_1/model4.pth" 
-scaledownepochs = [2]
-[scaleupepochs]
-0 = { modifier = "deepen", ignore = "inception_ignoreset", modify = "deepen_inception" }
+epochs = 22
+folder = "AdaptedInceptionCIFAR10_11_18_5"
+desc = "Experiment where we train adapted InceptionNet from briefly trained teacher on CIFAR-10 and then scale down using kd and wd"
+model_weights = "../results/AdaptedInceptionCIFAR10_11_18_3/model4.pth" 
+scaledownepochs = [0]
+
 

@@ -70,80 +70,57 @@ def update_batchnorm_statistics(dataloader, model, device):
         model(entry[0].to(device))
 
 
-def deepen_block(block, model, dataloader, device, **kwargs):
-    add_batch_norm = kwargs.get("add_batch_norm", True)
+def deepen_block(block, add_batch_norm):
     first_layer = block.layers[0]
     if isinstance(first_layer, nn.Conv2d):
-        new_conv_layer = _conv_only_deeper(first_layer)
+        block.layers.append(_conv_only_deeper(first_layer))
         if add_batch_norm:
-            # new_batch_norm_layer = nn.BatchNorm2d(first_layer.out_channels)
-            block.layers = nn.Sequential(
-                *block.layers,
-                new_conv_layer,
-                nn.BatchNorm2d(first_layer.out_channels),
-                nn.ReLU(),
-            )
-            # _update_batchnorm_weights(dataloader, model, device, new_batch_norm_layer)
-            # new_batch_norm_layer.weight = nn.Parameter(
-        #     torch.sqrt(new_batch_norm_layer.running_var + new_batch_norm_layer.eps)
-        # )
-        # new_batch_norm_layer.bias = nn.Parameter(new_batch_norm_layer.running_mean)
-
-        else:
-            block.layers = nn.Sequential(
-                *block.layers,
-                new_conv_layer,
-                nn.ReLU(),
-            )
+            block.layers.append(nn.BatchNorm2d(first_layer.out_channels))
+        block.layers.append(nn.ReLU())
     elif isinstance(first_layer, nn.Linear):
-        block.layers = nn.Sequential(
-            *block.layers,
-            _fc_only_deeper(first_layer),
-            nn.ReLU(),
-        )
+        block.layers.append(_fc_only_deeper(first_layer))
+        block.layers.append(nn.ReLU())
     else:
         raise tracing.UnsupportedLayer(str(type(first_layer)))
 
 
-def random_deepen_block(block):
+def random_deepen_block(block, add_batch_norm):
     first_layer = block.layers[0]
     if isinstance(first_layer, nn.Conv2d):
-        new_conv_layer = nn.Conv2d(
-            in_channels=first_layer.out_channels,
-            out_channels=first_layer.out_channels,
-            kernel_size=first_layer.kernel_size,
-            stride=1,
-            padding=(first_layer.kernel_size[0] // 2, first_layer.kernel_size[1] // 2),
+        block.layers.append(
+            nn.Conv2d(
+                in_channels=first_layer.out_channels,
+                out_channels=first_layer.out_channels,
+                kernel_size=first_layer.kernel_size,
+                stride=1,
+                padding=(
+                    first_layer.kernel_size[0] // 2,
+                    first_layer.kernel_size[1] // 2,
+                ),
+            )
         )
-        new_batch_norm_layer = nn.BatchNorm2d(first_layer.out_channels)
-        block.layers = nn.Sequential(
-            *block.layers,
-            new_conv_layer,
-            new_batch_norm_layer,
-            nn.ReLU(),
-        )
+        if add_batch_norm:
+            block.layers.append(nn.BatchNorm2d(first_layer.out_channels))
+        block.layers.append(nn.ReLU())
     elif isinstance(first_layer, nn.Linear):
-        block.layers = nn.Sequential(
-            *block.layers,
-            nn.Linear(first_layer.out_features, first_layer.out_features),
-            nn.ReLU(),
+        block.layers.append(
+            nn.Linear(first_layer.out_features, first_layer.out_features)
         )
+        block.layers.append(nn.ReLU())
     else:
         raise tracing.UnsupportedLayer(str(type(first_layer)))
 
 
-def deepen_blocks(model, dataloader, device, **kwargs):
-    filter_function = kwargs.get("filter_function", lambda b, h: True)
+def deepen_blocks(model, filter_function=lambda b, h: True, add_batch_norm=True):
     for block, hierarchy in tracing.get_all_deepen_blocks(model):
         if filter_function(block, hierarchy):
-            deepen_block(block, model, dataloader, device, **kwargs)
+            deepen_block(block, add_batch_norm)
 
 
-def random_deepen_blocks(model, dataloader, device, **kwargs):
-    filter_function = kwargs.get("filter_function", lambda b, h: True)
+def random_deepen_blocks(model, filter_function=lambda b, h: True, add_batch_norm=True):
     for block, hierarchy in tracing.get_all_deepen_blocks(model):
         if filter_function(block, hierarchy):
-            random_deepen_block(block, None, None, None, **kwargs)
+            random_deepen_block(block, add_batch_norm)
 
 
 # older deepening stuff ..
