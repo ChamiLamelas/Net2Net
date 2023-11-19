@@ -53,9 +53,7 @@ class Trainer:
                     smaller[-1] = backup
                 config = self.scale_up_epochs[epoch]
                 config["modifier"](
-                    self.model,
-                    config["filter_function"],
-                    config["add_batch_norm"]
+                    self.model, config["filter_function"], config["add_batch_norm"]
                 )
                 self.update_optimizer()
             elif epoch in self.scale_down_epochs:
@@ -67,7 +65,7 @@ class Trainer:
                 if not self.knowledge_distillation:
                     teacher = None
             self.train_epoch(epoch, self.optimizer, teacher)
-            test_acc = prediction.predict(self.model, self.test_loader)
+            test_acc = prediction.predict(self.model, self.test_loader, self.device)
             self.logger.log_metrics({"test_acc": test_acc}, "epoch", self.model)
         self.logger.stop()
 

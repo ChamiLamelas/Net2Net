@@ -3,12 +3,12 @@ NEEDSWORK document
 """
 
 import torch
-import device
 from tqdm import tqdm
+import device
 
 
-def forward(model, data, eval=True):
-    model, data = device.move(device.get_device(), model, data)
+def forward(model, data, eval=True, dev=device.get_device()):
+    model, data = device.move(dev, model, data)
     if eval:
         model.eval()
     else:
@@ -17,7 +17,7 @@ def forward(model, data, eval=True):
         return model(data)
 
 
-def predict(model, data_loader):
+def predict(model, data_loader, dev=device.get_device()):
     model.eval()
     correct = 0
     total = 0
@@ -25,7 +25,7 @@ def predict(model, data_loader):
         for batch in tqdm(
             data_loader, total=len(data_loader), desc=f"prediction epoch"
         ):
-            data, target = device.move(device.get_device(), *batch)
+            data, target = device.move(dev, *batch)
             correct += num_correct(model(data), target)
             total += data.size()[0]
     return correct / total
