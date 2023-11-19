@@ -26,15 +26,15 @@ def plot6():
     # )
     _, ax = plt.subplots()
     ax.plot(
-        teacher_metrics["train_epoch_times"],
-        teacher_metrics["train_epoch_accs"],
+        teacher_metrics["test_epoch_times"],
+        teacher_metrics["test_epoch_accs"],
         color="blue",
         linestyle="-",
         label="teacher",
     )
     ax.plot(
-        big_metrics["train_epoch_times"],
-        big_metrics["train_epoch_accs"],
+        big_metrics["test_epoch_times"],
+        big_metrics["test_epoch_accs"],
         color="red",
         linestyle="-",
         label="big",

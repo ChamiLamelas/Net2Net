@@ -83,9 +83,9 @@ def breakdown_into_lists(results_folder):
     train_batch_times = list()
     train_batch_accs = list()
     for entry in data:
-        if "batch" in entry:
-            train_batch_times.append(entry["time"])
-            train_batch_accs.append(entry["train_acc"])
+        # if "batch" in entry:
+        #     train_batch_times.append(entry["time"])
+        #     train_batch_accs.append(entry["train_acc"])
         if "epoch" in entry:
             if "train_acc" in entry:
                 train_epoch_times.append(entry["time"])
@@ -95,9 +95,9 @@ def breakdown_into_lists(results_folder):
                 test_epoch_accs.append(entry["test_acc"])
     windowsize = 100
     train_batch_times = train_batch_times[windowsize - 1 :]
-    train_batch_accs = np.convolve(
-        train_batch_accs, np.ones(windowsize) * (1 / windowsize), "valid"
-    )
+    # train_batch_accs = np.convolve(
+    #     train_batch_accs, np.ones(windowsize) * (1 / windowsize), "valid"
+    # )
     return {
         "train_epoch_times": train_epoch_times,
         "train_epoch_accs": train_epoch_accs,
