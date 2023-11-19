@@ -53,6 +53,7 @@ class Trainer:
                     smaller[-1] = backup
                 config = self.scale_up_epochs[epoch]
                 config["modifier"](
+                    self.model,
                     config["filter_function"],
                     config["add_batch_norm"]
                 )
