@@ -4,7 +4,7 @@ dataset = "cifar10"
 epochs = 17
 folder = "AdaptedInceptionCIFAR10_11_20_3c"
 desc = "Experiment where we train adapted InceptionNet from briefly trained teacher on CIFAR-10 and then scale down using kd"
-model_weights = "../results/AdaptedInceptionCIFAR10_11_20_2a/model_after_4_epochs.pt" 
+model_weights = "../results/AdaptedInceptionCIFAR10_11_20_2a/model_after_4_epochs.pth" 
 scaledownepochs = [0]
 weight_distillation = false
 
