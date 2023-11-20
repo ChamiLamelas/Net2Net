@@ -2,6 +2,6 @@ model = "cifar10_inception"
 optimizer_args = { lr = 0.01 }
 dataset = "cifar10"
 epochs = 25
-folder = "TeacherInceptionCIFAR10_11_18_3a"
+folder = "TeacherInceptionCIFAR10_11_20_1a"
 desc = "Experiment where we train InceptionNet briefly on CIFAR-10"
 
