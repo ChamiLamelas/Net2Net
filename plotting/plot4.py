@@ -9,106 +9,78 @@ sys.path.append(os.path.join("..", "src"))
 
 import plot
 import config
+from logger import ML_Logger as LOG
 
 
 def plot6():
-    teacher_metrics = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "TeacherInceptionCIFAR10_11_18_1")
+    metric = "train_acc"
+
+    teacher_metrics = LOG.load_metrics(
+        os.path.join(config.RESULTS, "TeacherInceptionTinyImageNet_11_19_1"),
+        "training",
+        metric,
+        "epoch",
     )
-    big_metrics = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "BigInceptionCIFAR10_11_18_2")
+
+    big_metrics = LOG.load_metrics(
+        os.path.join(config.RESULTS, "BigInceptionTinyImageNet_11_19_2"),
+        "training",
+        metric,
+        "epoch",
     )
-    # net2net_only = plot.breakdown_into_lists(
-    #     os.path.join(config.RESULTS, "AdaptedInceptionCIFAR10_11_11_3")
-    # )
-    # random_deepen = plot.breakdown_into_lists(
-    #     os.path.join(config.RESULTS, "AdaptedInceptionCIFAR10_11_11_4")
-    # )
     _, ax = plt.subplots()
     ax.plot(
-        teacher_metrics["test_epoch_times"],
-        teacher_metrics["test_epoch_accs"],
+        plot.to_min(teacher_metrics["times"]),
+        teacher_metrics["metrics"],
         color="blue",
         linestyle="-",
         label="teacher",
     )
     ax.plot(
-        big_metrics["test_epoch_times"],
-        big_metrics["test_epoch_accs"],
+        plot.to_min(big_metrics["times"]),
+        big_metrics["metrics"],
         color="red",
         linestyle="-",
         label="big",
     )
-    # ax.plot(
-    #     np.add(
-    #         net2net_only["train_batch_times"], teacher_metrics["train_epoch_times"][3]
-    #     ),
-    #     net2net_only["train_batch_accs"],
-    #     color="green",
-    #     linestyle="-",
-    #     label="net2net"
-    # )
-    # ax.plot(
-    #     np.add(
-    #         random_deepen["train_batch_times"], teacher_metrics["train_epoch_times"][3]
-    #     ),
-    #     random_deepen["train_batch_accs"],
-    #     color="orange",
-    #     linestyle="-",
-    #     label="random"
-    # )
-    plot.make_plot_nice(ax, "time (s)", "accuracy", 0, 1)
+    plot.make_plot_nice(ax, "time (min)", metric, 0, 1)
     plot.save("plot6.png")
 
 
 def plot7():
-    teacher_metrics = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "TeacherInceptionCIFAR10_11_11_1")
+    metric = "test_acc"
+
+    teacher_metrics = LOG.load_metrics(
+        os.path.join(config.RESULTS, "TeacherInceptionTinyImageNet_11_19_1"),
+        "training",
+        metric,
+        "epoch",
     )
-    big_metrics = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "BigInceptionCIFAR10_11_11_2")
-    )
-    net2net_only = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "AdaptedInceptionCIFAR10_11_11_3")
-    )
-    random_deepen = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "AdaptedInceptionCIFAR10_11_11_4")
+
+    big_metrics = LOG.load_metrics(
+        os.path.join(config.RESULTS, "BigInceptionTinyImageNet_11_19_2"),
+        "training",
+        metric,
+        "epoch",
     )
     _, ax = plt.subplots()
-    ax.scatter(
-        teacher_metrics["test_epoch_times"],
-        teacher_metrics["test_epoch_accs"],
+    ax.plot(
+        plot.to_min(teacher_metrics["times"]),
+        teacher_metrics["metrics"],
         color="blue",
-        marker="o",
+        linestyle="-",
         label="teacher",
     )
-    ax.scatter(
-        big_metrics["test_epoch_times"],
-        big_metrics["test_epoch_accs"],
+    ax.plot(
+        plot.to_min(big_metrics["times"]),
+        big_metrics["metrics"],
         color="red",
-        marker="*",
+        linestyle="-",
         label="big",
     )
-    ax.scatter(
-        np.add(
-            net2net_only["test_epoch_times"], teacher_metrics["test_epoch_times"][3]
-        ),
-        net2net_only["test_epoch_accs"],
-        color="green",
-        marker="x",
-        label="net2net"
-    )
-    ax.scatter(
-        np.add(
-            random_deepen["test_epoch_times"], teacher_metrics["test_epoch_times"][3]
-        ),
-        random_deepen["test_epoch_accs"],
-        color="orange",
-        marker="+",
-        label="random"
-    )
-    plot.make_plot_nice(ax, "time (s)", "accuracy", 0, 1)
+    plot.make_plot_nice(ax, "time (min)", metric, 0, 1)
     plot.save("plot7.png")
+
 
 def plot8():
     kd_metrics = plot.breakdown_into_lists(
@@ -155,7 +127,8 @@ def plot8():
     plot.make_plot_nice(ax, "time (s)", "accuracy", 0, 1)
     plot.save("plot8.png")
 
+
 if __name__ == "__main__":
     plot6()
-    # plot7()
+    plot7()
     # plot8()

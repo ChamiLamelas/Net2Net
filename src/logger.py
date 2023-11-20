@@ -11,7 +11,7 @@ import time
 import pytz
 import sys
 import os
-import json
+import csv
 import torch
 from collections import Counter
 
@@ -176,3 +176,22 @@ class ML_Logger(TimedLogger):
                 model.state_dict(),
                 os.path.join(self.log_folder, f"model{self.epoch_counts[save_key]}.pt"),
             )
+
+    @staticmethod
+    def load_metrics(log_folder, metrics_file, metric, granularity):
+        metrics_file = os.path.join(log_folder, metrics_file)
+
+        times = list()
+        metrics = list()
+
+        with open(
+            metrics_file + "." + granularity + "." + metric,
+            mode="r",
+            encoding="utf-8",
+        ) as f:
+            reader = csv.reader(f, delimiter=",")
+            for row in reader:
+                times.append(float(row[0]))
+                metrics.append(float(row[1]))
+
+        return {"times": times, "metrics": metrics}

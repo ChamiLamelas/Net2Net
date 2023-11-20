@@ -6,7 +6,6 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import argparse
 import config
-from logger import read_json
 import os
 import numpy as np
 import config
@@ -74,35 +73,5 @@ def make_plot_nice(
     ax.grid()
 
 
-def breakdown_into_lists(results_folder):
-    data = read_json(os.path.join(results_folder, "training_metrics.json"))
-    train_epoch_times = list()
-    train_epoch_accs = list()
-    test_epoch_times = list()
-    test_epoch_accs = list()
-    train_batch_times = list()
-    train_batch_accs = list()
-    for entry in data:
-        # if "batch" in entry:
-        #     train_batch_times.append(entry["time"])
-        #     train_batch_accs.append(entry["train_acc"])
-        if "epoch" in entry:
-            if "train_acc" in entry:
-                train_epoch_times.append(entry["time"])
-                train_epoch_accs.append(entry["train_acc"])
-            elif "test_acc" in entry:
-                test_epoch_times.append(entry["time"])
-                test_epoch_accs.append(entry["test_acc"])
-    windowsize = 100
-    train_batch_times = train_batch_times[windowsize - 1 :]
-    # train_batch_accs = np.convolve(
-    #     train_batch_accs, np.ones(windowsize) * (1 / windowsize), "valid"
-    # )
-    return {
-        "train_epoch_times": train_epoch_times,
-        "train_epoch_accs": train_epoch_accs,
-        "test_epoch_times": test_epoch_times,
-        "test_epoch_accs": test_epoch_accs,
-        "train_batch_times": train_batch_times,
-        "train_batch_accs": train_batch_accs,
-    }
+def to_min(secs):
+    return [sec // 60 for sec in secs]
