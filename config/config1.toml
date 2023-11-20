@@ -2,7 +2,7 @@ model = "tiny_imagenet_inception"
 optimizer_args = { lr = 0.01 }
 dataset = "tiny_imagenet"
 epochs = 50
-folder = "TeacherInceptionTinyImageNet_11_19_1"
+folder = "TeacherInceptionTinyImageNet_11_20_1"
 device = 0
 desc = "Experiment where we train InceptionNet briefly on TinyImageNet"
 
