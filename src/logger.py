@@ -13,7 +13,7 @@ import sys
 import os
 import csv
 import torch
-from collections import Counter
+from collections import Counter, defaultdict
 
 
 def delete_files(*files):
@@ -147,8 +147,7 @@ class ML_Logger(TimedLogger):
         super().__init__(log_folder, persist)
         self.best_save_metric = None
         self.start_time = None
-        self.batch_counts = Counter()
-        self.epoch_counts = Counter()
+        self.counts = defaultdict(Counter)
 
     def start(self, log_file, metrics_file, task=None):
         super().start(log_file, task)
@@ -165,6 +164,7 @@ class ML_Logger(TimedLogger):
             encoding="utf-8",
         ) as f:
             f.write(f"{save_time},{save_metric}\n")
+        self.counts[granularity][save_key] += 1
         if granularity == "epoch" and model is not None:
             if self.best_save_metric is None or save_metric > self.best_save_metric:
                 torch.save(
@@ -174,7 +174,7 @@ class ML_Logger(TimedLogger):
                 self.best_save_metric = save_metric
             torch.save(
                 model.state_dict(),
-                os.path.join(self.log_folder, f"model{self.epoch_counts[save_key]}.pt"),
+                os.path.join(self.log_folder, f"model_after_{self.counts['epoch'][save_key]}_epochs.pt"),
             )
 
     @staticmethod
