@@ -95,7 +95,6 @@ class Trainer:
             self.logger.log_metrics({"train_acc": correct / data.size()[0]}, "batch")
             total_correct += correct
             total_size += data.size()[0]
-            break
         self.learning_rate.step()
         self.logger.log_metrics({"train_acc": total_correct / total_size}, "epoch")
 
