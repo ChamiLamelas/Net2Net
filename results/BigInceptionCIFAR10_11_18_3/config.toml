@@ -1,0 +1,9 @@
+model = "cifar10_inception"
+optimizer_args = { lr = 0.001 }
+dataset = "cifar10"
+epochs = 25
+folder = "BigInceptionCIFAR10_11_18_3"
+desc = "Experiment where we train bigger InceptionNet from briefly on CIFAR-10 with 1/10 of smaller's learning rate"
+[scaleupepochs]
+0 = { modifier = "random_deepen_blocks", filter_function = "inception_deepen_filter_function", add_batch_norm = true }
+

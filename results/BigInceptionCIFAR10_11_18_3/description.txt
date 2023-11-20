@@ -1,0 +1,1 @@
+Experiment where we train bigger InceptionNet from briefly on CIFAR-10 with 1/10 of smaller's learning rate
