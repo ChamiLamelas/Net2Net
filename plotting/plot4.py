@@ -14,16 +14,19 @@ from logger import ML_Logger as LOG
 
 def plot6():
     metric = "train_acc"
+    folder1 = "TeacherInceptionCIFAR10_11_18_3a"
+    folder2 = "BigInceptionCIFAR10_11_18_3b"
+    output = "plot8.png"
 
     teacher_metrics = LOG.load_metrics(
-        os.path.join(config.RESULTS, "TeacherInceptionTinyImageNet_11_19_1"),
+        os.path.join(config.RESULTS, folder1),
         "training",
         metric,
         "epoch",
     )
 
     big_metrics = LOG.load_metrics(
-        os.path.join(config.RESULTS, "BigInceptionTinyImageNet_11_19_2"),
+        os.path.join(config.RESULTS, folder2),
         "training",
         metric,
         "epoch",
@@ -44,21 +47,24 @@ def plot6():
         label="big",
     )
     plot.make_plot_nice(ax, "time (min)", metric, 0, 1)
-    plot.save("plot6.png")
+    plot.save(output)
 
 
 def plot7():
     metric = "test_acc"
+    folder1 = "TeacherInceptionCIFAR10_11_18_3a"
+    folder2 = "BigInceptionCIFAR10_11_18_3b"
+    output = "plot9.png"
 
     teacher_metrics = LOG.load_metrics(
-        os.path.join(config.RESULTS, "TeacherInceptionTinyImageNet_11_19_1"),
+        os.path.join(config.RESULTS, folder1),
         "training",
         metric,
         "epoch",
     )
 
     big_metrics = LOG.load_metrics(
-        os.path.join(config.RESULTS, "BigInceptionTinyImageNet_11_19_2"),
+        os.path.join(config.RESULTS, folder2),
         "training",
         metric,
         "epoch",
@@ -79,7 +85,7 @@ def plot7():
         label="big",
     )
     plot.make_plot_nice(ax, "time (min)", metric, 0, 1)
-    plot.save("plot7.png")
+    plot.save(output)
 
 
 def plot8():
