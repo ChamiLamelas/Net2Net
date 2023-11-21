@@ -12,129 +12,279 @@ import config
 from logger import ML_Logger as LOG
 
 
-def plot6():
-    metric = "train_acc"
-    folder1 = "TeacherInceptionCIFAR10_11_20_1a"
-    folder2 = "BigInceptionCIFAR10_11_20_1b"
-    output = "plot8.png"
+def add_time_starter(metrics, starter):
+    if starter is not None:
+        return {
+            "times": starter[0]["times"][: starter[1] + 1]
+            + list(np.add(metrics["times"], starter[0]["times"][starter[1]])),
+            "metrics": starter[0]["metrics"][: starter[1] + 1] + metrics["metrics"],
+        }
+    return metrics
 
-    teacher_metrics = LOG.load_metrics(
-        os.path.join(config.RESULTS, folder1),
-        "training",
-        metric,
-        "epoch",
+
+def plot6(
+    metric,
+    granularity,
+    folder1,
+    folder2,
+    output,
+    label1,
+    label2,
+    starter1=None,
+    starter2=None,
+):
+    model1_metrics = add_time_starter(
+        LOG.load_metrics(
+            os.path.join(config.RESULTS, folder1),
+            "training",
+            metric,
+            granularity,
+        ), starter1
     )
 
-    big_metrics = LOG.load_metrics(
-        os.path.join(config.RESULTS, folder2),
-        "training",
-        metric,
-        "epoch",
+    model2_metrics = add_time_starter(
+        LOG.load_metrics(
+            os.path.join(config.RESULTS, folder2),
+            "training",
+            metric,
+            granularity,
+        ), starter2
     )
+
     _, ax = plt.subplots()
     ax.plot(
-        plot.to_min(teacher_metrics["times"]),
-        teacher_metrics["metrics"],
+        plot.to_min(model1_metrics["times"]),
+        model1_metrics["metrics"],
         color="blue",
-        linestyle="-",
-        label="teacher",
+        linestyle="solid",
+        label=label1,
     )
     ax.plot(
-        plot.to_min(big_metrics["times"]),
-        big_metrics["metrics"],
+        plot.to_min(model2_metrics["times"]),
+        model2_metrics["metrics"],
         color="red",
-        linestyle="-",
-        label="big",
+        linestyle="dotted",
+        label=label2,
     )
     plot.make_plot_nice(ax, "time (min)", metric, 0, 1)
     plot.save(output)
 
 
-def plot7():
-    metric = "test_acc"
-    folder1 = "TeacherInceptionCIFAR10_11_20_1a"
-    folder2 = "BigInceptionCIFAR10_11_20_1b"
-    output = "plot9.png"
-
-    teacher_metrics = LOG.load_metrics(
+def plot7(
+    metric,
+    granularity,
+    folder1,
+    folder2,
+    folder3,
+    folder4,
+    output,
+    label1,
+    label2,
+    label3,
+    label4,
+):
+    model1_metrics = LOG.load_metrics(
         os.path.join(config.RESULTS, folder1),
         "training",
         metric,
-        "epoch",
+        granularity,
     )
-
-    big_metrics = LOG.load_metrics(
+    model2_metrics = LOG.load_metrics(
         os.path.join(config.RESULTS, folder2),
         "training",
         metric,
-        "epoch",
+        granularity,
+    )
+    model3_metrics = LOG.load_metrics(
+        os.path.join(config.RESULTS, folder3),
+        "training",
+        metric,
+        granularity,
+    )
+    model4_metrics = LOG.load_metrics(
+        os.path.join(config.RESULTS, folder4),
+        "training",
+        metric,
+        granularity,
     )
     _, ax = plt.subplots()
     ax.plot(
-        plot.to_min(teacher_metrics["times"]),
-        teacher_metrics["metrics"],
+        plot.to_min(model1_metrics["times"]),
+        model1_metrics["metrics"],
         color="blue",
-        linestyle="-",
-        label="teacher",
+        linestyle="solid",
+        label=label1,
     )
     ax.plot(
-        plot.to_min(big_metrics["times"]),
-        big_metrics["metrics"],
+        plot.to_min(model2_metrics["times"]),
+        model2_metrics["metrics"],
         color="red",
-        linestyle="-",
-        label="big",
+        linestyle="dotted",
+        label=label2,
     )
-    plot.make_plot_nice(ax, "time (min)", metric, 0, 1)
-    plot.save(output)
-
-
-def plot8():
-    kd_metrics = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "AdaptedInceptionCIFAR10_11_11_6")
-    )
-    kd_and_wd_metrics = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "AdaptedInceptionCIFAR10_11_11_5")
-    )
-    no_kd_metrics = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "AdaptedInceptionCIFAR10_11_11_8")
-    )
-    wd_metrics = plot.breakdown_into_lists(
-        os.path.join(config.RESULTS, "AdaptedInceptionCIFAR10_11_11_7")
-    )
-    _, ax = plt.subplots()
-    ax.scatter(
-        kd_metrics["test_epoch_times"],
-        kd_metrics["test_epoch_accs"],
-        color="blue",
-        marker="o",
-        label="kd",
-    )
-    ax.scatter(
-        wd_metrics["test_epoch_times"],
-        wd_metrics["test_epoch_accs"],
+    ax.plot(
+        plot.to_min(model3_metrics["times"]),
+        model3_metrics["metrics"],
         color="green",
-        marker="x",
-        label="wd",
+        linestyle="dashed",
+        label=label3,
     )
-    ax.scatter(
-        no_kd_metrics["test_epoch_times"],
-        no_kd_metrics["test_epoch_accs"],
-        color="yellow",
-        marker="^",
-        label="baseline",
+    ax.plot(
+        plot.to_min(model4_metrics["times"]),
+        model4_metrics["metrics"],
+        color="orange",
+        linestyle="dashdot",
+        label=label4,
     )
-    ax.scatter(
-        kd_and_wd_metrics["test_epoch_times"],
-        kd_and_wd_metrics["test_epoch_accs"],
-        color="red",
-        marker="*",
-        label="kd + wd",
-    )
-    plot.make_plot_nice(ax, "time (s)", "accuracy", 0, 1)
-    plot.save("plot8.png")
+    plot.make_plot_nice(ax, "time (min)", metric, 0, 1)
+    plot.save(output)
 
 
 if __name__ == "__main__":
-    plot6()
-    plot7()
-    # plot8()
+    plot6(
+        "train_acc",
+        "epoch",
+        "TeacherInceptionCIFAR10_11_20_1a",
+        "BigInceptionCIFAR10_11_20_1b",
+        "plot10.png",
+        "teacher",
+        "big",
+    )
+    plot6(
+        "train_acc",
+        "batch",
+        "TeacherInceptionCIFAR10_11_20_1a",
+        "BigInceptionCIFAR10_11_20_1b",
+        "plot11.png",
+        "teacher",
+        "big",
+    )
+    plot6(
+        "test_acc",
+        "epoch",
+        "TeacherInceptionCIFAR10_11_20_1a",
+        "BigInceptionCIFAR10_11_20_1b",
+        "plot12.png",
+        "teacher",
+        "big",
+    )
+    plot6(
+        "train_acc",
+        "epoch",
+        "TeacherInceptionCIFAR10_11_20_1a",
+        "AdaptedInceptionCIFAR10_11_20_2a",
+        "plot13.png",
+        "teacher",
+        "net2net",
+        starter2=(
+            LOG.load_metrics(
+                os.path.join(config.RESULTS, "TeacherInceptionCIFAR10_11_20_1a"),
+                "training",
+                "train_acc",
+                "epoch",
+            ),
+            3,
+        ),
+    )
+    plot6(
+        "train_acc",
+        "batch",
+        "TeacherInceptionCIFAR10_11_20_1a",
+        "AdaptedInceptionCIFAR10_11_20_2a",
+        "plot14.png",
+        "teacher",
+        "net2net",
+        starter2=(
+            LOG.load_metrics(
+                os.path.join(config.RESULTS, "TeacherInceptionCIFAR10_11_20_1a"),
+                "training",
+                "train_acc",
+                "epoch",
+            ),
+            3,
+        ),
+    )
+    plot6(
+        "test_acc",
+        "epoch",
+        "TeacherInceptionCIFAR10_11_20_1a",
+        "AdaptedInceptionCIFAR10_11_20_2a",
+        "plot15.png",
+        "teacher",
+        "net2net",
+        starter2=(
+            LOG.load_metrics(
+                os.path.join(config.RESULTS, "TeacherInceptionCIFAR10_11_20_1a"),
+                "training",
+                "test_acc",
+                "epoch",
+            ),
+            3,
+        ),
+    )
+    plot6(
+        "train_acc",
+        "epoch",
+        "AdaptedInceptionCIFAR10_11_20_2a",
+        "AdaptedInceptionCIFAR10_11_20_2b",
+        "plot16.png",
+        "net2net",
+        "random",
+    )
+    plot6(
+        "train_acc",
+        "batch",
+        "AdaptedInceptionCIFAR10_11_20_2a",
+        "AdaptedInceptionCIFAR10_11_20_2b",
+        "plot17.png",
+        "net2net",
+        "random",
+    )
+    plot6(
+        "test_acc",
+        "epoch",
+        "AdaptedInceptionCIFAR10_11_20_2a",
+        "AdaptedInceptionCIFAR10_11_20_2b",
+        "plot18.png",
+        "net2net",
+        "random",
+    )
+    plot7(
+        "train_acc",
+        "epoch",
+        "AdaptedInceptionCIFAR10_11_20_3a",
+        "AdaptedInceptionCIFAR10_11_20_3b",
+        "AdaptedInceptionCIFAR10_11_20_3c",
+        "AdaptedInceptionCIFAR10_11_20_3d",
+        "plot19.png",
+        "kd + wd",
+        "kd",
+        "wd",
+        "baseline",
+    )
+    plot7(
+        "train_acc",
+        "batch",
+        "AdaptedInceptionCIFAR10_11_20_3a",
+        "AdaptedInceptionCIFAR10_11_20_3b",
+        "AdaptedInceptionCIFAR10_11_20_3c",
+        "AdaptedInceptionCIFAR10_11_20_3d",
+        "plot20.png",
+        "kd + wd",
+        "kd",
+        "wd",
+        "baseline",
+    )
+    plot7(
+        "test_acc",
+        "epoch",
+        "AdaptedInceptionCIFAR10_11_20_3a",
+        "AdaptedInceptionCIFAR10_11_20_3b",
+        "AdaptedInceptionCIFAR10_11_20_3c",
+        "AdaptedInceptionCIFAR10_11_20_3d",
+        "plot21.png",
+        "kd + wd",
+        "kd",
+        "wd",
+        "baseline",
+    )
