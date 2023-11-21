@@ -141,7 +141,10 @@ class NonSequentialConvolution(nn.Module):
 def load_inception(weights, init_weights, dropout):
     if not hasattr(models.inception, "InceptionNet2NetDeepenBlock"):
         raise RuntimeError(
-            "You have not loaded the instrumented version of InceptionNet"
+            """
+            You have not loaded the instrumented version of InceptionNet.
+            Make sure you run ./torchmod.sh
+            """
         )
     return models.inception_v3(
         weights=weights, init_weights=init_weights, dropout=dropout
