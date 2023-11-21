@@ -1,0 +1,10 @@
+model = "cifar10_inception"
+optimizer_args = { lr = 0.01 }
+dataset = "cifar10"
+epochs = 21
+folder = "AdaptedInceptionCIFAR10_11_20_2a"
+desc = "Experiment where we train net2net adapted InceptionNet from briefly trained teacher on CIFAR-10"
+model_weights = "../results/TeacherInceptionCIFAR10_11_20_1a/model_after_4_epochs.pth" 
+[scaleupepochs]
+0 = { modifier = "deepen_blocks", filter_function = "inception_deepen_filter_function", add_batch_norm = true }
+
