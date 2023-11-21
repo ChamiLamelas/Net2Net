@@ -1,0 +1,27 @@
+2023-11-21 10:26:28,307 | [INFO] : training start time: 11/21/2023 10:26:28 AM
+2023-11-21 10:26:28,307 | [INFO] : Current model size: 25132754 parameters
+2023-11-21 10:26:28,751 | [INFO] : Model size was changed to 34199378 parameters
+2023-11-21 10:26:28,751 | [INFO] : Learning rate is now 0.001000
+2023-11-21 10:30:50,048 | [INFO] : Current model size: 34199378 parameters
+2023-11-21 10:35:08,685 | [INFO] : Current model size: 34199378 parameters
+2023-11-21 10:39:27,834 | [INFO] : Current model size: 34199378 parameters
+2023-11-21 10:43:46,179 | [INFO] : Current model size: 34199378 parameters
+2023-11-21 10:48:04,639 | [INFO] : Current model size: 34199378 parameters
+2023-11-21 10:52:23,157 | [INFO] : Current model size: 34199378 parameters
+2023-11-21 10:56:42,208 | [INFO] : Current model size: 34199378 parameters
+2023-11-21 11:01:00,833 | [INFO] : Current model size: 34199378 parameters
+2023-11-21 11:05:20,139 | [INFO] : Current model size: 34199378 parameters
+2023-11-21 11:09:39,571 | [INFO] : Current model size: 34199378 parameters
+2023-11-21 11:13:58,345 | [INFO] : Current model size: 34199378 parameters
+2023-11-21 11:18:18,547 | [INFO] : Current model size: 34199378 parameters
+2023-11-21 11:22:37,161 | [INFO] : Current model size: 34199378 parameters
+2023-11-21 11:26:56,547 | [INFO] : Current model size: 34199378 parameters
+2023-11-21 11:31:15,270 | [INFO] : Current model size: 34199378 parameters
+2023-11-21 11:35:34,271 | [INFO] : Current model size: 34199378 parameters
+2023-11-21 11:39:54,951 | [INFO] : Current model size: 34199378 parameters
+2023-11-21 11:44:14,594 | [INFO] : Current model size: 34199378 parameters
+2023-11-21 11:48:33,573 | [INFO] : Current model size: 34199378 parameters
+2023-11-21 11:52:53,181 | [INFO] : Current model size: 34199378 parameters
+2023-11-21 11:57:11,932 | [INFO] : Current model size: 34199378 parameters
+2023-11-21 12:01:31,565 | [INFO] : Current model size: 34199378 parameters
+2023-11-21 12:05:49,995 | [INFO] : training runtime (h:mm:ss): 1:39:22
