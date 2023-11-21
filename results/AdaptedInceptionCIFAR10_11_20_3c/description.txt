@@ -1,0 +1,1 @@
+Experiment where we train adapted InceptionNet from briefly trained teacher on CIFAR-10 and then scale down using kd
