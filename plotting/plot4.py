@@ -14,8 +14,8 @@ from logger import ML_Logger as LOG
 
 def plot6():
     metric = "train_acc"
-    folder1 = "TeacherInceptionCIFAR10_11_18_3a"
-    folder2 = "BigInceptionCIFAR10_11_18_3b"
+    folder1 = "TeacherInceptionCIFAR10_11_20_1a"
+    folder2 = "BigInceptionCIFAR10_11_20_1b"
     output = "plot8.png"
 
     teacher_metrics = LOG.load_metrics(
@@ -52,8 +52,8 @@ def plot6():
 
 def plot7():
     metric = "test_acc"
-    folder1 = "TeacherInceptionCIFAR10_11_18_3a"
-    folder2 = "BigInceptionCIFAR10_11_18_3b"
+    folder1 = "TeacherInceptionCIFAR10_11_20_1a"
+    folder2 = "BigInceptionCIFAR10_11_20_1b"
     output = "plot9.png"
 
     teacher_metrics = LOG.load_metrics(
