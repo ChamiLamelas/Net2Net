@@ -1,0 +1,27 @@
+2023-11-20 21:27:54,422 | [INFO] : training start time: 11/20/2023 09:27:54 PM
+2023-11-20 21:27:54,423 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 21:31:33,244 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 21:35:10,978 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 21:38:49,188 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 21:42:28,741 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 21:46:07,156 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 21:49:45,465 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 21:53:24,786 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 21:57:02,986 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 22:00:41,353 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 22:04:18,577 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 22:07:56,655 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 22:11:34,702 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 22:15:12,920 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 22:18:50,194 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 22:22:27,648 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 22:26:05,968 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 22:29:43,667 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 22:33:22,344 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 22:36:59,544 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 22:40:37,587 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 22:44:15,764 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 22:47:53,317 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 22:51:31,269 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 22:55:08,917 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 22:58:45,997 | [INFO] : training runtime (h:mm:ss): 1:30:52

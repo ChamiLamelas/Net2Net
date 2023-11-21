@@ -1,0 +1,1 @@
+Experiment where we train InceptionNet briefly on CIFAR-10
