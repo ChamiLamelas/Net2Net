@@ -1,8 +1,8 @@
 model = "tiny_imagenet_inception"
-optimizer_args = { lr = 0.01 }
+optimizer_args = { lr = 0.01, weight_decay = 0.01 }
 dataset = "tiny_imagenet"
 epochs = 50
-folder = "TeacherInceptionTinyImageNet_11_20_1"
-device = 0
+folder = "TeacherInceptionTinyImageNet_11_21_1"
+device = 1
 desc = "Experiment where we train InceptionNet briefly on TinyImageNet"
 
