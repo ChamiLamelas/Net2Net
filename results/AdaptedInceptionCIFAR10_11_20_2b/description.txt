@@ -1,0 +1,1 @@
+Experiment where we train randomly adapted InceptionNet from briefly trained teacher on CIFAR-10
