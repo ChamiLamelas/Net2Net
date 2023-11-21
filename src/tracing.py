@@ -31,6 +31,23 @@ def get_all_deepen_blocks(module):
     return blocks
 
 
+def is_learnable(module):
+    return any(isinstance(module, layer_type) for layer_type in [nn.Conv2d, nn.Linear])
+
+
+def get_all_learnable_layers(module):
+    layers = dict()
+
+    def _recursive_get_all_learnable_layers(hierarchy, parent, curr):
+        if is_learnable(curr):
+            layers[hierarchy] = parent
+        for name, child in curr.named_children():
+            _recursive_get_all_learnable_layers(hierarchy + (name,), curr, child)
+
+    _recursive_get_all_learnable_layers(tuple(), None, module)
+    return layers
+
+
 # old tracing stuff ...
 
 """

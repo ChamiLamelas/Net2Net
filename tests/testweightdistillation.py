@@ -11,22 +11,32 @@ import deepening
 import models
 import copy
 import utils
+import torch
 
 
 def test_deeper_distillation():
-    s = models.TwoConvolution(3, 5)
+    s = models.OneConvolution(3, 5)
 
     # copy student to be the teacher and deepen it
     t = copy.deepcopy(s)
-    deepening.deepen(t)
+    deepening.deepen_blocks(t, add_batch_norm=False)
 
     # pretend we did some learning and update weights to be different from student
-    t.conv1[0].weight = nn.Parameter(t.conv1[0].weight.data + 1)
-    t.fc[0].weight = nn.Parameter(t.fc[0].weight.data + 1)
+    t.conv_block.layers[0].weight = nn.Parameter(t.conv_block.layers[0].weight + 1)
+    t.linear.weight = nn.Parameter(t.linear.weight.data + 1)
 
+    # do the transfer 
     distillation.deeper_weight_transfer(t, s)
-    utils.checkequal(t.conv1[0].weight.data, s.conv1.weight.data)
-    utils.checkequal(t.fc[0].weight.data, s.fc.weight.data)
+
+    # check the weights updated
+    utils.checkequal(
+        t.conv_block.layers[0].weight.data, s.conv_block.layers[0].weight.data
+    )
+    utils.checkequal(t.linear.weight.data, s.linear.weight.data)
+
+    # make sure that the models work and give the same output
+    x = torch.randn((1, 3, 5, 5))
+    utils.checkequal(t(x), s(x))
 
 
 def main():

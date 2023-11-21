@@ -6,7 +6,7 @@ import torchvision.models as models
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
-import tracing
+# import deepening
 
 
 # def _count_layers(model, layertype):
@@ -138,18 +138,34 @@ class NonSequentialConvolution(nn.Module):
         return x
 
 
+def load_inception(weights, init_weights, dropout):
+    if not hasattr(models.inception, "InceptionNet2NetDeepenBlock"):
+        raise RuntimeError(
+            "You have not loaded the instrumented version of InceptionNet"
+        )
+    return models.inception_v3(
+        weights=weights, init_weights=init_weights, dropout=dropout
+    )
+
+
 def cifar10_inception(dropout=0.5):
     """~27 million parameters"""
 
-    model = models.inception_v3(weights=None, init_weights=True, dropout=dropout)
+    model = load_inception(None, True, dropout)
     model.fc = nn.Linear(2048, 10)
     return model
+
+
+# def deepened_cifar10_inception(dropout=0.5):
+#     model = cifar10_inception(dropout)
+#     deepening.deepen_blocks(model, inception_deepen_filter_function, True)
+#     return model
 
 
 def tiny_imagenet_inception(dropout=0.5):
     """~27 million parameters"""
 
-    model = models.inception_v3(weights=None, init_weights=True, dropout=dropout)
+    model = load_inception(None, True, dropout)
     model.fc = nn.Linear(2048, 200)
     return model
 
@@ -161,7 +177,7 @@ def imagenet_inception(dropout=0.5):
     # https://pytorch.org/vision/0.12/generated/torchvision.models.inception_v3.html
     # requires Nx3x299x299 (N>=1) input for training, produces 2 1000-dim logit sets
     # https://pytorch.org/vision/main/models/generated/torchvision.models.inception_v3.html#torchvision.models.inception_v3
-    return models.inception_v3(weights=None, init_weights=True, dropout=dropout)
+    return load_inception(None, True, dropout)
 
 
 """

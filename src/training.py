@@ -21,26 +21,29 @@ class Trainer:
         self.optimizer_fn = config["optimizer"]
         self.optimizer_args = config["optimizer_args"]
         self.learning_rate_decay = config["learning_rate_decay"]
+        self.folder = config["folder"]
+        self.logger = ML_Logger(log_folder=self.folder, persist=False)
         self.model = config["model"]
-        self.update_optimizer()
+        self.update_optimizer(None, False)
         self.train_loader = config["trainloader"]
         self.test_loader = config["testloader"]
         self.scale_up_epochs = config["scaleupepochs"]
         self.scale_down_epochs = config["scaledownepochs"]
-        self.folder = config["folder"]
         self.total_epochs = config["epochs"]
         self.T = config["T"]
         self.soft_target_loss_weight = config["soft_target_loss_weight"]
         self.ce_loss_weight = config["ce_loss_weight"]
         self.weight_distillation = config["weight_distillation"]
         self.knowledge_distillation = config["knowledge_distillation"]
-        self.logger = ML_Logger(log_folder=self.folder, persist=False)
 
     def train(self):
         smaller = list()
         teacher = None
         self.logger.start(task="training", log_file="training", metrics_file="training")
         for epoch in range(self.total_epochs):
+            self.logger.info(
+                f"Current model size: {models.count_parameters(self.model)} parameters"
+            )
             if epoch in self.scale_up_epochs:
                 backup = copy.deepcopy(self.model)
                 if len(smaller) == 0 or models.count_parameters(
@@ -55,11 +58,11 @@ class Trainer:
                 config["modifier"](
                     self.model, config["filter_function"], config["add_batch_norm"]
                 )
-                self.update_optimizer()
+                self.update_optimizer("up", True)
             elif epoch in self.scale_down_epochs:
                 teacher = copy.deepcopy(self.model)
                 self.model = smaller[-1]
-                self.update_optimizer()
+                self.update_optimizer("down", True)
                 if self.weight_distillation:
                     distillation.deeper_weight_transfer(teacher, self.model)
                 if not self.knowledge_distillation:
@@ -69,13 +72,22 @@ class Trainer:
             self.logger.log_metrics({"test_acc": test_acc}, "epoch", self.model)
         self.logger.stop()
 
-    def update_optimizer(self):
+    def update_optimizer(self, scale, log):
+        if scale == "up":
+            self.optimizer_args["lr"] /= 10
+        elif scale == "down":
+            self.optimizer_args["lr"] *= 10
         self.optimizer = self.optimizer_fn(
             self.model.parameters(), **self.optimizer_args
         )
         self.learning_rate = optim.lr_scheduler.ExponentialLR(
             self.optimizer, self.learning_rate_decay
         )
+        if log:
+            self.logger.info(
+                f"Model size was changed to {models.count_parameters(self.model)} parameters"
+            )
+            self.logger.info(f"Learning rate is now {self.optimizer_args['lr']:.6f}")
 
     def train_epoch(self, epoch, optimizer, teacher):
         self.model = self.model.to(self.device)
