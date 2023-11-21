@@ -3,5 +3,6 @@ optimizer_args = { lr = 0.01 }
 dataset = "cifar10"
 epochs = 25
 folder = "TeacherInceptionCIFAR10_11_20_1a"
+device = 0
 desc = "Experiment where we train InceptionNet briefly on CIFAR-10"
 
