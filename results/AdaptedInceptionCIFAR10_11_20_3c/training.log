@@ -1,0 +1,27 @@
+2023-11-20 22:37:47,106 | [INFO] : training start time: 11/20/2023 11:37:47 PM
+2023-11-20 22:37:47,109 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 22:37:47,755 | [INFO] : Model size was changed to 34199378 parameters
+2023-11-20 22:37:47,755 | [INFO] : Learning rate is now 0.001000
+2023-11-20 22:48:10,213 | [INFO] : Current model size: 34199378 parameters
+2023-11-20 22:58:30,584 | [INFO] : Current model size: 34199378 parameters
+2023-11-20 23:08:49,555 | [INFO] : Current model size: 34199378 parameters
+2023-11-20 23:19:09,175 | [INFO] : Current model size: 34199378 parameters
+2023-11-20 23:19:09,352 | [INFO] : Model size was changed to 25132754 parameters
+2023-11-20 23:19:09,353 | [INFO] : Learning rate is now 0.010000
+2023-11-20 23:29:48,201 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 23:40:25,905 | [INFO] : Current model size: 25132754 parameters
+2023-11-20 23:51:05,356 | [INFO] : Current model size: 25132754 parameters
+2023-11-21 00:01:43,014 | [INFO] : Current model size: 25132754 parameters
+2023-11-21 00:12:22,526 | [INFO] : Current model size: 25132754 parameters
+2023-11-21 00:23:02,167 | [INFO] : Current model size: 25132754 parameters
+2023-11-21 00:33:41,623 | [INFO] : Current model size: 25132754 parameters
+2023-11-21 00:44:21,519 | [INFO] : Current model size: 25132754 parameters
+2023-11-21 00:55:00,862 | [INFO] : Current model size: 25132754 parameters
+2023-11-21 01:05:40,049 | [INFO] : Current model size: 25132754 parameters
+2023-11-21 01:16:19,162 | [INFO] : Current model size: 25132754 parameters
+2023-11-21 01:26:57,999 | [INFO] : Current model size: 25132754 parameters
+2023-11-21 01:37:37,149 | [INFO] : Current model size: 25132754 parameters
+2023-11-21 01:48:15,943 | [INFO] : Current model size: 25132754 parameters
+2023-11-21 01:58:54,657 | [INFO] : Current model size: 25132754 parameters
+2023-11-21 02:09:33,832 | [INFO] : Current model size: 25132754 parameters
+2023-11-21 02:20:13,660 | [INFO] : training runtime (h:mm:ss): 3:42:27
