@@ -1,0 +1,1 @@
+Experiment where we train a bigger InceptionNet briefly on TinyImageNet
