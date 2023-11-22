@@ -4,6 +4,5 @@ dataset = "tiny_imagenet"
 epochs = 50
 folder = "TeacherInceptionTinyImageNet_11_21_1"
 device = 0
-batchsize = 256
 desc = "Experiment where we train InceptionNet briefly on TinyImageNet"
 

@@ -4,7 +4,6 @@ dataset = "tiny_imagenet"
 epochs = 50
 folder = "BigInceptionTinyImageNet_11_21_2"
 device = 1
-batchsize = 256
 desc = "Experiment where we train a bigger InceptionNet briefly on TinyImageNet"
 [scaleupepochs]
 0 = { modifier = "random_deepen_blocks", filter_function = "inception_deepen_filter_function", add_batch_norm = true }
