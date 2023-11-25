@@ -6,6 +6,7 @@ import torchvision.models as models
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
+
 # import deepening
 
 
@@ -50,7 +51,9 @@ class NormalizedConvolutionalNet2NetDeepenBlock(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, **kwargs):
         super().__init__()
         self.layers = nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, kernel_size, **kwargs), nn.ReLU()
+            nn.Conv2d(in_channels, out_channels, kernel_size, **kwargs),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(),
         )
 
     def forward(self, x):
@@ -99,6 +102,14 @@ class TwoConvolution(nn.Module):
         x = torch.flatten(x, 1)
         x = self.linear(x)
         return x
+    
+class RectangularConvolution(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv = ConvolutionalNet2NetDeepenBlock(in_channels=1, out_channels=3, kernel_size=(7,1))
+
+    def forward(self, x):
+        return self.conv(x)
 
 
 class BatchNormConvolution(nn.Module):

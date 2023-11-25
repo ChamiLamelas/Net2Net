@@ -22,33 +22,12 @@ def add_time_starter(metrics, starter):
     return metrics
 
 
-def plot6(
-    metric,
-    granularity,
-    folder1,
-    folder2,
-    output,
-    label1,
-    label2,
-    starter1=None,
-    starter2=None,
-):
-    model1_metrics = add_time_starter(
-        LOG.load_metrics(
-            os.path.join(config.RESULTS, folder1),
-            "training",
-            metric,
-            granularity,
-        ), starter1
-    )
-
-    model2_metrics = add_time_starter(
-        LOG.load_metrics(
-            os.path.join(config.RESULTS, folder2),
-            "training",
-            metric,
-            granularity,
-        ), starter2
+def plot5(metric, granularity, folder1, output, label1):
+    model1_metrics = LOG.load_metrics(
+        os.path.join(config.RESULTS, folder1),
+        "training",
+        metric,
+        granularity,
     )
 
     _, ax = plt.subplots()
@@ -59,14 +38,63 @@ def plot6(
         linestyle="solid",
         label=label1,
     )
+
+    plot.make_plot_nice(ax, "time (min)", metric, 0, 1)
+    plot.save(output)
+
+
+def plot6(
+    metric,
+    granularity,
+    folder1,
+    folder2,
+    output,
+    label1,
+    label2,
+    starter1=None,
+    starter2=None,
+    unit="min",
+):
+    model1_metrics = add_time_starter(
+        LOG.load_metrics(
+            os.path.join(config.RESULTS, folder1),
+            "training",
+            metric,
+            granularity,
+        ),
+        starter1,
+    )
+
+    model2_metrics = add_time_starter(
+        LOG.load_metrics(
+            os.path.join(config.RESULTS, folder2),
+            "training",
+            metric,
+            granularity,
+        ),
+        starter2,
+    )
+
+    if unit == "min":
+        model1_metrics["times"] = plot.to_min(model1_metrics["times"])
+        model2_metrics["times"] = plot.to_min(model2_metrics["times"])
+
+    _, ax = plt.subplots()
     ax.plot(
-        plot.to_min(model2_metrics["times"]),
+        model1_metrics["times"],
+        model1_metrics["metrics"],
+        color="blue",
+        linestyle="solid",
+        label=label1,
+    )
+    ax.plot(
+        model2_metrics["times"],
         model2_metrics["metrics"],
         color="red",
         linestyle="dotted",
         label=label2,
     )
-    plot.make_plot_nice(ax, "time (min)", metric, 0, 1)
+    plot.make_plot_nice(ax, f"time ({unit})", metric, 0, 1)
     plot.save(output)
 
 
@@ -172,7 +200,7 @@ if __name__ == "__main__":
         "train_acc",
         "epoch",
         "TeacherInceptionCIFAR10_11_20_1a",
-        "AdaptedInceptionCIFAR10_11_20_2a",
+        "AdaptedInceptionCIFAR10_11_21_2a",
         "plot13.png",
         "teacher",
         "net2net",
@@ -183,14 +211,14 @@ if __name__ == "__main__":
                 "train_acc",
                 "epoch",
             ),
-            3,
+            1,
         ),
     )
     plot6(
         "train_acc",
         "batch",
         "TeacherInceptionCIFAR10_11_20_1a",
-        "AdaptedInceptionCIFAR10_11_20_2a",
+        "AdaptedInceptionCIFAR10_11_21_2a",
         "plot14.png",
         "teacher",
         "net2net",
@@ -201,14 +229,14 @@ if __name__ == "__main__":
                 "train_acc",
                 "epoch",
             ),
-            3,
+            1,
         ),
     )
     plot6(
         "test_acc",
         "epoch",
         "TeacherInceptionCIFAR10_11_20_1a",
-        "AdaptedInceptionCIFAR10_11_20_2a",
+        "AdaptedInceptionCIFAR10_11_21_2a",
         "plot15.png",
         "teacher",
         "net2net",
@@ -219,7 +247,7 @@ if __name__ == "__main__":
                 "test_acc",
                 "epoch",
             ),
-            3,
+            1,
         ),
     )
     plot6(
@@ -287,4 +315,236 @@ if __name__ == "__main__":
         "kd",
         "wd",
         "baseline",
+    )
+    plot6(
+        "train_acc",
+        "epoch",
+        "TinyModelCIFAR10_11_21_1",
+        "BigModelCIFAR10_11_21_1",
+        "plot22.png",
+        "teacher",
+        "big",
+        unit="sec",
+    )
+    plot6(
+        "test_acc",
+        "epoch",
+        "TinyModelCIFAR10_11_21_1",
+        "BigModelCIFAR10_11_21_1",
+        "plot23.png",
+        "teacher",
+        "big",
+        unit="sec",
+    )
+    plot6(
+        "train_acc",
+        "epoch",
+        "TinyModelCIFAR10_11_21_1",
+        "AdaptedTinyModelCIFAR10_11_21_1",
+        "plot24.png",
+        "teacher",
+        "net2net",
+        unit="sec",
+        starter2=(
+            LOG.load_metrics(
+                os.path.join(config.RESULTS, "TinyModelCIFAR10_11_21_1"),
+                "training",
+                "train_acc",
+                "epoch",
+            ),
+            3,
+        ),
+    )
+    plot6(
+        "test_acc",
+        "epoch",
+        "TinyModelCIFAR10_11_21_1",
+        "AdaptedTinyModelCIFAR10_11_21_1",
+        "plot25.png",
+        "teacher",
+        "net2net",
+        unit="sec",
+        starter2=(
+            LOG.load_metrics(
+                os.path.join(config.RESULTS, "TinyModelCIFAR10_11_21_1"),
+                "training",
+                "test_acc",
+                "epoch",
+            ),
+            3,
+        ),
+    )
+    plot6(
+        "train_acc",
+        "epoch",
+        "TeacherInceptionTinyImageNet_11_22_1",
+        "BigInceptionTinyImageNet_11_22_2",
+        "plot26.png",
+        "teacher",
+        "big",
+        unit="min",
+    )
+    plot6(
+        "test_acc",
+        "epoch",
+        "TeacherInceptionTinyImageNet_11_22_1",
+        "BigInceptionTinyImageNet_11_22_2",
+        "plot27.png",
+        "teacher",
+        "big",
+        unit="min",
+    )
+    plot6(
+        "train_acc",
+        "epoch",
+        "TeacherInceptionCIFAR10_11_20_1a",
+        "BigInceptionCIFAR10_11_22_1b",
+        "plot28.png",
+        "teacher",
+        "big",
+    )
+    plot6(
+        "test_acc",
+        "epoch",
+        "TeacherInceptionCIFAR10_11_20_1a",
+        "BigInceptionCIFAR10_11_22_1b",
+        "plot29.png",
+        "teacher",
+        "big",
+    )
+    plot6(
+        "train_acc",
+        "epoch",
+        "TeacherInceptionTinyImageNet_11_19_1",
+        "BigInceptionTinyImageNet_11_19_2",
+        "plot30.png",
+        "teacher",
+        "big",
+        unit="min",
+    )
+    plot6(
+        "test_acc",
+        "epoch",
+        "TeacherInceptionTinyImageNet_11_19_1",
+        "BigInceptionTinyImageNet_11_19_2",
+        "plot31.png",
+        "teacher",
+        "big",
+        unit="min",
+    )
+    plot6(
+        "train_acc",
+        "epoch",
+        "TeacherInceptionCIFAR10_11_20_1a",
+        "AdaptedInceptionCIFAR10_11_20_2a",
+        "plot32.png",
+        "teacher",
+        "net2net",
+        starter2=(
+            LOG.load_metrics(
+                os.path.join(config.RESULTS, "TeacherInceptionCIFAR10_11_20_1a"),
+                "training",
+                "train_acc",
+                "epoch",
+            ),
+            3,
+        ),
+    )
+    plot6(
+        "test_acc",
+        "epoch",
+        "TeacherInceptionCIFAR10_11_20_1a",
+        "AdaptedInceptionCIFAR10_11_20_2a",
+        "plot33.png",
+        "teacher",
+        "net2net",
+        starter2=(
+            LOG.load_metrics(
+                os.path.join(config.RESULTS, "TeacherInceptionCIFAR10_11_20_1a"),
+                "training",
+                "test_acc",
+                "epoch",
+            ),
+            3,
+        ),
+    )
+    plot6(
+        "train_acc",
+        "epoch",
+        "TeacherInceptionTinyImageNet_11_22_2",
+        "BigInceptionTinyImageNet_11_22_3",
+        "plot34.png",
+        "teacher",
+        "big",
+        unit="min",
+    )
+    plot6(
+        "test_acc",
+        "epoch",
+        "TeacherInceptionTinyImageNet_11_22_2",
+        "BigInceptionTinyImageNet_11_22_3",
+        "plot35.png",
+        "teacher",
+        "big",
+        unit="min",
+    )
+    plot6(
+        "train_acc",
+        "epoch",
+        "TeacherInceptionTinyImageNet_11_22_3",
+        "BigInceptionTinyImageNet_11_22_3",
+        "plot36.png",
+        "teacher",
+        "big",
+        unit="min",
+    )
+    plot6(
+        "test_acc",
+        "epoch",
+        "TeacherInceptionTinyImageNet_11_22_3",
+        "BigInceptionTinyImageNet_11_22_3",
+        "plot37.png",
+        "teacher",
+        "big",
+        unit="min",
+    )
+    plot6(
+        "train_acc",
+        "epoch",
+        "TeacherInceptionTinyImageNet_11_23_1",
+        "BigInceptionTinyImageNet_11_23_1",
+        "plot38.png",
+        "teacher",
+        "big",
+        unit="min",
+    )
+    plot6(
+        "test_acc",
+        "epoch",
+        "TeacherInceptionTinyImageNet_11_23_1",
+        "BigInceptionTinyImageNet_11_23_1",
+        "plot39.png",
+        "teacher",
+        "big",
+        unit="min",
+    )
+    plot6(
+        "train_acc",
+        "epoch",
+        "TeacherInceptionTinyImageNet_11_23_2",
+        "BigInceptionTinyImageNet_11_23_2",
+        "plot40.png",
+        "teacher",
+        "big",
+        unit="min",
+    )
+    plot6(
+        "test_acc",
+        "epoch",
+        "TeacherInceptionTinyImageNet_11_23_2",
+        "BigInceptionTinyImageNet_11_23_2",
+        "plot41.png",
+        "teacher",
+        "big",
+        unit="min",
     )

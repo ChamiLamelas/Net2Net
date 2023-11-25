@@ -1,0 +1,116 @@
+import torch.nn.functional as F
+from logger import ML_Logger
+import torch
+import prediction
+import models
+import gpu
+import copy
+import distillation
+import torch.optim as optim
+import job 
+
+
+class Trainer:
+    def __init__(self, config):
+        self.job = job.Job(config)
+        self.logger = ML_Logger(log_folder=config["folder"], persist=False)
+        self.update_optimizer(None, False)
+        self.T = config["T"]
+        self.soft_target_loss_weight = config["soft_target_loss_weight"]
+        self.ce_loss_weight = config["ce_loss_weight"]
+        self.weight_distillation = config["weight_distillation"]
+        self.knowledge_distillation = config["knowledge_distillation"]
+
+    def train(self, scheduler):
+        smaller = list()
+        teacher = None
+        self.logger.start(task="training", log_file="training", metrics_file="training")
+        for epoch in range(self.total_epochs):
+            self.logger.info(
+                f"Current model size: {models.count_parameters(self.model)} parameters"
+            )
+            if epoch in self.scale_up_epochs:
+                backup = copy.deepcopy(self.model)
+                if len(smaller) == 0 or models.count_parameters(
+                    self.model
+                ) > models.count_parameters(smaller[-1]):
+                    smaller.append(backup)
+                elif models.count_parameters(self.model) == models.count_parameters(
+                    smaller[-1]
+                ):
+                    smaller[-1] = backup
+                config = self.scale_up_epochs[epoch]
+                config["modifier"](
+                    self.model, config["filter_function"], config["add_batch_norm"]
+                )
+                self.update_optimizer("up", True)
+            elif epoch in self.scale_down_epochs:
+                teacher = copy.deepcopy(self.model)
+                self.model = smaller[-1]
+                self.update_optimizer("down", True)
+                if self.weight_distillation:
+                    distillation.deeper_weight_transfer(teacher, self.model)
+                if not self.knowledge_distillation:
+                    teacher = None
+            self.train_epoch(epoch, self.optimizer, teacher)
+            test_acc = prediction.predict(self.model, self.test_loader, self.device)
+            self.logger.log_metrics({"test_acc": test_acc}, "epoch", self.model)
+        self.logger.stop()
+
+    def update_optimizer(self, scale, log):
+        if scale == "up":
+            self.optimizer_args["lr"] /= 10
+        elif scale == "down":
+            self.optimizer_args["lr"] *= 10
+        self.optimizer = self.optimizer_fn(
+            self.model.parameters(), **self.optimizer_args
+        )
+        self.learning_rate = optim.lr_scheduler.ExponentialLR(
+            self.optimizer, self.learning_rate_decay
+        )
+        if log:
+            self.logger.info(
+                f"Model size was changed to {models.count_parameters(self.model)} parameters"
+            )
+            self.logger.info(f"Learning rate is now {self.optimizer_args['lr']:.6f}")
+
+    def train_epoch(self, epoch, optimizer, teacher):
+        self.model = self.model.to(self.device)
+        self.model.train()
+        total_correct = 0
+        total_size = 0
+        for data, target in self.train_loader:
+            data, target = device.move(self.device, data, target)
+            optimizer.zero_grad()
+            loss, correct = self.compute_loss(data, target, teacher)
+            loss.backward()
+            optimizer.step()
+            total_correct += correct
+            total_size += data.size()[0]
+        self.learning_rate.step()
+        self.logger.log_metrics({"train_acc": total_correct / total_size}, "epoch")
+
+
+    def compute_loss(self, data, target, teacher):
+        student_logits = self.model(data)
+        correct = prediction.num_correct(student_logits, target)
+        loss = F.cross_entropy(student_logits, target)
+        self.logger.log_metrics({"cross_entropy_loss": loss.item()}, "batch")
+        if teacher is not None:
+            with torch.no_grad():
+                teacher_logits = Trainer.get_logits(teacher, data)
+            soft_targets = F.softmax(teacher_logits / self.T, dim=-1)
+            soft_prob = F.log_softmax(student_logits / self.T, dim=-1)
+            soft_targets_loss = (
+                -torch.sum(soft_targets * soft_prob)
+                / soft_prob.size()[0]
+                * (self.T**2)
+            )
+            self.logger.log_metrics(
+                {"soft_targets_loss": soft_targets_loss.item()}, "batch"
+            )
+            loss = (
+                self.soft_target_loss_weight * soft_targets_loss
+                + self.ce_loss_weight * loss
+            )
+        return loss, correct

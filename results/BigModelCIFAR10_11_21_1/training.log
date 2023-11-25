@@ -1,0 +1,29 @@
+2023-11-21 13:07:15,075 | [INFO] : training start time: 11/21/2023 02:07:15 PM
+2023-11-21 13:07:15,076 | [INFO] : Current model size: 20042 parameters
+2023-11-21 13:07:15,083 | [INFO] : Model size was changed to 66410 parameters
+2023-11-21 13:07:15,083 | [INFO] : Learning rate is now 0.001000
+2023-11-21 13:07:37,413 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:07:56,624 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:08:14,242 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:08:35,766 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:08:56,462 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:09:14,771 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:09:35,027 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:09:55,897 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:10:11,809 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:10:24,573 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:10:37,321 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:10:49,941 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:11:02,697 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:11:15,512 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:11:28,231 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:11:42,103 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:11:54,770 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:12:07,378 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:12:19,923 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:12:32,312 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:12:44,882 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:12:57,475 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:13:11,253 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:13:31,278 | [INFO] : Current model size: 66410 parameters
+2023-11-21 13:13:51,324 | [INFO] : training runtime (h:mm:ss): 0:06:37

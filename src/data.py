@@ -47,6 +47,25 @@ def load_cifar10(train, batch_size):
     )
 
 
+def load_small_cifar10(train, batch_size):
+    return torch.utils.data.DataLoader(
+        datasets.CIFAR10(
+            DATA_FOLDER,
+            train=train,
+            download=True,
+            transform=transforms.Compose(
+                [
+                    transforms.ToTensor(),
+                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+                ]
+            ),
+        ),
+        batch_size=batch_size,
+        shuffle=train,
+        pin_memory=True,
+    )
+
+
 def load_imagenet(train, batch_size):
     """
     Following:
