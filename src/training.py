@@ -74,9 +74,9 @@ class Trainer:
 
     def update_optimizer(self, scale, log):
         if scale == "up":
-            self.optimizer_args["lr"] /= 10
+            self.optimizer_args["lr"] /= 1
         elif scale == "down":
-            self.optimizer_args["lr"] *= 10
+            self.optimizer_args["lr"] *= 1
         self.optimizer = self.optimizer_fn(
             self.model.parameters(), **self.optimizer_args
         )
