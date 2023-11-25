@@ -112,9 +112,15 @@ class Config:
             self.config["scaleupepochs"][k]["modifier"] = getdynamic(
                 self.config["scaleupepochs"][k]["modifier"]
             )
-            self.config["scaleupepochs"][k]["filter_function"] = getattr(
-                models, self.config["scaleupepochs"][k]["filter_function"]
-            )
+            if "filter_function" not in self.config["scaleupepochs"][k]:
+                self.config["scaleupepochs"][k]["filter_function"] = None
+            else:
+                self.config["scaleupepochs"][k]["filter_function"] = getattr(
+                    models, self.config["scaleupepochs"][k]["filter_function"]
+                )
+            self.config["scaleupepochs"][k]["add_batch_norm"] = self.config[
+                "scaleupepochs"
+            ][k].get("add_batch_norm", None)
 
     def loadscaledownepochs(self):
         self.config["scaledownepochs"] = set(self.config.get("scaledownepochs", list()))

@@ -14,6 +14,10 @@ import deepening
 import copy
 
 
+def doubledeepen(model, _, __):
+    deepening.deepen_blocks(model)
+    deepening.deepen_blocks(model)
+
 def deepenwiden(model):
     deepening.deepen(model)
     widening.widen(model)

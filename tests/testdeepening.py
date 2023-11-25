@@ -5,7 +5,7 @@ import os
 
 sys.path.append(os.path.join("..", "src"))
 
-from utils import check_adaptation
+from utils import check_adaptation, doubledeepen
 import models
 import torch
 import deepening
@@ -82,11 +82,22 @@ def test_deepen_subnet():
 
 def test_deepen_rectangular_kernel():
     check_adaptation(
-        models.ConvolutionalNet2NetDeepenBlock,
-        {"in_channels": 1, "out_channels": 3, "kernel_size": (7, 1)},
+        models.RectangularConvolution,
+        {},
         torch.randn,
         ((1, 1, 28, 28)),
         deepening.deepen_blocks,
+        add_batch_norm=False,
+    )
+
+
+def test_double_deepen():
+    check_adaptation(
+        models.OneConvolution,
+        {"in_channels": 1, "out_features": 5},
+        torch.randn,
+        ((1, 1, 28, 28)),
+        doubledeepen,
         add_batch_norm=False,
     )
 
@@ -97,6 +108,7 @@ def main():
     test_deepen_small_convolutional()
     test_deepen_norm_convolutional()
     test_deepen_rectangular_kernel()
+    test_double_deepen()
     test_deepen_subnet()
     print("ALL NON-INCEPTION DEEPEN TESTS PASSED!")
     test_deepen_inception()

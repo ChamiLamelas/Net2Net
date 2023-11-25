@@ -1,0 +1,1 @@
+Experiment where we a bigger neural network on cifar10 just to see what it gets

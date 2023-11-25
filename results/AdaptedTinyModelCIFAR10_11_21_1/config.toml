@@ -1,0 +1,13 @@
+model = "BatchNormConvolution"
+model_args = { in_channels = 3, out_features = 10 }
+optimizer_args = { lr = 0.01 }
+dataset = "small_cifar10"
+epochs = 21
+batchsize = 2048
+folder = "AdaptedTinyModelCIFAR10_11_21_1"
+desc = "Experiment where we adapt a neural network on cifar10 just to see what it gets"
+model_weights = "../results/TinyModelCIFAR10_11_21_1/model_after_4_epochs.pt" 
+[scaleupepochs]
+0 = { modifier = "deepen_blocks" }
+
+

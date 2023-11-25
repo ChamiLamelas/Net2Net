@@ -1,0 +1,9 @@
+model = "BatchNormConvolution"
+model_args = { in_channels = 3, out_features = 10 }
+optimizer_args = { lr = 0.01 }
+dataset = "small_cifar10"
+epochs = 25
+batchsize = 2048
+folder = "TinyModelCIFAR10_11_21_1"
+desc = "Experiment where we a smaller neural network on cifar10 just to see what it gets"
+

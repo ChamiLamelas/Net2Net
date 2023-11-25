@@ -1,0 +1,29 @@
+2023-11-21 23:40:57,200 | [INFO] : training start time: 11/22/2023 12:40:57 AM
+2023-11-21 23:40:57,203 | [INFO] : Current model size: 25132754 parameters
+2023-11-21 23:40:57,781 | [INFO] : Model size was changed to 34199378 parameters
+2023-11-21 23:40:57,782 | [INFO] : Learning rate is now 0.010000
+2023-11-21 23:51:19,786 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 00:01:36,723 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 00:11:53,483 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 00:22:10,099 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 00:32:27,297 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 00:42:43,806 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 00:53:00,222 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 01:03:16,887 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 01:13:33,615 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 01:23:50,325 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 01:34:07,055 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 01:44:23,896 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 01:54:40,554 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 02:04:58,155 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 02:15:15,863 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 02:25:33,004 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 02:35:49,817 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 02:46:06,446 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 02:56:22,820 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 03:06:39,506 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 03:16:56,097 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 03:27:12,334 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 03:37:28,763 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 03:47:45,313 | [INFO] : Current model size: 34199378 parameters
+2023-11-22 03:58:01,835 | [INFO] : training runtime (h:mm:ss): 4:17:05
