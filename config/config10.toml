@@ -1,0 +1,12 @@
+model = "tiny_imagenet_inception"
+optimizer_args = { lr = 0.01, weight_decay = 0.00000001 }
+dataset = "tiny_imagenet"
+epochs = 46
+folder = "AdaptedInceptionTinyImageNet_11_24_1"
+desc = "Experiment where we train net2net adapted InceptionNet from briefly trained teacher on TinyImageNet"
+model_weights = "../results/TeacherInceptionTinyImageNet_11_24_1/model_after_4_epochs.pt" 
+device = 0
+[scaleupepochs]
+0 = { modifier = "deepen_blocks", filter_function = "inception_deepen_filter_function", add_batch_norm = true }
+
+
