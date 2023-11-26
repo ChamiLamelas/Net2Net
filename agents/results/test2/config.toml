@@ -4,7 +4,7 @@ total_episodes = 1
 folder = "test2"
 
 [scheduler]
-running_time = 30
+running_time = 600
 gpu_changes = [
     # { time = 60, change = "up" }
 ]

@@ -1,7 +1,101 @@
-2023-11-26 12:38:38,343 | [INFO] : training start time: 11/26/2023 01:38:38 PM
-2023-11-26 12:38:38,343 | [INFO] : Current model size: 20234 parameters
-2023-11-26 12:38:38,343 | [INFO] : Current training mode: initial
-2023-11-26 12:39:06,643 | [INFO] : Current model size: 20234 parameters
-2023-11-26 12:39:06,643 | [INFO] : Current training mode: initial
-2023-11-26 12:39:07,359 | [INFO] : training has run out of time
-2023-11-26 12:39:07,360 | [INFO] : training runtime (h:mm:ss): 0:00:30
+2023-11-26 16:05:30,795 | [INFO] : training start time: 11/26/2023 04:05:30 PM
+2023-11-26 16:05:30,795 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:05:30,796 | [INFO] : Current training mode: initial
+2023-11-26 16:05:45,621 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:05:45,621 | [INFO] : Current training mode: initial
+2023-11-26 16:05:57,952 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:05:57,952 | [INFO] : Current training mode: initial
+2023-11-26 16:06:10,294 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:06:10,294 | [INFO] : Current training mode: initial
+2023-11-26 16:06:22,461 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:06:22,462 | [INFO] : Current training mode: initial
+2023-11-26 16:06:34,751 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:06:34,751 | [INFO] : Current training mode: initial
+2023-11-26 16:06:46,789 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:06:46,789 | [INFO] : Current training mode: initial
+2023-11-26 16:06:58,945 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:06:58,945 | [INFO] : Current training mode: initial
+2023-11-26 16:07:11,154 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:07:11,154 | [INFO] : Current training mode: initial
+2023-11-26 16:07:23,527 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:07:23,527 | [INFO] : Current training mode: initial
+2023-11-26 16:07:35,718 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:07:35,718 | [INFO] : Current training mode: initial
+2023-11-26 16:07:47,926 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:07:47,926 | [INFO] : Current training mode: initial
+2023-11-26 16:08:00,059 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:08:00,059 | [INFO] : Current training mode: initial
+2023-11-26 16:08:12,222 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:08:12,222 | [INFO] : Current training mode: initial
+2023-11-26 16:08:24,403 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:08:24,403 | [INFO] : Current training mode: initial
+2023-11-26 16:08:36,649 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:08:36,649 | [INFO] : Current training mode: initial
+2023-11-26 16:08:48,972 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:08:48,972 | [INFO] : Current training mode: initial
+2023-11-26 16:09:01,163 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:09:01,164 | [INFO] : Current training mode: initial
+2023-11-26 16:09:13,403 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:09:13,404 | [INFO] : Current training mode: initial
+2023-11-26 16:09:25,547 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:09:25,547 | [INFO] : Current training mode: initial
+2023-11-26 16:09:37,775 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:09:37,775 | [INFO] : Current training mode: initial
+2023-11-26 16:09:50,032 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:09:50,032 | [INFO] : Current training mode: initial
+2023-11-26 16:10:02,198 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:10:02,198 | [INFO] : Current training mode: initial
+2023-11-26 16:10:14,458 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:10:14,458 | [INFO] : Current training mode: initial
+2023-11-26 16:10:26,817 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:10:26,817 | [INFO] : Current training mode: initial
+2023-11-26 16:10:39,110 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:10:39,111 | [INFO] : Current training mode: initial
+2023-11-26 16:10:51,363 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:10:51,363 | [INFO] : Current training mode: initial
+2023-11-26 16:11:03,575 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:11:03,575 | [INFO] : Current training mode: initial
+2023-11-26 16:11:15,722 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:11:15,722 | [INFO] : Current training mode: initial
+2023-11-26 16:11:28,043 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:11:28,043 | [INFO] : Current training mode: initial
+2023-11-26 16:11:40,349 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:11:40,349 | [INFO] : Current training mode: initial
+2023-11-26 16:11:52,654 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:11:52,654 | [INFO] : Current training mode: initial
+2023-11-26 16:12:04,905 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:12:04,906 | [INFO] : Current training mode: initial
+2023-11-26 16:12:17,170 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:12:17,170 | [INFO] : Current training mode: initial
+2023-11-26 16:12:29,339 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:12:29,339 | [INFO] : Current training mode: initial
+2023-11-26 16:12:41,410 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:12:41,410 | [INFO] : Current training mode: initial
+2023-11-26 16:12:53,616 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:12:53,616 | [INFO] : Current training mode: initial
+2023-11-26 16:13:05,890 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:13:05,890 | [INFO] : Current training mode: initial
+2023-11-26 16:13:18,090 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:13:18,090 | [INFO] : Current training mode: initial
+2023-11-26 16:13:30,321 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:13:30,321 | [INFO] : Current training mode: initial
+2023-11-26 16:13:42,571 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:13:42,571 | [INFO] : Current training mode: initial
+2023-11-26 16:13:54,621 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:13:54,622 | [INFO] : Current training mode: initial
+2023-11-26 16:14:06,885 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:14:06,885 | [INFO] : Current training mode: initial
+2023-11-26 16:14:19,102 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:14:19,102 | [INFO] : Current training mode: initial
+2023-11-26 16:14:31,194 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:14:31,194 | [INFO] : Current training mode: initial
+2023-11-26 16:14:43,468 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:14:43,469 | [INFO] : Current training mode: initial
+2023-11-26 16:14:55,674 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:14:55,674 | [INFO] : Current training mode: initial
+2023-11-26 16:15:07,975 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:15:07,975 | [INFO] : Current training mode: initial
+2023-11-26 16:15:20,123 | [INFO] : Current model size: 20234 parameters
+2023-11-26 16:15:20,123 | [INFO] : Current training mode: initial
+2023-11-26 16:15:30,104 | [INFO] : training has run out of time
+2023-11-26 16:15:30,105 | [INFO] : training runtime (h:mm:ss): 0:10:00
