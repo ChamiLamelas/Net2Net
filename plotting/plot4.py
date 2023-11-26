@@ -640,3 +640,112 @@ if __name__ == "__main__":
             1,
         ),
     )
+    plot6(
+        "train_acc",
+        "epoch",
+        "TeacherInceptionTinyImageNet_11_24_1",
+        "AdaptedInceptionTinyImageNet_11_25_2",
+        "plot48.png",
+        "teacher",
+        "net2net",
+        starter2=(
+            LOG.load_metrics(
+                os.path.join(config.RESULTS, "TeacherInceptionTinyImageNet_11_24_1"),
+                "training",
+                "train_acc",
+                "epoch",
+            ),
+            1,
+        ),
+    )
+    plot6(
+        "test_acc",
+        "epoch",
+        "TeacherInceptionTinyImageNet_11_24_1",
+        "AdaptedInceptionTinyImageNet_11_25_2",
+        "plot49.png",
+        "teacher",
+        "net2net",
+        starter2=(
+            LOG.load_metrics(
+                os.path.join(config.RESULTS, "TeacherInceptionTinyImageNet_11_24_1"),
+                "training",
+                "test_acc",
+                "epoch",
+            ),
+            1,
+        ),
+    )
+    plot6(
+        "train_acc",
+        "epoch",
+        "TeacherInceptionTinyImageNet_11_24_1",
+        "AdaptedInceptionTinyImageNet_11_25_3",
+        "plot50.png",
+        "teacher",
+        "net2net",
+        starter2=(
+            LOG.load_metrics(
+                os.path.join(config.RESULTS, "TeacherInceptionTinyImageNet_11_24_1"),
+                "training",
+                "train_acc",
+                "epoch",
+            ),
+            1,
+        ),
+    )
+    plot6(
+        "test_acc",
+        "epoch",
+        "TeacherInceptionTinyImageNet_11_24_1",
+        "AdaptedInceptionTinyImageNet_11_25_3",
+        "plot51.png",
+        "teacher",
+        "net2net",
+        starter2=(
+            LOG.load_metrics(
+                os.path.join(config.RESULTS, "TeacherInceptionTinyImageNet_11_24_1"),
+                "training",
+                "test_acc",
+                "epoch",
+            ),
+            1,
+        ),
+    )
+    plot6(
+        "train_acc",
+        "epoch",
+        "TeacherInceptionTinyImageNet_11_24_1",
+        "AdaptedInceptionTinyImageNet_11_25_4",
+        "plot52.png",
+        "teacher",
+        "net2net",
+        starter2=(
+            LOG.load_metrics(
+                os.path.join(config.RESULTS, "TeacherInceptionTinyImageNet_11_24_1"),
+                "training",
+                "train_acc",
+                "epoch",
+            ),
+            1,
+        ),
+    )
+    plot6(
+        "test_acc",
+        "epoch",
+        "TeacherInceptionTinyImageNet_11_24_1",
+        "AdaptedInceptionTinyImageNet_11_25_4",
+        "plot53.png",
+        "teacher",
+        "net2net",
+        starter2=(
+            LOG.load_metrics(
+                os.path.join(config.RESULTS, "TeacherInceptionTinyImageNet_11_24_1"),
+                "training",
+                "test_acc",
+                "epoch",
+            ),
+            1,
+        ),
+    )
+
