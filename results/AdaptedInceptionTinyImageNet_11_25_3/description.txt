@@ -1,0 +1,1 @@
+Experiment where we train net2net adapted InceptionNet from briefly trained teacher on TinyImageNet
