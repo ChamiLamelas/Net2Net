@@ -12,6 +12,7 @@ import torch.optim as optim
 import job
 import deepening
 import time
+import tracing
 
 
 class Trainer:
@@ -20,7 +21,7 @@ class Trainer:
         self.logger = logger
         config = config.get("trainer", dict())
         self.optimizer_fn = getattr(optim, config.get("optimizer", "Adam"))
-        self.optimizer_args = config.get("optimizer_args", dict())
+        self.optimizer_args = config.get("optimizer_args", {"lr": 0.01})
         self.learning_rate_decay = config.get("learning_rate_decay", 0.9)
         self.update_optimizer(None, False)
         self.T = config.get("T", 2)
@@ -36,48 +37,60 @@ class Trainer:
         self.teacher = None
         self.smaller = list()
         self.epoch = 0
+        self.increase_limit = None
+        self.lr_scale = config.get("lr_scale", 1)
+
+    def adapt_up(self):
+        backup = copy.deepcopy(self.job.model)
+        if len(self.smaller) == 0 or models.count_parameters(
+            self.job.model
+        ) > models.count_parameters(self.smaller[-1]):
+            self.smaller.append(backup)
+        elif models.count_parameters(self.job.model) == models.count_parameters(
+            self.smaller[-1]
+        ):
+            self.smaller[-1] = backup
+        deepening.deepen_blocks(
+            self.mode,
+            self.agent.action(
+                {
+                    "model": self.job.model,
+                    "last_epoch_time": self.last_runtime / self.scheduler.running_time,
+                    "timeleft": self.time_left() / self.scheduler.running_time,
+                }
+            ),
+        )
+        self.update_optimizer("up", True)
 
     def train(self, log_file):
-        self.logger.start(task="training", log_file=log_file, metrics_file="training")
+        self.logger.start(task="training", log_file=log_file, metrics_file=log_file)
         while not self.stopped_early:
             self.logger.info(
                 f"Current model size: {models.count_parameters(self.job.model)} parameters"
             )
             self.logger.info(f"Current training mode: {self.mode}")
+            if (
+                self.mode == "increased"
+                and len(tracing.get_all_important_layers(self.job.model))
+                < self.increase_limit
+            ):
+                self.adapt_up()
+            elif self.mode == "decreased":
+                self.soft_target_loss_weight *= self.kd_weight_decay
             self.train_epoch()
             self.epoch += 1
             if self.allocation == "up":
-                backup = copy.deepcopy(self.job.model)
-                if len(self.smaller) == 0 or models.count_parameters(
-                    self.job.model
-                ) > models.count_parameters(self.smaller[-1]):
-                    self.smaller.append(backup)
-                elif models.count_parameters(self.job.model) == models.count_parameters(
-                    self.smaller[-1]
-                ):
-                    self.smaller[-1] = backup
-                deepening.deepen_blocks(
-                    self.mode,
-                    self.agent.action(
-                        {
-                            "model": self.job.model,
-                            "last_epoch_time": self.last_runtime
-                            / self.scheduler.running_time,
-                            "timeleft": self.time_left() / self.scheduler.running_time,
-                        }
-                    ),
-                )
-                self.update_optimizer("up", True)
                 self.mode = "increased"
+                self.increase_limit = 2 * len(
+                    tracing.get_all_important_layers(self.job.model)
+                )
             elif self.allocation == "down":
                 teacher = copy.deepcopy(self.job.model)
                 self.job.model = self.smaller[-1]
                 self.update_optimizer("down", True)
-                if self.weight_distillation:
-                    distillation.deeper_weight_transfer(teacher, self.job.model)
+                distillation.deeper_weight_transfer(teacher, self.job.model)
                 self.soft_target_loss_weight = self.start_soft_target_loss_weight
                 self.ce_loss_weight = self.start_ce_loss_weight
-                self.distillation_mode = True
                 self.mode = "decreased"
             if not self.stopped_early:
                 test_acc = prediction.predict(
@@ -85,18 +98,15 @@ class Trainer:
                 )
                 if self.mode == "increased":
                     self.agent.record_acc(test_acc)
-                if self.mode == "decreased":
-                    self.soft_target_loss_weight *= self.kd_weight_decay
                 self.logger.log_metrics({"test_acc": test_acc}, "epoch", self.job.model)
         self.agent.record_acc(test_acc)
         self.logger.stop()
 
     def update_optimizer(self, scale, log):
-        # todo maybe change these.. ?
         if scale == "up":
-            self.optimizer_args["lr"] /= 10
+            self.optimizer_args["lr"] /= self.lr_scale
         elif scale == "down":
-            self.optimizer_args["lr"] *= 10
+            self.optimizer_args["lr"] *= self.lr_scale
         self.optimizer = self.optimizer_fn(
             self.job.model.parameters(), **self.optimizer_args
         )
