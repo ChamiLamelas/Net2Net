@@ -1,3 +1,5 @@
+#!/usr/bin/env python3.8
+
 from datetime import timedelta, datetime
 from pathlib import Path
 from math import ceil

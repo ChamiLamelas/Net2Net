@@ -26,5 +26,5 @@ class NetworkEncoder(nn.Module):
 
 if __name__ == "__main__":
     encoder = NetworkEncoder(50, 16)
-    print(encoder(models.BatchNormConvolution(3, 5)))
+    print(encoder(models.BatchNormConvolution(3, 5)).size())
 

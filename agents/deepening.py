@@ -1,6 +1,4 @@
-"""
-NEEDSWORK document
-"""
+#!/usr/bin/env python3.8
 
 import gpu
 import numpy as np
@@ -64,13 +62,6 @@ def _conv_only_deeper(layer):
     return new_layer
 
 
-def update_batchnorm_statistics(dataloader, model, device):
-    model = model.to(device)
-    model.train()
-    for entry in dataloader:
-        model(entry[0].to(device))
-
-
 def deepen_block(parent, name, block, add_batch_norm):
     first_layer = block.layers[0]
     new_block = copy.deepcopy(block)
@@ -88,103 +79,12 @@ def deepen_block(parent, name, block, add_batch_norm):
     setattr(parent, name, nn.Sequential(block, new_block))
 
 
-def random_deepen_block(parent, name, block, add_batch_norm):
-    first_layer = block.layers[0]
-    new_block = copy.deepcopy(block)
-    new_block.layers = nn.Sequential()
-    if isinstance(first_layer, nn.Conv2d):
-        new_block.layers.append(
-            nn.Conv2d(
-                in_channels=first_layer.out_channels,
-                out_channels=first_layer.out_channels,
-                kernel_size=first_layer.kernel_size,
-                stride=1,
-                padding=(
-                    first_layer.kernel_size[0] // 2,
-                    first_layer.kernel_size[1] // 2,
-                ),
-            )
-        )
-        if add_batch_norm:
-            new_block.layers.append(nn.BatchNorm2d(first_layer.out_channels))
-        new_block.layers.append(nn.ReLU())
-    elif isinstance(first_layer, nn.Linear):
-        new_block.layers.append(
-            nn.Linear(first_layer.out_features, first_layer.out_features)
-        )
-        new_block.layers.append(nn.ReLU())
-    else:
-        raise tracing.UnsupportedLayer(str(type(first_layer)))
-    setattr(parent, name, nn.Sequential(block, new_block))
-
-
-def deepen_blocks(model, filter_function=None, add_batch_norm=None):
-    if filter_function is None:
-        filter_function = lambda b, h: True
+def deepen_blocks(model, indices=None, add_batch_norm=None):
+    if indices is None:
+        indices = set()
     if add_batch_norm is None:
         add_batch_norm = True
-    for hierarchy, name in tracing.get_all_deepen_blocks(model):
+    for idx, (hierarchy, name) in enumerate(tracing.get_all_deepen_blocks(model)):
         block = getattr(hierarchy[-1], name)
-        if filter_function(block, hierarchy):
+        if idx in indices:
             deepen_block(hierarchy[-1], name, block, add_batch_norm)
-
-
-def random_deepen_blocks(model, filter_function=None, add_batch_norm=None):
-    if filter_function is None:
-        filter_function = lambda b, h: True
-    if add_batch_norm is None:
-        add_batch_norm = True
-    for hierarchy, name in tracing.get_all_deepen_blocks(model):
-        block = getattr(hierarchy[-1], name)
-        if filter_function(block, hierarchy):
-            deepen_block(hierarchy[-1], name, block, add_batch_norm)
-
-
-# older deepening stuff ..
-
-"""
-def deeper(m):
-    if isinstance(m, nn.Linear):
-        new_layer = _fc_only_deeper(m)
-    elif isinstance(m, nn.Conv2d):
-        new_layer = _conv_only_deeper(m)
-    else:
-        raise tracing.UnsupportedLayer(str(type(m)))
-    return nn.Sequential(m, nn.ReLU(), new_layer)
-
-
-def random_deeper(m):
-    if isinstance(m, nn.Linear):
-        new_layer = nn.Linear(m.out_features, m.out_features)
-    elif isinstance(m, nn.Conv2d):
-        new_layer = nn.Conv2d(
-            in_channels=m.out_channels,
-            out_channels=m.out_channels,
-            kernel_size=m.kernel_size,
-            stride=1,
-            padding=(m.kernel_size[0] // 2, m.kernel_size[1] // 2),
-        )
-    else:
-        raise tracing.UnsupportedLayer(str(type(m)))
-    return nn.Sequential(m, nn.ReLU(), new_layer)
-
-
-def deepen(model, ignore=set(), modifier=lambda x, y: True):
-    table = tracing.LayerTable(model, ignore)
-    for e in table:
-        curr = table.get(e["hierarchy"])
-        if (isinstance(curr, nn.Conv2d) or isinstance(curr, nn.Linear)) and modifier(
-            e, curr
-        ):
-            table.set(e["hierarchy"], deeper(curr))
-
-
-def random_deepen(model, ignore=set(), modifier=lambda x, y: True):
-    table = tracing.LayerTable(model, ignore)
-    for e in table:
-        curr = table.get(e["hierarchy"])
-        if (isinstance(curr, nn.Conv2d) or isinstance(curr, nn.Linear)) and modifier(
-            e, curr
-        ):
-            table.set(e["hierarchy"], random_deeper(curr))
-"""

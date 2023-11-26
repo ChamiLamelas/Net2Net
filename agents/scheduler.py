@@ -6,6 +6,7 @@ import time
 
 class Scheduler:
     def __init__(self, config):
+        config = config["scheduler"]
         self.running_time = config["running_time"]
         self.gpu_changes = config["gpu_changes"]
         self.start_time = None
@@ -14,18 +15,38 @@ class Scheduler:
     def start(self):
         self.start_time = time.time()
 
-    def timed_out(self):
+    def checkstart(self):
+        assert self.start_time is not None, "run start( ) first"
+
+    def time_left(self):
+        self.checkstart()
         self.curr_time = time.time() - self.start_time
-        return self.curr_time >= self.running_time
+        return max(self.running_time - self.curr_time, 0)
 
     def allocation(self):
-        assert self.start_time is not None, "run start( ) first"
+        self.checkstart()
         self.curr_time = time.time() - self.start_time
-        if self.curr_time >= self.gpu_changes[self.change]["time"]:
+        output = "same"
+        if (
+            self.change < len(self.gpu_changes)
+            and self.curr_time >= self.gpu_changes[self.change]["time"]
+        ):
+            output = self.gpu_changes[self.change]["change"]
             self.change += 1
-            return self.gpu_changes[self.change]["time"]["change"]
-        return "same"
+        return output
 
 
 if __name__ == "__main__":
-    pass
+    s = Scheduler(
+        {
+            "scheduler": {
+                "running_time": 10,
+                "gpu_changes": [{"time": 5, "change": "up"}],
+            }
+        }
+    )
+
+    s.start()
+    for i in range(10):
+        time.sleep(1)
+        print(f"{s.allocation()} {s.time_left()}")

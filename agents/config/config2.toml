@@ -1,0 +1,22 @@
+[runner]
+seed = 42
+total_episodes = 1
+folder = "test2"
+
+[scheduler]
+running_time = 300
+gpu_changes = [
+    # { time = 60, change = "up" }
+]
+
+[job]
+model = "LargeConvNet"
+dataset = "cifar10"
+
+[agent]
+device = 0
+gamma = 0.99
+alpha = 0.01
+hidden_size = 50
+embedding_size = 16
+final_weight = 0.5

@@ -56,3 +56,45 @@ class BatchNormConvolution(nn.Module):
         x = torch.flatten(x, 1)
         x = self.fc(x)
         return x
+
+
+class ConvNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = NormalizedConvolutionalNet2NetDeepenBlock(3, 32, 3)
+        self.conv2 = NormalizedConvolutionalNet2NetDeepenBlock(32, 64, 3)
+        self.finalpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.fc = FeedForwardNet2NetDeepenBlock(64, 10)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.conv2(x)
+        x = self.finalpool(x)
+        x = torch.flatten(x, 1)
+        x = self.fc(x)
+        return x
+
+
+class LargeConvNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = nn.Sequential(
+            NormalizedConvolutionalNet2NetDeepenBlock(3, 32, 3),
+            NormalizedConvolutionalNet2NetDeepenBlock(32, 32, 3, padding=1),
+        )
+        self.conv2 = nn.Sequential(
+            NormalizedConvolutionalNet2NetDeepenBlock(32, 64, 3),
+            NormalizedConvolutionalNet2NetDeepenBlock(64, 64, 3, padding=1),
+        )
+        self.finalpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.fc = nn.Sequential(
+            FeedForwardNet2NetDeepenBlock(64, 10), FeedForwardNet2NetDeepenBlock(10, 10)
+        )
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.conv2(x)
+        x = self.finalpool(x)
+        x = torch.flatten(x, 1)
+        x = self.fc(x)
+        return x

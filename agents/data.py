@@ -1,3 +1,5 @@
+#!/usr/bin/env python3.8
+
 import torch
 from torchvision import datasets, transforms
 import os
@@ -5,12 +7,12 @@ import os
 DATA_FOLDER = os.path.join("..", "data")
 
 
-def cifar10(train, batch_size):
+def cifar10(train, batch_size, download=False):
     return torch.utils.data.DataLoader(
         datasets.CIFAR10(
             DATA_FOLDER,
             train=train,
-            download=True,
+            download=download,
             transform=transforms.Compose(
                 [
                     transforms.ToTensor(),
@@ -22,3 +24,9 @@ def cifar10(train, batch_size):
         shuffle=train,
         pin_memory=True,
     )
+
+if __name__ == "__main__":
+    dataset = cifar10(True, 1)
+    element = next(iter(dataset))[0]
+    print(element.requires_grad)
+    
