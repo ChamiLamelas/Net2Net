@@ -76,6 +76,7 @@ def run(config, total_eps, logger):
 
 
 def main():
+    torch.autograd.set_detect_anomaly(True)
     args = get_args()
     config = loadconfig(args)
     runner_config = config["runner"]

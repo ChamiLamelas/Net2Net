@@ -6,6 +6,7 @@ import torch.nn as nn
 import tf_and_torch
 import tracing
 import copy
+import models
 
 
 def _fc_only_deeper_tf_numpy(weight):
@@ -79,12 +80,16 @@ def deepen_block(parent, name, block, add_batch_norm):
     setattr(parent, name, nn.Sequential(block, new_block))
 
 
-def deepen_blocks(model, indices=None, add_batch_norm=None):
-    if indices is None:
-        indices = set()
-    if add_batch_norm is None:
-        add_batch_norm = True
-    for idx, (hierarchy, name) in enumerate(tracing.get_all_deepen_blocks(model)):
+def deepen_model(model, logger=None, index=None, add_batch_norm=True):
+    blocks = tracing.get_all_deepen_blocks(model)
+    if index == len(blocks):
+        if logger is not None:
+            logger.info("no layers were added")
+    else:
+        hierarchy, name = blocks[index]
         block = getattr(hierarchy[-1], name)
-        if idx in indices:
-            deepen_block(hierarchy[-1], name, block, add_batch_norm)
+        deepen_block(hierarchy[-1], name, block, add_batch_norm)
+        if logger is not None:
+            logger.info(
+                f"deepening layer {index}/{len(blocks)}: {models.get_str_rep(block)}"
+            )

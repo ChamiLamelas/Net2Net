@@ -9,51 +9,62 @@ import torch.optim as optim
 import models
 import numpy as np
 import gpu
+from torch.distributions import Categorical
 
 
 class Policy(nn.Module):
-    def __init__(self, config):
+    def __init__(self, config, device):
         super().__init__()
         self.encoder = encoding.NetworkEncoder(
-            config["hidden_size"], config["embedding_size"]
+            config["hidden_size"], config["embedding_size"], device
         )
         self.decider = decider.SigmoidClassifier((config["hidden_size"] * 2) + 2)
+        self.softmax = nn.Softmax(dim=0)
+        self.device = device
 
     def forward(self, state):
         encodings = self.encoder(state["model"])
         other_features = torch.tensor(
-            [state["last_epoch_time"], state["timeleft"]], requires_grad=True
+            [state["last_epoch_time"], state["timeleft"]],
+            requires_grad=True,
+            device=self.device,
         ).repeat((encodings.size()[0], 1))
-        return self.decider(torch.cat([other_features, encodings], dim=1))
+        scores = self.decider(torch.cat([other_features, encodings], dim=1))
+        return self.softmax(scores).reshape(scores.size()[0])
 
 
 class Agent:
     def __init__(self, config):
         config = config["agent"]
-        self.policy = Policy(config)
+        self.device = gpu.get_device(config["device"])
+        self.policy = Policy(config, self.device)
         self.gamma = config["gamma"]
         self.optimizer = optim.Adam(self.policy.parameters(), config["alpha"])
         self.probabilities = None
         self.rewards = None
         self.final_weight = config["final_weight"]
-        self.device = gpu.get_device(config["device"])
+        self.policy = self.policy.to(self.device)
 
     def init(self):
         self.probabilities = list()
         self.rewards = [None]
 
+    def remove_unrewarded_probability(self):
+        if len(self.probabilities) > (len(self.rewards) - 1):
+            self.probabilities.pop(-1)
+
     def action(self, state):
         assert self.probabilities is not None, "call init( )"
-        if len(self.probabilities) > len(self.rewards):
-            self.rewards.append(0)
+        self.remove_unrewarded_probability()
         probabilities = self.policy(state)
-        action = set(
-            e[0] for e in filter(lambda x: x[1] >= 0.5, enumerate(probabilities))
-        )
-        self.probabilities.append(torch.sum(torch.log(probabilities)))
-        return action
+        selector = Categorical(probabilities)
+        action = selector.sample()
+        self.probabilities.append(selector.log_prob(action))
+        return action.item()
 
-    def record_acc(self, acc):
+    def record_acc(self, acc, final=False):
+        if final:
+            self.remove_unrewarded_probability()
         self.rewards.append(acc)
 
     def T(self):
@@ -90,11 +101,6 @@ class Agent:
 
 
 if __name__ == "__main__":
-    p = Policy({"hidden_size": 50, "embedding_size": 16})
-    print(
-        p({"model": models.ConvNet(), "last_epoch_time": 0.1, "timeleft": 0.5}).size()
-    )
-
     a = Agent(
         {
             "agent": {
@@ -103,6 +109,7 @@ if __name__ == "__main__":
                 "gamma": 0.99,
                 "alpha": 0.01,
                 "final_weight": 0.5,
+                "device": 0,
             }
         }
     )
