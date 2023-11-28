@@ -15,14 +15,11 @@ def count_parameters(model):
 
 
 def get_str_rep(layer):
-    if is_deepen_block(layer):
+    if layer is None:
+        return "none-layer"
+    elif is_deepen_block(layer):
         layer = layer.layers[0]
-    if isinstance(layer, nn.Conv2d):
-        return f"conv-{layer.in_channels}-{layer.out_channels}-{layer.kernel_size[0]}-{layer.kernel_size[1]}-{layer.padding[0]}-{layer.padding[1]}"
-    elif isinstance(layer, nn.Linear):
-        return f"linear-{layer.in_features}-{layer.out_features}"
-    elif layer is None:
-        return f"none-layer"
+    return str(layer)
 
 
 class FeedForwardNet2NetDeepenBlock(nn.Module):
@@ -80,6 +77,7 @@ class ConvNet(nn.Module):
         super().__init__()
         self.conv1 = NormalizedConvolutionalNet2NetDeepenBlock(3, 32, 3)
         self.conv2 = NormalizedConvolutionalNet2NetDeepenBlock(32, 32, 3)
+        self.pool1 = nn.AvgPool2d((2, 2))
         self.conv3 = NormalizedConvolutionalNet2NetDeepenBlock(32, 32, 3)
         self.finalpool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = FeedForwardNet2NetDeepenBlock(32, 10)
@@ -87,6 +85,7 @@ class ConvNet(nn.Module):
     def forward(self, x):
         x = self.conv1(x)
         x = self.conv2(x)
+        x = self.pool1(x)
         x = self.conv3(x)
         x = self.finalpool(x)
         x = torch.flatten(x, 1)
@@ -105,6 +104,7 @@ class LargeConvNet(nn.Module):
             NormalizedConvolutionalNet2NetDeepenBlock(32, 32, 3),
             NormalizedConvolutionalNet2NetDeepenBlock(32, 32, 3, padding=1),
         )
+        self.pool1 = nn.AvgPool2d((2, 2))
         self.conv3 = nn.Sequential(
             NormalizedConvolutionalNet2NetDeepenBlock(32, 32, 3),
             NormalizedConvolutionalNet2NetDeepenBlock(32, 32, 3, padding=1),
@@ -117,6 +117,7 @@ class LargeConvNet(nn.Module):
     def forward(self, x):
         x = self.conv1(x)
         x = self.conv2(x)
+        x = self.pool1(x)
         x = self.conv3(x)
         x = self.finalpool(x)
         x = torch.flatten(x, 1)

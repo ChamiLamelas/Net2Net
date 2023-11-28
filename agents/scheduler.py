@@ -8,12 +8,13 @@ class Scheduler:
     def __init__(self, config):
         config = config["scheduler"]
         self.running_time = config["running_time"]
-        self.gpu_changes = config["gpu_changes"]
+        self.gpu_changes = config.get("gpu_changes", list())
         self.start_time = None
-        self.change = 0
+        self.change = None
 
     def start(self):
         self.start_time = time.time()
+        self.change = 0
 
     def checkstart(self):
         assert self.start_time is not None, "run start( ) first"

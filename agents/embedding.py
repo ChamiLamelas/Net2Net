@@ -1,6 +1,7 @@
 #!/usr/bin/env python3.8
 
 import torch.nn as nn
+import numpy as np
 import torch
 import sys
 import os
@@ -19,7 +20,7 @@ class LayerEmbedder:
 
     def get_embeddings(self, model):
         ids = list()
-        layers = tracing.get_all_important_layers(model)
+        layers = tracing.get_all_layers(model)
         for layer in layers:
             str_rep = models.get_str_rep(layer)
             if str_rep not in self.ids:
@@ -30,7 +31,14 @@ class LayerEmbedder:
         embedder = nn.Embedding(len(self.ids), self.embedding_size)
         embedder.eval()
         output = embedder(torch.LongTensor(ids))
-        return output
+        important_idxs = np.argwhere(list(map(tracing.is_important, layers))).flatten()
+        decision_matrix = torch.zeros((len(important_idxs), len(ids)))
+        for i, idx in enumerate(important_idxs):
+            decision_matrix[i, idx] = 1
+        decision_matrix[-1, -1] = 1
+        # output = output.detach().clone()
+        # print("get_embeddings", output.requires_grad, decision_matrix.requires_grad)
+        return output, decision_matrix
 
 
 if __name__ == "__main__":

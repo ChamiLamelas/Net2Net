@@ -1,14 +1,11 @@
 #!/usr/bin/env python3.8
 
 import torch.nn as nn
-import models 
-
-
+import models
 
 
 class UnsupportedLayer(Exception):
     pass
-
 
 
 def get_all_deepen_blocks(module):
@@ -29,6 +26,8 @@ def is_important(module):
     return any(isinstance(module, layer_type) for layer_type in [nn.Conv2d, nn.Linear])
 
 
+
+
 def get_all_important_layer_hierarchies(module):
     layers = dict()
 
@@ -44,14 +43,14 @@ def get_all_important_layer_hierarchies(module):
     return layers
 
 
-def get_all_important_layers(module):
+def get_all_layers(module):
     layers = list()
 
-    def _recursive_get_all_important_layers(curr):
-        if is_important(curr):
+    def _recursive_get_all_layers(curr):
+        if len(list(curr.children())) == 0:
             layers.append(curr)
         for child in curr.children():
-            _recursive_get_all_important_layers(child)
+            _recursive_get_all_layers(child)
 
-    _recursive_get_all_important_layers(module)
+    _recursive_get_all_layers(module)
     return layers

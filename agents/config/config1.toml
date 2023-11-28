@@ -2,12 +2,10 @@
 seed = 42
 total_episodes = 1
 folder = "test1"
+agent = "RandomAgent"
 
 [scheduler]
-running_time = 600
-gpu_changes = [
-    # { time = 60, change = "up" }
-]
+running_time = 390
 
 [job]
 model = "ConvNet"

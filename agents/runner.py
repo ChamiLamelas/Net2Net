@@ -4,14 +4,14 @@ import training
 import environment
 import agent
 import toml
-import torch
-import numpy as np
 import argparse
-import random
 import os
 from logger import ML_Logger
 import shutil
 from pathlib import Path
+import heuristics
+import seed
+import torch
 
 RESULTS = "results"
 
@@ -26,15 +26,6 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("configfile", type=file, help="configuration file")
     return parser.parse_args()
-
-
-def set_seed(config):
-    seed = config["seed"]
-    torch.manual_seed(seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed(seed)
-    np.random.seed(seed)
-    random.seed(seed)
 
 
 def setup_folder(config, configfile):
@@ -62,17 +53,25 @@ def loadconfig(args):
     return toml.load(args.configfile)
 
 
-def run(config, total_eps, logger):
+def get_agent(config, run_config):
+    for module in [agent, heuristics]:
+        if hasattr(module, run_config["agent"]):
+            return getattr(module, run_config["agent"])(config)
+    raise RuntimeError("could not find agent")
+
+
+def run(config, run_config, logger):
+    total_eps = run_config["total_episodes"]
     max_digits = len(str(total_eps))
     env = environment.Environment(config)
-    agt = agent.Agent(config)
+    agt = get_agent(config, run_config)
     for ep in range(total_eps):
         env.scheduler.start()
         agt.init()
         tr = training.Trainer(config, env.scheduler, agt, logger)
         tr.train(f"training{str(ep).zfill(max_digits)}")
         agt.update()
-        print(f"ep {ep}")
+        print(f"episode {ep + 1}/{total_eps} finished")
 
 
 def main():
@@ -80,9 +79,9 @@ def main():
     args = get_args()
     config = loadconfig(args)
     runner_config = config["runner"]
-    set_seed(runner_config)
+    seed.set_seed(runner_config["seed"])
     logger = setup_folder(runner_config, args.configfile)
-    run(config, runner_config["total_episodes"], logger)
+    run(config, runner_config, logger)
 
 
 if __name__ == "__main__":
