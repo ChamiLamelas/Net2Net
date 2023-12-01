@@ -1,7 +1,6 @@
 #!/usr/bin/env python3.8
 
 import torch.nn as nn
-import numpy as np
 import torch
 import sys
 import os
@@ -10,37 +9,73 @@ sys.path.append(os.path.join("..", "src"))
 
 import tracing
 import models
+import pickle
 
+VOCABS = "vocabs"
+IDS = ".ids.pkl"
+EMBEDDINGS = ".embeddings.pkl"
+NONE_LAYER_ID = 0
 
-class LayerEmbedder:
-    def __init__(self, embedding_size):
-        self.ids = {models.get_str_rep(None): 0}
-        self.id = 1
-        self.embedding_size = embedding_size
+class Vocabulary:
+    def __init__(self, name=None, models=None):
+        self.ids_file = os.path.join(VOCABS, name + IDS)
+        self.embeddings_file = os.path.join(VOCABS, name + EMBEDDINGS)
+        self.embeddings = None
+        if models is None:
+            self.load_from_files()
+        else:
+            self.init_from_models(models)
 
-    def get_embeddings(self, model):
-        ids = list()
-        layers = tracing.get_all_layers(model)
-        for layer in layers:
-            str_rep = models.get_str_rep(layer)
-            if str_rep not in self.ids:
-                self.ids[str_rep] = self.id
-                self.id += 1
-            ids.append(self.ids[str_rep])
-        ids.append(0)
-        embedder = nn.Embedding(len(self.ids), self.embedding_size)
-        embedder.eval()
-        output = embedder(torch.LongTensor(ids))
-        important_idxs = np.argwhere(list(map(tracing.is_important, layers))).flatten()
-        decision_matrix = torch.zeros((len(important_idxs), len(ids)))
-        for i, idx in enumerate(important_idxs):
-            decision_matrix[i, idx] = 1
-        decision_matrix[-1, -1] = 1
-        # output = output.detach().clone()
-        # print("get_embeddings", output.requires_grad, decision_matrix.requires_grad)
-        return output, decision_matrix
+    def load_from_files(self):
+        if os.path.isfile(self.ids_file):
+            with open(self.ids_file, "rb") as f:
+                self.ids = pickle.load(f)
+        else:
+            raise RuntimeError(f"{self.ids_file} does not exist")
+        if os.path.isfile(self.embeddings_file):
+            with open(self.embeddings_file, "rb") as f:
+                self.embeddings = torch.load(f)
+
+    def init_from_models(self, models):
+        self.ids = {"none-layer": NONE_LAYER_ID}
+        for model in models:
+            for layer in tracing.get_all_layers(model):
+                key = str(layer)
+                if key not in self.ids:
+                    self.ids[key] = len(self.ids)
+
+    def id(self, model):
+        ids = [NONE_LAYER_ID]
+        for layer in tracing.get_all_layers(model):
+            key = str(layer)
+            if key in self.ids:
+                ids.append(self.ids[key])
+            else:
+                raise RuntimeError(f"{key} does not have an ID in the vocabulary")
+        return torch.LongTensor(ids)
+
+    def save(self, embeddings=None):
+        if embeddings is not None:
+            torch.save(embeddings, self.embeddings_file)
+        with open(self.ids_file, "wb+") as f:
+            pickle.dump(self.ids, f)
+
+    def size(self):
+        return len(self.ids)
+
+    def has_embeddings(self):
+        return self.embeddings is not None
+
+    def get_embeddings(self):
+        return self.embeddings
 
 
 if __name__ == "__main__":
-    embedder = LayerEmbedder(16)
-    print(embedder.get_embeddings(models.ConvNet()))
+    vocab = Vocabulary("test", [models.ConvNet()])
+    print(vocab.has_embeddings())
+
+    embedder = nn.Embedding(vocab.size(), 4)
+    vocab.save(embedder.state_dict())
+
+    vocab2 = Vocabulary("test")
+    print(vocab2.has_embeddings())

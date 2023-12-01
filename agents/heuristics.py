@@ -55,12 +55,12 @@ if __name__ == "__main__":
         {"model": models.ConvNet(), "last_epoch_time": 0.1, "timeleft": 0.25},
     ]
 
-    r = RandomAgent({"agent": {}})
+    r = RandomAgent({"agent": {"device": 0}})
     r.init()
     print(r.action(states[0]))
     print(r.action(states[1]))
 
-    d = DeterministicAgent({"agent": {"action_sequence": [3]}})
+    d = DeterministicAgent({"agent": {"device": 0, "action_sequence": [3]}})
     d.init()
     print(d.action(states[0]))
     print(d.action(states[1]))

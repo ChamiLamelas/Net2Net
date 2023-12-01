@@ -95,8 +95,6 @@ class Agent(BaseAgent):
     ):
         self.transform_rewards()
         goals = self.compute_goals()
-        print(self.probabilities)
-        print(goals)
         self.optimizer.zero_grad()
         objective = torch.sum(
             torch.stack([p * g for p, g in zip(self.probabilities, goals)])
@@ -110,6 +108,7 @@ if __name__ == "__main__":
     a = Agent(
         {
             "agent": {
+                "vocab": "models",
                 "hidden_size": 50,
                 "embedding_size": 16,
                 "gamma": 0.99,
