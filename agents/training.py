@@ -12,6 +12,7 @@ import torch.optim as optim
 import job
 import deepening
 import time
+import tracing
 
 
 class Trainer:
@@ -37,6 +38,7 @@ class Trainer:
         self.smaller = list()
         self.epoch = 0
         self.lr_scale = config.get("lr_scale", 1)
+        self.increase_limit = None
 
     def adapt_up(self):
         backup = copy.deepcopy(self.job.model)
@@ -69,7 +71,10 @@ class Trainer:
                 f"Current model size: {models.count_parameters(self.job.model)} parameters"
             )
             self.logger.info(f"Current training mode: {self.mode}")
-            if self.mode == "increased":
+            if (
+                self.mode == "increased"
+                and tracing.get_all_layers(self.job.model) < self.increase_limit
+            ):
                 self.adapt_up()
             elif self.mode == "decreased":
                 self.soft_target_loss_weight *= self.kd_weight_decay
@@ -77,6 +82,7 @@ class Trainer:
             self.epoch += 1
             if self.allocation == "up":
                 self.mode = "increased"
+                self.increase_limit = len(tracing.get_all_layers(self.job.model)) * 2
             elif self.allocation == "down":
                 teacher = copy.deepcopy(self.job.model)
                 self.job.model = self.smaller[-1]
