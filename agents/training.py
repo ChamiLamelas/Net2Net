@@ -39,6 +39,7 @@ class Trainer:
         self.epoch = 0
         self.lr_scale = config.get("lr_scale", 1)
         self.increase_limit = None
+        self.min_lr = config.get("min_lr", 1e-8)
 
     def adapt_up(self):
         backup = copy.deepcopy(self.job.model)
@@ -50,19 +51,20 @@ class Trainer:
             self.smaller[-1]
         ):
             self.smaller[-1] = backup
+        action, choices = self.agent.action(
+            {
+                "model": self.job.model,
+                "last_epoch_time": self.last_runtime / self.scheduler.running_time,
+                "timeleft": self.scheduler.time_left() / self.scheduler.running_time,
+            }
+        )
         deepening.deepen_model(
             self.job.model,
             self.logger,
-            self.agent.action(
-                {
-                    "model": self.job.model,
-                    "last_epoch_time": self.last_runtime / self.scheduler.running_time,
-                    "timeleft": self.scheduler.time_left()
-                    / self.scheduler.running_time,
-                }
-            ),
+            action,
         )
         self.update_optimizer("up", True)
+        self.logger.log_metrics({"action": f"{action}/{choices}"}, "epoch")
 
     def train(self, log_file):
         self.logger.start(task="training", log_file=log_file, metrics_file=log_file)
@@ -73,7 +75,7 @@ class Trainer:
             self.logger.info(f"Current training mode: {self.mode}")
             if (
                 self.mode == "increased"
-                and tracing.get_all_layers(self.job.model) < self.increase_limit
+                and len(tracing.get_all_layers(self.job.model)) < self.increase_limit
             ):
                 self.adapt_up()
             elif self.mode == "decreased":
@@ -143,7 +145,11 @@ class Trainer:
             total_correct += correct
             total_size += data.size()[0]
         if not self.stopped_early and self.allocation == "same":
-            self.learning_rate.step()
+            if self.learning_rate.get_last_lr()[0] > self.min_lr:
+                self.learning_rate.step()
+                self.logger.info(
+                    f"New learning rate: {self.learning_rate.get_last_lr()[0]}"
+                )
             self.last_runtime = time.time() - ti
             self.logger.log_metrics({"train_acc": total_correct / total_size}, "epoch")
 

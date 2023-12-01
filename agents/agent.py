@@ -63,7 +63,7 @@ class Agent(BaseAgent):
         selector = Categorical(probabilities)
         action = selector.sample()
         self.probabilities.append(selector.log_prob(action))
-        return action.item()
+        return action.item(), probabilities.shape[0]
 
     def record_acc(self, acc, final=False):
         if final:

@@ -31,7 +31,6 @@ def get_args():
 def setup_folder(config, configfile):
     test_dir = config["folder"].startswith("test")
     config["folder"] = os.path.join(RESULTS, config["folder"])
-    logger = ML_Logger(log_folder=config["folder"], persist=False)
     if os.path.isdir(config["folder"]):
         if test_dir:
             print("Specified a test folder -- deleting!")
@@ -40,6 +39,7 @@ def setup_folder(config, configfile):
             raise RuntimeError(
                 f"{config['folder']} already exists -- please delete it or specify a different folder"
             )
+    logger = ML_Logger(log_folder=config["folder"], persist=False)
     Path(config["folder"]).mkdir(exist_ok=True, parents=True)
     if "desc" in config:
         Path(os.path.join(config["folder"], "description.txt")).write_text(

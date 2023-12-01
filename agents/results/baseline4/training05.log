@@ -1,0 +1,100 @@
+2023-12-01 10:43:51,166 | [INFO] : training start time: 12/01/2023 10:43:51 AM
+2023-12-01 10:43:51,166 | [INFO] : Current model size: 19914 parameters
+2023-12-01 10:43:51,166 | [INFO] : Current training mode: initial
+2023-12-01 10:44:03,478 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-01 10:44:05,427 | [INFO] : Current model size: 19914 parameters
+2023-12-01 10:44:05,427 | [INFO] : Current training mode: initial
+2023-12-01 10:44:17,809 | [INFO] : New learning rate: 0.008100000000000001
+2023-12-01 10:44:19,606 | [INFO] : Current model size: 19914 parameters
+2023-12-01 10:44:19,606 | [INFO] : Current training mode: initial
+2023-12-01 10:44:32,347 | [INFO] : New learning rate: 0.007290000000000001
+2023-12-01 10:44:34,139 | [INFO] : Current model size: 19914 parameters
+2023-12-01 10:44:34,139 | [INFO] : Current training mode: initial
+2023-12-01 10:44:46,905 | [INFO] : New learning rate: 0.006561000000000002
+2023-12-01 10:44:48,691 | [INFO] : Current model size: 19914 parameters
+2023-12-01 10:44:48,691 | [INFO] : Current training mode: initial
+2023-12-01 10:45:01,734 | [INFO] : New learning rate: 0.005904900000000002
+2023-12-01 10:45:03,505 | [INFO] : Current model size: 19914 parameters
+2023-12-01 10:45:03,505 | [INFO] : Current training mode: initial
+2023-12-01 10:45:16,105 | [INFO] : New learning rate: 0.005314410000000002
+2023-12-01 10:45:17,888 | [INFO] : Current model size: 19914 parameters
+2023-12-01 10:45:17,888 | [INFO] : Current training mode: initial
+2023-12-01 10:45:31,001 | [INFO] : New learning rate: 0.004782969000000002
+2023-12-01 10:45:32,769 | [INFO] : Current model size: 19914 parameters
+2023-12-01 10:45:32,769 | [INFO] : Current training mode: initial
+2023-12-01 10:45:45,524 | [INFO] : New learning rate: 0.004304672100000002
+2023-12-01 10:45:47,278 | [INFO] : Current model size: 19914 parameters
+2023-12-01 10:45:47,278 | [INFO] : Current training mode: initial
+2023-12-01 10:46:00,357 | [INFO] : New learning rate: 0.003874204890000002
+2023-12-01 10:46:02,121 | [INFO] : Current model size: 19914 parameters
+2023-12-01 10:46:02,121 | [INFO] : Current training mode: initial
+2023-12-01 10:46:14,891 | [INFO] : New learning rate: 0.003486784401000002
+2023-12-01 10:46:16,668 | [INFO] : Current model size: 19914 parameters
+2023-12-01 10:46:16,669 | [INFO] : Current training mode: initial
+2023-12-01 10:46:29,491 | [INFO] : New learning rate: 0.003138105960900002
+2023-12-01 10:46:31,261 | [INFO] : Current model size: 19914 parameters
+2023-12-01 10:46:31,261 | [INFO] : Current training mode: initial
+2023-12-01 10:46:43,853 | [INFO] : New learning rate: 0.0028242953648100018
+2023-12-01 10:46:45,615 | [INFO] : Current model size: 19914 parameters
+2023-12-01 10:46:45,615 | [INFO] : Current training mode: initial
+2023-12-01 10:46:58,310 | [INFO] : New learning rate: 0.0025418658283290017
+2023-12-01 10:47:00,070 | [INFO] : Current model size: 19914 parameters
+2023-12-01 10:47:00,070 | [INFO] : Current training mode: initial
+2023-12-01 10:47:13,032 | [INFO] : New learning rate: 0.0022876792454961017
+2023-12-01 10:47:14,791 | [INFO] : Current model size: 19914 parameters
+2023-12-01 10:47:14,791 | [INFO] : Current training mode: initial
+2023-12-01 10:47:27,598 | [INFO] : New learning rate: 0.0020589113209464917
+2023-12-01 10:47:29,370 | [INFO] : Current model size: 19914 parameters
+2023-12-01 10:47:29,370 | [INFO] : Current training mode: initial
+2023-12-01 10:47:42,234 | [INFO] : New learning rate: 0.0018530201888518425
+2023-12-01 10:47:44,009 | [INFO] : Current model size: 19914 parameters
+2023-12-01 10:47:44,010 | [INFO] : Current training mode: initial
+2023-12-01 10:47:56,869 | [INFO] : New learning rate: 0.0016677181699666583
+2023-12-01 10:47:58,641 | [INFO] : Current model size: 19914 parameters
+2023-12-01 10:47:58,642 | [INFO] : Current training mode: initial
+2023-12-01 10:48:11,496 | [INFO] : New learning rate: 0.0015009463529699924
+2023-12-01 10:48:13,262 | [INFO] : Current model size: 19914 parameters
+2023-12-01 10:48:13,262 | [INFO] : Current training mode: initial
+2023-12-01 10:48:20,436 | [INFO] : Current model size: 19914 parameters
+2023-12-01 10:48:20,436 | [INFO] : Current training mode: increased
+2023-12-01 10:48:20,441 | [INFO] : deepening layer 1/4: Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1))
+2023-12-01 10:48:20,441 | [INFO] : Model size was changed to 29226 parameters
+2023-12-01 10:48:20,441 | [INFO] : Learning rate is now 0.010000
+2023-12-01 10:48:34,800 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-01 10:48:36,587 | [INFO] : Current model size: 29226 parameters
+2023-12-01 10:48:36,587 | [INFO] : Current training mode: increased
+2023-12-01 10:48:36,591 | [INFO] : no layers were added
+2023-12-01 10:48:36,591 | [INFO] : Model size was changed to 29226 parameters
+2023-12-01 10:48:36,591 | [INFO] : Learning rate is now 0.010000
+2023-12-01 10:48:51,204 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-01 10:48:52,991 | [INFO] : Current model size: 29226 parameters
+2023-12-01 10:48:52,991 | [INFO] : Current training mode: increased
+2023-12-01 10:48:52,996 | [INFO] : deepening layer 3/5: Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1))
+2023-12-01 10:48:52,996 | [INFO] : Model size was changed to 38538 parameters
+2023-12-01 10:48:52,996 | [INFO] : Learning rate is now 0.010000
+2023-12-01 10:49:08,200 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-01 10:49:10,040 | [INFO] : Current model size: 38538 parameters
+2023-12-01 10:49:10,040 | [INFO] : Current training mode: increased
+2023-12-01 10:49:10,046 | [INFO] : deepening layer 2/6: Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+2023-12-01 10:49:10,046 | [INFO] : Model size was changed to 47850 parameters
+2023-12-01 10:49:10,046 | [INFO] : Learning rate is now 0.010000
+2023-12-01 10:49:26,048 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-01 10:49:27,862 | [INFO] : Current model size: 47850 parameters
+2023-12-01 10:49:27,863 | [INFO] : Current training mode: increased
+2023-12-01 10:49:27,869 | [INFO] : deepening layer 4/7: Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1))
+2023-12-01 10:49:27,870 | [INFO] : Model size was changed to 57162 parameters
+2023-12-01 10:49:27,870 | [INFO] : Learning rate is now 0.010000
+2023-12-01 10:49:44,378 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-01 10:49:46,569 | [INFO] : Current model size: 57162 parameters
+2023-12-01 10:49:46,569 | [INFO] : Current training mode: increased
+2023-12-01 10:49:46,575 | [INFO] : deepening layer 2/8: Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+2023-12-01 10:49:46,576 | [INFO] : Model size was changed to 66474 parameters
+2023-12-01 10:49:46,576 | [INFO] : Learning rate is now 0.010000
+2023-12-01 10:50:04,603 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-01 10:50:06,604 | [INFO] : Current model size: 66474 parameters
+2023-12-01 10:50:06,604 | [INFO] : Current training mode: increased
+2023-12-01 10:50:24,454 | [INFO] : New learning rate: 0.008100000000000001
+2023-12-01 10:50:26,313 | [INFO] : Current model size: 66474 parameters
+2023-12-01 10:50:26,313 | [INFO] : Current training mode: increased
+2023-12-01 10:50:30,447 | [INFO] : training has run out of time
+2023-12-01 10:50:30,448 | [INFO] : training runtime (h:mm:ss): 0:06:40
