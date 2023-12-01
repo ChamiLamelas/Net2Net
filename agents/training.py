@@ -51,7 +51,7 @@ class Trainer:
             self.smaller[-1]
         ):
             self.smaller[-1] = backup
-        action, choices = self.agent.action(
+        action, probabilities = self.agent.action(
             {
                 "model": self.job.model,
                 "last_epoch_time": self.last_runtime / self.scheduler.running_time,
@@ -64,7 +64,8 @@ class Trainer:
             action,
         )
         self.update_optimizer("up", True)
-        self.logger.log_metrics({"action": f"{action}/{choices}"}, "epoch")
+        self.logger.log_metrics({"action": action}, "epoch")
+        self.logger.log_metrics({"probabilities": probabilities}, "epoch")
 
     def train(self, log_file):
         self.logger.start(task="training", log_file=log_file, metrics_file=log_file)

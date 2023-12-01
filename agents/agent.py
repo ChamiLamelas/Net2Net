@@ -2,7 +2,6 @@
 
 import policy
 import reward
-import torch.nn as nn
 import torch.optim as optim
 import models
 import numpy as np
@@ -11,11 +10,13 @@ from torch.distributions import Categorical
 from abc import ABC, abstractmethod
 from collections import deque
 import torch
+import os
 
 
 class BaseAgent(ABC):
     def __init__(self, config):
         self.performance = None
+        self.folder = config["runner"]["folder"]
         self.config = config["agent"]
         self.device = gpu.get_device(self.config["device"])
 
@@ -63,7 +64,7 @@ class Agent(BaseAgent):
         selector = Categorical(probabilities)
         action = selector.sample()
         self.probabilities.append(selector.log_prob(action))
-        return action.item(), probabilities.shape[0]
+        return action.item(), probabilities
 
     def record_acc(self, acc, final=False):
         if final:
@@ -102,6 +103,10 @@ class Agent(BaseAgent):
         loss = -objective
         loss.backward()
         self.optimizer.step()
+
+    def save(self):
+        torch.save(self.policy.state_dict(), os.path.join(self.folder, "policy.pt"))
+        self.policy.save_embeddings()
 
 
 if __name__ == "__main__":

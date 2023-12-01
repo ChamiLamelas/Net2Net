@@ -1,0 +1,6 @@
+2023-12-01 17:06:46,407 | [INFO] : training start time: 12/01/2023 05:06:46 PM
+2023-12-01 17:06:46,407 | [INFO] : Current model size: 19914 parameters
+2023-12-01 17:06:46,407 | [INFO] : Current training mode: initial
+2023-12-01 17:06:59,206 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-01 17:07:01,014 | [INFO] : Current model size: 19914 parameters
+2023-12-01 17:07:01,014 | [INFO] : Current training mode: initial

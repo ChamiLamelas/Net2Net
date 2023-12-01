@@ -13,6 +13,7 @@ RESULTS = "results"
 PLOTS = "plots"
 
 BASELINE_FOLDERS = ["baseline1", "baseline2", "baseline3", "baseline4", "baseline5"]
+AGENT_FOLDERS = ["middle", "early"]
 
 EXTENSIONS = {"train": "train_acc", "test": "test_acc"}
 
@@ -106,8 +107,34 @@ def random_plot():
         save(f"{k.lower()}_baseline.png")
 
 
+def _dict_to_list(d):
+    l = [None] * len(d)
+    for k, v in d.items():
+        l[k] = v
+    return l
+
+
+def agent_plot():
+    for folder in AGENT_FOLDERS:
+        final_accs = defaultdict(dict)
+        folder = os.path.join(RESULTS, folder)
+        for entry in os.scandir(folder):
+            for k, v in EXTENSIONS.items():
+                if entry.name.endswith(v):
+                    episode = int(entry.name[len("training") : entry.name.index(".")])
+                    final_accs[k][episode] = _get_final_acc(entry.path)
+        final_accs = {k: _dict_to_list(v) for k, v in final_accs.items()}
+        for k, v in final_accs.items():
+            _, ax = plt.subplots()
+            x = np.arange(len(v))
+            ax.plot(x, v)
+            make_plot_nice(ax, "Episode", f"{k.title()} Accuracy", 0, 1, legendcol=None)
+            save(f"{k.lower()}_{os.path.basename(folder)}.png")
+
+
 def main():
     random_plot()
+    agent_plot()
 
 
 if __name__ == "__main__":

@@ -72,6 +72,8 @@ def run(config, run_config, logger):
         tr.train(f"training{str(ep).zfill(max_digits)}")
         agt.update()
         print(f"episode {ep + 1}/{total_eps} finished")
+    if run_config.get("save", False):
+        agt.save()
 
 
 def main():
