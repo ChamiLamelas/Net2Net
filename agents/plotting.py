@@ -13,7 +13,7 @@ RESULTS = "results"
 PLOTS = "plots"
 
 BASELINE_FOLDERS = ["baseline1", "baseline2", "baseline3", "baseline4", "baseline5"]
-AGENT_FOLDERS = ["middle", "early"]
+AGENT_FOLDERS = ["middle2", "early2"]
 
 EXTENSIONS = {"train": "train_acc", "test": "test_acc"}
 

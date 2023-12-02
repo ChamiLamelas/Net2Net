@@ -1,12 +1,12 @@
 [runner]
 seed = 42
 total_episodes = 25
-folder = "early2"
+folder = "early3"
 agent = "Agent"
 
 [scheduler]
-running_time = 400
-gpu_changes = [{ time = 70, change = "up" }]
+running_time = 1200
+gpu_changes = [{ time = 210, change = "up" }]
 
 [job]
 model = "ConvNet"
@@ -14,7 +14,7 @@ dataset = "cifar10"
 
 [agent]
 vocab = "models"
-device = 1
+device = 0
 gamma = 0.99
 alpha = 0.01
 hidden_size = 50

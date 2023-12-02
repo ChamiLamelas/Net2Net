@@ -1,12 +1,12 @@
 [runner]
 seed = 42
 total_episodes = 25
-folder = "middle2"
+folder = "middle3"
 agent = "Agent"
 
 [scheduler]
-running_time = 400
-gpu_changes = [{ time = 200, change = "up" }]
+running_time = 1200
+gpu_changes = [{ time = 600, change = "up" }]
 
 [job]
 model = "ConvNet"

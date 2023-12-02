@@ -80,6 +80,9 @@ class Agent(BaseAgent):
         for t in range(self.T() - 1, -1, -1):
             G = self.rewards[t] + (self.gamma * G)
             Gs.appendleft(G)
+        Gs = torch.tensor(Gs)
+        if Gs.shape[0] > 1:
+            Gs = (Gs - Gs.mean()) / Gs.std()
         return Gs
 
     def transform_rewards(self):
