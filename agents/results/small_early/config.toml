@@ -1,0 +1,21 @@
+[runner]
+seed = 42
+total_episodes = 1
+folder = "small_early"
+agent = "RandomAgent"
+
+[scheduler]
+running_time = 210
+
+[job]
+model = "ConvNet"
+dataset = "cifar10"
+
+[agent]
+vocab = "models"
+device = 0
+gamma = 0.99
+alpha = 0.01
+hidden_size = 50
+embedding_size = 16
+final_weight = 0.5

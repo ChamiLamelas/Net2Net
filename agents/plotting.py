@@ -6,14 +6,14 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import toml
-import csv
+import logger
 import os
 
 RESULTS = "results"
 PLOTS = "plots"
 
 BASELINE_FOLDERS = ["baseline1", "baseline2", "baseline3", "baseline4", "baseline5"]
-AGENT_FOLDERS = ["middle2", "early2"]
+AGENT_FOLDERS = ["middle2", "early2", "middle3", "early3"]
 
 EXTENSIONS = {"train": "train_acc", "test": "test_acc"}
 
@@ -61,20 +61,12 @@ def make_plot_nice(
     ax.grid()
 
 
-def _get_final_acc(path):
-    with open(path, "r", encoding="utf-8") as f:
-        reader = csv.reader(f)
-        for row in reader:
-            pass
-        return float(row[1])
-
-
 def _get_final_accs(folder):
     final_accs = defaultdict(list)
     for entry in os.scandir(folder):
         for k, v in EXTENSIONS.items():
             if entry.name.endswith(v):
-                final_accs[k].append(_get_final_acc(entry.path))
+                final_accs[k].append(logger.get_final_metric(entry.path))
     return final_accs
 
 
@@ -122,7 +114,7 @@ def agent_plot():
             for k, v in EXTENSIONS.items():
                 if entry.name.endswith(v):
                     episode = int(entry.name[len("training") : entry.name.index(".")])
-                    final_accs[k][episode] = _get_final_acc(entry.path)
+                    final_accs[k][episode] = logger.get_final_metric(entry.path)
         final_accs = {k: _dict_to_list(v) for k, v in final_accs.items()}
         for k, v in final_accs.items():
             _, ax = plt.subplots()

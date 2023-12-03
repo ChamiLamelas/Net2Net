@@ -12,6 +12,8 @@ import torch.optim as optim
 import job
 import deepening
 import time
+import logger
+import os
 import tracing
 
 
@@ -19,7 +21,8 @@ class Trainer:
     def __init__(self, config, scheduler, agent, logger):
         self.job = job.Job(config)
         self.logger = logger
-        config = config.get("trainer", dict())
+        self.config = config.get("trainer", dict())
+
         self.optimizer_fn = getattr(optim, config.get("optimizer", "Adam"))
         self.optimizer_args = config.get("optimizer_args", {"lr": 0.01})
         self.learning_rate_decay = config.get("learning_rate_decay", 0.9)
@@ -69,6 +72,12 @@ class Trainer:
 
     def train(self, log_file):
         self.logger.start(task="training", log_file=log_file, metrics_file=log_file)
+        if "weights" in self.config:
+            self.job.model.load_state_dict(torch.load(self.config["weights"]))
+            self.last_runtime = logger.get_final_metric(self.config["runtimes"])
+            self.logger.info(
+                f"Initialized model with weights: {self.config['weights']}"
+            )
         while not self.stopped_early:
             self.logger.info(
                 f"Current model size: {models.count_parameters(self.job.model)} parameters"
@@ -153,6 +162,7 @@ class Trainer:
                 )
             self.last_runtime = time.time() - ti
             self.logger.log_metrics({"train_acc": total_correct / total_size}, "epoch")
+            self.logger.log_metrics({"last_runtime": self.last_runtime}, "epoch")
 
     def compute_loss(self, data, target, teacher):
         student_logits = self.job.model(data)

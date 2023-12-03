@@ -1,11 +1,11 @@
 [runner]
 seed = 42
-total_episodes = 1
-folder = "small2"
+total_episodes = 2
+folder = "test1"
 agent = "RandomAgent"
 
 [scheduler]
-running_time = 900
+running_time = 35
 
 [job]
 model = "ConvNet"

@@ -14,6 +14,14 @@ import torch
 from collections import Counter, defaultdict
 
 
+def get_final_metric(path):
+    with open(path, "r", encoding="utf-8") as f:
+        reader = csv.reader(f)
+        for row in reader:
+            pass
+        return float(row[1])
+
+
 def delete_files(*files):
     for file in files:
         if os.path.isfile(file):
@@ -170,6 +178,7 @@ class ML_Logger(TimedLogger):
                     self.metrics_file + ".bestmodel.pt",
                 )
                 self.best_save_metric = save_metric
+            torch.save(model.state_dict(), self.metrics_file + ".finalmodel.pt")
 
     @staticmethod
     def load_metrics(log_folder, metrics_file, metric, granularity):

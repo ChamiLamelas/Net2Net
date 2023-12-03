@@ -1,19 +1,17 @@
 [runner]
 seed = 42
-total_episodes = 1
+total_episodes = 2
 folder = "test1"
-agent = "Agent"
+agent = "RandomAgent"
 
 [scheduler]
-running_time = 69
-gpu_changes = [{ time = 30, change = "up" }]
+running_time = 35
 
 [job]
 model = "ConvNet"
 dataset = "cifar10"
 
 [agent]
-vocab = "models"
 device = 0
 gamma = 0.99
 alpha = 0.01

@@ -47,7 +47,6 @@ class Agent(BaseAgent):
         self.rewards = None
         self.final_weight = self.config["final_weight"]
         self.policy = self.policy.to(self.device)
-        self.baseline_decay = self.config.get("baseline_decay", None)
 
     def init(self):
         self.probabilities = list()
