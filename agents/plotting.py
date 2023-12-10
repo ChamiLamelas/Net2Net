@@ -5,15 +5,23 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-import toml
+import csv
 import logger
 import os
 
 RESULTS = "results"
 PLOTS = "plots"
 
-BASELINE_FOLDERS = ["baseline1", "baseline2", "baseline3", "baseline4", "baseline5"]
-AGENT_FOLDERS = ["middle2", "early2", "middle3", "early3"]
+SMALL_FOLDER = "no_adaptation"
+
+BASELINE_FOLDERS = [
+    "baseline_early",
+    "baseline_early_middle",
+    "baseline_middle",
+    "baseline_middle_late",
+    "baseline_late",
+]
+AGENT_FOLDERS = ["test_late", "test_late2"]
 
 EXTENSIONS = {"train": "train_acc", "test": "test_acc"}
 
@@ -70,33 +78,42 @@ def _get_final_accs(folder):
     return final_accs
 
 
-def _get_adaptation_point(folder):
-    return toml.load(os.path.join(folder, "config.toml"))["scheduler"]["gpu_changes"][
-        0
-    ]["time"]
+def _transform_labels(labels):
+    new_labels = list()
+    for label in labels:
+        split_label = label.split("_")
+        new_labels.append("-".join([e[0].upper() for e in split_label]))
+    return new_labels
 
 
 def random_plot():
-    times = list()
+    small_final_accs = dict()
+    for k, v in EXTENSIONS.items():
+        small_final_accs[k] = logger.get_final_metric(
+            os.path.join(RESULTS, SMALL_FOLDER, f"training0.epoch.{v}")
+        )
     all_final_accs = defaultdict(list)
+    labels = list()
     for folder in BASELINE_FOLDERS:
+        labels.append(folder[folder.index("_") + 1 :])
         folder = os.path.join(RESULTS, folder)
-        times.append(_get_adaptation_point(folder))
         final_accs = _get_final_accs(folder)
         for k, v in final_accs.items():
             all_final_accs[k].append(v)
-    xs = np.arange(len(times))
     for k, v in all_final_accs.items():
         _, ax = plt.subplots()
         means = [np.mean(e) for e in v]
         stds = [np.std(e) for e in v]
+        xs = np.arange(len(labels))
         ax.errorbar(xs, means, stds, fmt="ok")
         ax.set_xticks(xs)
-        ax.set_xticklabels(times)
+        ax.set_xticklabels(_transform_labels(labels))
+        ax.axhline(small_final_accs[k], 0, 1, linewidth=0.5, label="no adaptation")
         make_plot_nice(
             ax, "Adaptation Time (s)", f"{k.title()} Accuracy", 0, 1, legendcol=None
         )
         save(f"{k.lower()}_baseline.png")
+        print(f"{k}: {small_final_accs[k]}")
 
 
 def _dict_to_list(d):
@@ -120,13 +137,42 @@ def agent_plot():
             _, ax = plt.subplots()
             x = np.arange(len(v))
             ax.plot(x, v)
+            print(f"{folder}: {k}: {np.max(v)}")
             make_plot_nice(ax, "Episode", f"{k.title()} Accuracy", 0, 1, legendcol=None)
             save(f"{k.lower()}_{os.path.basename(folder)}.png")
+
+
+def load_objectives(path):
+    objectives = list()
+    with open(path, "r") as f:
+        reader = csv.reader(f)
+        for row in reader:
+            objectives.append(float(row[-1]))
+    return objectives
+
+
+def objective_plot():
+    for folder in AGENT_FOLDERS:
+        folder = os.path.join(RESULTS, folder)
+        _, ax = plt.subplots()
+        objectives = load_objectives(os.path.join(folder, "agent.episode.objective"))
+        x = np.arange(len(objectives))
+        ax.plot(x, objectives)
+        make_plot_nice(
+            ax,
+            "Episode",
+            "Objective",
+            np.min(objectives),
+            np.max(objectives),
+            legendcol=None,
+        )
+        save(f"objective_{os.path.basename(folder)}.png")
 
 
 def main():
     random_plot()
     agent_plot()
+    objective_plot()
 
 
 if __name__ == "__main__":

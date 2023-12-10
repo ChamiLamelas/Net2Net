@@ -1,0 +1,28 @@
+[runner]
+seed = 42
+total_episodes = 1000
+folder = "test_late6"
+agent = "Agent"
+
+[scheduler]
+running_time = 400
+gpu_changes = [{ time = 387, change = "up" }]
+start_time = 387
+
+[job]
+model = "ConvNet"
+dataset = "cifar10"
+
+[agent]
+vocab = "models"
+device = 0
+gamma = 0
+alpha = 0.0001
+weight_decay = 0
+hidden_size = 50
+embedding_size = 16
+max_actions = 5
+decider_lstm_size = 16
+decider_linear_size = 128
+learning_rate_decay = 0.9
+time_encoding_size = 8

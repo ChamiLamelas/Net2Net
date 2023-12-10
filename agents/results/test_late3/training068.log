@@ -1,0 +1,18 @@
+2023-12-06 21:36:38,629 | [INFO] : training068 start time: 12/06/2023 09:36:38 PM
+2023-12-06 21:36:38,629 | [DEBUG] : Current model size: 30730 parameters
+2023-12-06 21:36:38,629 | [DEBUG] : Current training mode: initial
+2023-12-06 21:36:38,643 | [DEBUG] : Current model size: 30730 parameters
+2023-12-06 21:36:38,643 | [DEBUG] : Current training mode: increased
+2023-12-06 21:36:38,646 | [INFO] : no layers were added
+2023-12-06 21:36:38,646 | [DEBUG] : Model size was changed to 30730 parameters
+2023-12-06 21:36:38,646 | [DEBUG] : Learning rate is now 0.010000
+2023-12-06 21:36:47,229 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-06 21:36:47,229 | [DEBUG] : Current model size: 30730 parameters
+2023-12-06 21:36:47,229 | [DEBUG] : Current training mode: increased
+2023-12-06 21:36:47,232 | [INFO] : no layers were added
+2023-12-06 21:36:47,232 | [DEBUG] : Model size was changed to 30730 parameters
+2023-12-06 21:36:47,232 | [DEBUG] : Learning rate is now 0.010000
+2023-12-06 21:36:50,915 | [INFO] : training has run out of time
+2023-12-06 21:36:50,916 | [INFO] : training068 runtime (h:mm:ss): 0:00:13
+2023-12-06 21:36:50,916 | [INFO] : training068 end time: 12/06/2023 09:36:50 PM
+2023-12-06 21:36:50,918 | [INFO] : episode 69/300 finished, objective: 0.842497819429512

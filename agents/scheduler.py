@@ -9,11 +9,12 @@ class Scheduler:
         config = config["scheduler"]
         self.running_time = config["running_time"]
         self.gpu_changes = config.get("gpu_changes", list())
+        self.start_offset = config.get("start_time", 0)
         self.start_time = None
         self.change = None
 
     def start(self):
-        self.start_time = time.time()
+        self.start_time = time.time() - self.start_offset
         self.change = 0
 
     def checkstart(self):

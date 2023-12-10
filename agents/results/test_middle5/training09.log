@@ -1,0 +1,21 @@
+2023-12-03 21:14:50,122 | [INFO] : training09 start time: 12/03/2023 09:14:50 PM
+2023-12-03 21:14:50,126 | [INFO] : Initialized model with weights: results/small_middle/weights.pth
+2023-12-03 21:14:50,126 | [INFO] : Current model size: 19914 parameters
+2023-12-03 21:14:50,126 | [INFO] : Current training mode: initial
+2023-12-03 21:14:50,141 | [INFO] : Current model size: 19914 parameters
+2023-12-03 21:14:50,141 | [INFO] : Current training mode: increased
+2023-12-03 21:14:50,145 | [INFO] : deepening layer 3/4: Linear(in_features=32, out_features=10, bias=True)
+2023-12-03 21:14:50,145 | [INFO] : Model size was changed to 20024 parameters
+2023-12-03 21:14:50,145 | [INFO] : Learning rate is now 0.010000
+2023-12-03 21:15:03,366 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-03 21:15:05,180 | [INFO] : Current model size: 20024 parameters
+2023-12-03 21:15:05,180 | [INFO] : Current training mode: increased
+2023-12-03 21:15:05,183 | [INFO] : no layers were added
+2023-12-03 21:15:05,184 | [INFO] : Model size was changed to 20024 parameters
+2023-12-03 21:15:05,184 | [INFO] : Learning rate is now 0.010000
+2023-12-03 21:15:09,417 | [INFO] : training has run out of time
+2023-12-03 21:15:09,418 | [INFO] : training09 runtime (h:mm:ss): 0:00:20
+2023-12-03 21:15:09,418 | [INFO] : training09 end time: 12/03/2023 09:15:09 PM
+2023-12-03 21:15:09,418 | [INFO] : episode 10/10 finished, objective: None
+2023-12-03 21:15:09,418 | [INFO] : learning runtime (h:mm:ss): 0:03:21
+2023-12-03 21:15:09,418 | [INFO] : learning end time: 12/03/2023 09:15:09 PM

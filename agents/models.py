@@ -7,7 +7,7 @@ DEEPEN_BLOCK_NAME = "Net2NetDeepenBlock"
 
 
 def is_deepen_block(layer):
-    return DEEPEN_BLOCK_NAME in type(layer).__name__
+    return DEEPEN_BLOCK_NAME in type(layer).__name__ and layer.original
 
 
 def count_parameters(model):
@@ -26,9 +26,48 @@ class FeedForwardNet2NetDeepenBlock(nn.Module):
     def __init__(self, in_features, out_features):
         super().__init__()
         self.layers = nn.Sequential(nn.Linear(in_features, out_features), nn.ReLU())
+        self.original = True
 
     def forward(self, x):
         return self.layers(x)
+
+
+class FeedForwardNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc = FeedForwardNet2NetDeepenBlock(3072, 10)
+
+    def forward(self, x):
+        x = x.flatten(start_dim=1)
+        x = self.fc(x)
+        return x
+
+
+class FeedForwardNet2(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc1 = FeedForwardNet2NetDeepenBlock(3072, 32)
+        self.fc2 = FeedForwardNet2NetDeepenBlock(32, 10)
+
+    def forward(self, x):
+        x = x.flatten(start_dim=1)
+        x = self.fc1(x)
+        x = self.fc2(x)
+        return x
+
+class FeedForwardNet3(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc1 = FeedForwardNet2NetDeepenBlock(3072, 32)
+        self.fc2 = FeedForwardNet2NetDeepenBlock(32, 32)
+        self.fc3 = FeedForwardNet2NetDeepenBlock(32, 10)
+
+    def forward(self, x):
+        x = x.flatten(start_dim=1)
+        x = self.fc1(x)
+        x = self.fc2(x)
+        x = self.fc3(x)
+        return x
 
 
 class ConvolutionalNet2NetDeepenBlock(nn.Module):
@@ -50,6 +89,7 @@ class NormalizedConvolutionalNet2NetDeepenBlock(nn.Module):
             nn.BatchNorm2d(out_channels),
             nn.ReLU(),
         )
+        self.original = True
 
     def forward(self, x):
         return self.layers(x)

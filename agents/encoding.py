@@ -4,6 +4,7 @@ import torch.nn as nn
 import models
 import gpu
 import embedding
+import torch
 
 
 class NetworkEncoder(nn.Module):
@@ -11,14 +12,18 @@ class NetworkEncoder(nn.Module):
         super().__init__()
         self.vocab = vocab
         self.embedder = nn.Embedding(vocab.size(), embedding_size)
+        self.embedder.weight.requires_grad = False
         if vocab.has_embeddings():
             self.embedder.load_state_dict(vocab.get_embeddings())
+        # DEBUG!
         self.encoder = nn.LSTM(
             embedding_size, hidden_size, bidirectional=True, batch_first=True
         )
 
     def forward(self, layers):
         embeddings = self.embedder(layers)
+        # return embeddings
+        # DEBUG!
         return self.encoder(embeddings)[0]
 
 

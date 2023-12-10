@@ -1,0 +1,8 @@
+2023-12-07 10:29:30,097 | [INFO] : training075 start time: 12/07/2023 10:29:30 AM
+2023-12-07 10:29:30,097 | [DEBUG] : Current model size: 98666 parameters
+2023-12-07 10:29:30,097 | [DEBUG] : Current training mode: initial
+2023-12-07 10:29:30,111 | [DEBUG] : Current model size: 98666 parameters
+2023-12-07 10:29:30,111 | [DEBUG] : Current training mode: increased
+2023-12-07 10:29:30,115 | [INFO] : deepening layer 0/2: Linear(in_features=3072, out_features=32, bias=True)
+2023-12-07 10:29:30,115 | [DEBUG] : Model size was changed to 99722 parameters
+2023-12-07 10:29:30,115 | [DEBUG] : Learning rate is now 0.010000

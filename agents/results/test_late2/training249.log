@@ -1,0 +1,18 @@
+2023-12-05 23:37:57,790 | [INFO] : training249 start time: 12/05/2023 11:37:57 PM
+2023-12-05 23:37:57,790 | [DEBUG] : Current model size: 30730 parameters
+2023-12-05 23:37:57,790 | [DEBUG] : Current training mode: initial
+2023-12-05 23:37:57,806 | [DEBUG] : Current model size: 30730 parameters
+2023-12-05 23:37:57,806 | [DEBUG] : Current training mode: increased
+2023-12-05 23:37:57,811 | [INFO] : no layers were added
+2023-12-05 23:37:57,811 | [DEBUG] : Model size was changed to 30730 parameters
+2023-12-05 23:37:57,811 | [DEBUG] : Learning rate is now 0.010000
+2023-12-05 23:38:06,671 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-05 23:38:06,671 | [DEBUG] : Current model size: 30730 parameters
+2023-12-05 23:38:06,671 | [DEBUG] : Current training mode: increased
+2023-12-05 23:38:06,676 | [INFO] : no layers were added
+2023-12-05 23:38:06,676 | [DEBUG] : Model size was changed to 30730 parameters
+2023-12-05 23:38:06,676 | [DEBUG] : Learning rate is now 0.010000
+2023-12-05 23:38:08,063 | [INFO] : training has run out of time
+2023-12-05 23:38:08,064 | [INFO] : training249 runtime (h:mm:ss): 0:00:11
+2023-12-05 23:38:08,064 | [INFO] : training249 end time: 12/05/2023 11:38:08 PM
+2023-12-05 23:38:08,067 | [INFO] : episode 250/300 finished, objective: 0.03965066620003347

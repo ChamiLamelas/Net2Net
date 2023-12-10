@@ -1,0 +1,18 @@
+2023-12-05 23:19:25,718 | [INFO] : training148 start time: 12/05/2023 11:19:25 PM
+2023-12-05 23:19:25,719 | [DEBUG] : Current model size: 30730 parameters
+2023-12-05 23:19:25,719 | [DEBUG] : Current training mode: initial
+2023-12-05 23:19:25,734 | [DEBUG] : Current model size: 30730 parameters
+2023-12-05 23:19:25,734 | [DEBUG] : Current training mode: increased
+2023-12-05 23:19:25,739 | [INFO] : no layers were added
+2023-12-05 23:19:25,739 | [DEBUG] : Model size was changed to 30730 parameters
+2023-12-05 23:19:25,739 | [DEBUG] : Learning rate is now 0.010000
+2023-12-05 23:19:34,813 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-05 23:19:34,814 | [DEBUG] : Current model size: 30730 parameters
+2023-12-05 23:19:34,814 | [DEBUG] : Current training mode: increased
+2023-12-05 23:19:34,818 | [INFO] : no layers were added
+2023-12-05 23:19:34,818 | [DEBUG] : Model size was changed to 30730 parameters
+2023-12-05 23:19:34,818 | [DEBUG] : Learning rate is now 0.010000
+2023-12-05 23:19:36,020 | [INFO] : training has run out of time
+2023-12-05 23:19:36,021 | [INFO] : training148 runtime (h:mm:ss): 0:00:11
+2023-12-05 23:19:36,021 | [INFO] : training148 end time: 12/05/2023 11:19:36 PM
+2023-12-05 23:19:36,025 | [INFO] : episode 149/300 finished, objective: 0.2490468957762451

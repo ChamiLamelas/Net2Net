@@ -5,6 +5,7 @@ test.py
 test.json
 data/
 *.pt
+agents/screenlog.*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

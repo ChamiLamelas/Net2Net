@@ -4,7 +4,8 @@ import torch
 import torch.nn as nn
 import numpy as np
 import tracing
-import models 
+import models
+import sys
 
 
 def make_decider_matrix(model):
@@ -27,10 +28,77 @@ class SigmoidClassifier(nn.Module):
         return self.sigmoid(self.linear(encoding))
 
 
+class Decider(nn.Module):
+    def __init__(self, in_features, decider_size):
+        super().__init__()
+        self.linear1 = nn.Linear(in_features, decider_size)
+        self.relu = nn.ReLU()
+        self.linear2 = nn.Linear(decider_size, 1)
+        self.softmax = nn.Softmax(dim=0)
+
+    def forward(self, encodings):
+        encodings = self.linear1(encodings)
+        encodings = self.relu(encodings)
+        encodings = self.linear2(encodings)
+        encodings = self.softmax(encodings)
+        encodings = encodings.flatten()
+        return encodings
+
+
+class Decider2(nn.Module):
+    def __init__(
+        self,
+        in_features,
+        decider_lstm_size,
+        decider_linear_size,
+        time_encoding_size,
+        max_actions,
+    ):
+        super().__init__()
+        self.lstm = nn.LSTM(in_features, decider_lstm_size)
+        self.linear1 = nn.Linear(
+            decider_lstm_size + time_encoding_size, decider_linear_size
+            # time_encoding_size, decider_linear_size
+        )
+        self.relu1 = nn.ReLU()
+        self.linear2 = nn.Linear(decider_linear_size, decider_linear_size)
+        self.relu2 = nn.ReLU()
+        self.linear3 = nn.Linear(decider_linear_size, max_actions)
+        self.softmax = nn.Softmax(dim=1)
+
+    def forward(self, input):
+        features = input["encodings"]
+        features = self.lstm(features)[0][-1]
+        # print(input["other"].size(), features.size())
+        features = torch.cat([input["other"], features]).unsqueeze(0)
+        # features = torch.cat([input["other"]]).unsqueeze(0)
+        # features = input["other"][1].reshape((-1, 1))
+        # print(features, file=sys.stderr)
+        features = self.linear1(features)
+        features = self.relu1(features)
+        features = self.linear2(features)
+        features = self.relu2(features)
+        features = self.linear3(features)
+        features = self.softmax(features)
+        # features = features.flatten()
+        return features
+
+
 if __name__ == "__main__":
-    input = torch.randn((1, 3))
+    input = torch.randn((2, 3))
+    print(input)
+
     classifier = SigmoidClassifier(3)
+    print(classifier(input[0]))
     print(classifier(input))
 
     dm = make_decider_matrix(models.ConvNet())
     print(dm)
+
+    input = torch.rand((4, 5))
+
+    decider = Decider(5, 16)
+    print(decider(input), decider(input).sum(), sep="\n")
+
+    decider2 = Decider2(5, 16, 10)
+    print(decider2(input))

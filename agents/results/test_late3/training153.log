@@ -1,0 +1,18 @@
+2023-12-06 21:55:04,573 | [INFO] : training153 start time: 12/06/2023 09:55:04 PM
+2023-12-06 21:55:04,573 | [DEBUG] : Current model size: 30730 parameters
+2023-12-06 21:55:04,573 | [DEBUG] : Current training mode: initial
+2023-12-06 21:55:04,588 | [DEBUG] : Current model size: 30730 parameters
+2023-12-06 21:55:04,588 | [DEBUG] : Current training mode: increased
+2023-12-06 21:55:04,591 | [INFO] : no layers were added
+2023-12-06 21:55:04,591 | [DEBUG] : Model size was changed to 30730 parameters
+2023-12-06 21:55:04,591 | [DEBUG] : Learning rate is now 0.010000
+2023-12-06 21:55:13,035 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-06 21:55:13,064 | [DEBUG] : Current model size: 30730 parameters
+2023-12-06 21:55:13,064 | [DEBUG] : Current training mode: increased
+2023-12-06 21:55:13,068 | [INFO] : no layers were added
+2023-12-06 21:55:13,068 | [DEBUG] : Model size was changed to 30730 parameters
+2023-12-06 21:55:13,068 | [DEBUG] : Learning rate is now 0.010000
+2023-12-06 21:55:16,844 | [INFO] : training has run out of time
+2023-12-06 21:55:16,845 | [INFO] : training153 runtime (h:mm:ss): 0:00:13
+2023-12-06 21:55:16,845 | [INFO] : training153 end time: 12/06/2023 09:55:16 PM
+2023-12-06 21:55:16,848 | [INFO] : episode 154/300 finished, objective: 0.2297966043595309

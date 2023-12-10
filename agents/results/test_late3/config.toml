@@ -1,0 +1,24 @@
+[runner]
+seed = 42
+total_episodes = 300
+folder = "test_late3"
+agent = "Agent"
+
+[scheduler]
+running_time = 400
+gpu_changes = [{ time = 387, change = "up" }]
+start_time = 387
+
+[job]
+model = "FeedForwardNet"
+dataset = "cifar10"
+
+[agent]
+vocab = "models"
+device = 0
+gamma = 0.9
+alpha = 0.001
+hidden_size = 50
+embedding_size = 16
+final_weight = 0.9
+max_actions = 2

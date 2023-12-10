@@ -1,0 +1,18 @@
+2023-12-06 22:20:27,221 | [INFO] : training270 start time: 12/06/2023 10:20:27 PM
+2023-12-06 22:20:27,221 | [DEBUG] : Current model size: 30730 parameters
+2023-12-06 22:20:27,221 | [DEBUG] : Current training mode: initial
+2023-12-06 22:20:27,236 | [DEBUG] : Current model size: 30730 parameters
+2023-12-06 22:20:27,236 | [DEBUG] : Current training mode: increased
+2023-12-06 22:20:27,239 | [INFO] : no layers were added
+2023-12-06 22:20:27,239 | [DEBUG] : Model size was changed to 30730 parameters
+2023-12-06 22:20:27,239 | [DEBUG] : Learning rate is now 0.010000
+2023-12-06 22:20:35,940 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-06 22:20:35,941 | [DEBUG] : Current model size: 30730 parameters
+2023-12-06 22:20:35,941 | [DEBUG] : Current training mode: increased
+2023-12-06 22:20:35,944 | [INFO] : no layers were added
+2023-12-06 22:20:35,944 | [DEBUG] : Model size was changed to 30730 parameters
+2023-12-06 22:20:35,944 | [DEBUG] : Learning rate is now 0.010000
+2023-12-06 22:20:39,495 | [INFO] : training has run out of time
+2023-12-06 22:20:39,496 | [INFO] : training270 runtime (h:mm:ss): 0:00:13
+2023-12-06 22:20:39,496 | [INFO] : training270 end time: 12/06/2023 10:20:39 PM
+2023-12-06 22:20:39,498 | [INFO] : episode 271/300 finished, objective: 0.004398637661056046

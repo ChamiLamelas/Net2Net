@@ -12,6 +12,7 @@ from pathlib import Path
 import heuristics
 import seed
 import torch
+import copy
 
 RESULTS = "results"
 
@@ -65,19 +66,23 @@ def run(config, run_config, logger):
     max_digits = len(str(total_eps))
     env = environment.Environment(config)
     agt = get_agent(config, run_config)
+    agt_logger = copy.deepcopy(logger)
+    agt_logger.start("agent", "agent", "learning")
     for ep in range(total_eps):
         env.scheduler.start()
         agt.init()
         tr = training.Trainer(config, env.scheduler, agt, logger)
         tr.train(f"training{str(ep).zfill(max_digits)}")
-        agt.update()
-        print(f"episode {ep + 1}/{total_eps} finished")
+        obj = agt.update()
+        agt_logger.info(f"episode {ep + 1}/{total_eps} finished, objective: {obj}")
+        agt_logger.log_metrics({"objective": obj}, "episode", agt.policy)
     if run_config.get("save", False):
         agt.save()
+    agt_logger.stop()
 
 
 def main():
-    torch.autograd.set_detect_anomaly(True)
+    # torch.autograd.set_detect_anomaly(True)
     args = get_args()
     config = loadconfig(args)
     runner_config = config["runner"]

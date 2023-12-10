@@ -1,0 +1,27 @@
+[runner]
+seed = 42
+total_episodes = 10
+folder = "test_middle11"
+agent = "DeterministicAgent"
+
+[scheduler]
+running_time = 20
+gpu_changes = [{ time = 0, change = "up" }]
+
+[trainer]
+weights = "results/small_middle2/weights.pth"
+runtimes = "results/small_middle2/runtimes"
+
+[job]
+model = "ConvNet"
+dataset = "cifar10"
+
+[agent]
+action_sequence = [4]
+vocab = "models"
+device = 1
+gamma = 0.99
+alpha = 0.001
+hidden_size = 50
+embedding_size = 16
+final_weight = 0.8

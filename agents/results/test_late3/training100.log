@@ -1,0 +1,18 @@
+2023-12-06 21:43:34,999 | [INFO] : training100 start time: 12/06/2023 09:43:34 PM
+2023-12-06 21:43:34,999 | [DEBUG] : Current model size: 30730 parameters
+2023-12-06 21:43:34,999 | [DEBUG] : Current training mode: initial
+2023-12-06 21:43:35,013 | [DEBUG] : Current model size: 30730 parameters
+2023-12-06 21:43:35,013 | [DEBUG] : Current training mode: increased
+2023-12-06 21:43:35,016 | [INFO] : no layers were added
+2023-12-06 21:43:35,016 | [DEBUG] : Model size was changed to 30730 parameters
+2023-12-06 21:43:35,016 | [DEBUG] : Learning rate is now 0.010000
+2023-12-06 21:43:43,641 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-06 21:43:43,641 | [DEBUG] : Current model size: 30730 parameters
+2023-12-06 21:43:43,641 | [DEBUG] : Current training mode: increased
+2023-12-06 21:43:43,644 | [INFO] : no layers were added
+2023-12-06 21:43:43,644 | [DEBUG] : Model size was changed to 30730 parameters
+2023-12-06 21:43:43,644 | [DEBUG] : Learning rate is now 0.010000
+2023-12-06 21:43:47,281 | [INFO] : training has run out of time
+2023-12-06 21:43:47,282 | [INFO] : training100 runtime (h:mm:ss): 0:00:13
+2023-12-06 21:43:47,282 | [INFO] : training100 end time: 12/06/2023 09:43:47 PM
+2023-12-06 21:43:47,285 | [INFO] : episode 101/300 finished, objective: 0.7517927359756191

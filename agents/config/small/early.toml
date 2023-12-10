@@ -5,7 +5,7 @@ folder = "small_early"
 agent = "RandomAgent"
 
 [scheduler]
-running_time = 210
+running_time = 70
 
 [job]
 model = "ConvNet"

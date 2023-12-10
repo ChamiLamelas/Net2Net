@@ -1,0 +1,19 @@
+2023-12-04 22:59:24,098 | [INFO] : training042 start time: 12/04/2023 10:59:24 PM
+2023-12-04 22:59:24,102 | [INFO] : Initialized model with weights: results/small_late/weights.pth
+2023-12-04 22:59:24,102 | [DEBUG] : Current model size: 19914 parameters
+2023-12-04 22:59:24,102 | [DEBUG] : Current training mode: initial
+2023-12-04 22:59:24,116 | [DEBUG] : Current model size: 19914 parameters
+2023-12-04 22:59:24,116 | [DEBUG] : Current training mode: increased
+2023-12-04 22:59:24,124 | [INFO] : deepening layer 3/4: Linear(in_features=32, out_features=10, bias=True)
+2023-12-04 22:59:24,124 | [INFO] : Model size was changed to 20024 parameters
+2023-12-04 22:59:24,124 | [INFO] : Learning rate is now 0.010000
+2023-12-04 22:59:36,634 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-04 22:59:36,635 | [DEBUG] : Current model size: 20024 parameters
+2023-12-04 22:59:36,635 | [DEBUG] : Current training mode: increased
+2023-12-04 22:59:36,643 | [INFO] : deepening layer 2/5: Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1))
+2023-12-04 22:59:36,643 | [INFO] : Model size was changed to 29336 parameters
+2023-12-04 22:59:36,643 | [INFO] : Learning rate is now 0.010000
+2023-12-04 22:59:40,385 | [INFO] : training has run out of time
+2023-12-04 22:59:40,386 | [INFO] : training042 runtime (h:mm:ss): 0:00:17
+2023-12-04 22:59:40,386 | [INFO] : training042 end time: 12/04/2023 10:59:40 PM
+2023-12-04 22:59:40,389 | [INFO] : episode 43/100 finished, objective: 117.11045265742158

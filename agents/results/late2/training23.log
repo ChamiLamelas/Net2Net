@@ -1,0 +1,37 @@
+2023-12-04 00:36:12,972 | [INFO] : training23 start time: 12/04/2023 12:36:12 AM
+2023-12-04 00:36:12,976 | [INFO] : Initialized model with weights: results/small_late/weights.pth
+2023-12-04 00:36:12,976 | [INFO] : Current model size: 19914 parameters
+2023-12-04 00:36:12,976 | [INFO] : Current training mode: initial
+2023-12-04 00:36:12,990 | [INFO] : Current model size: 19914 parameters
+2023-12-04 00:36:12,990 | [INFO] : Current training mode: increased
+2023-12-04 00:36:12,998 | [INFO] : deepening layer 3/4: Linear(in_features=32, out_features=10, bias=True)
+2023-12-04 00:36:12,998 | [INFO] : Model size was changed to 20024 parameters
+2023-12-04 00:36:12,998 | [INFO] : Learning rate is now 0.010000
+2023-12-04 00:36:25,373 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-04 00:36:27,007 | [INFO] : Current model size: 20024 parameters
+2023-12-04 00:36:27,007 | [INFO] : Current training mode: increased
+2023-12-04 00:36:27,014 | [INFO] : deepening layer 3/5: Linear(in_features=32, out_features=10, bias=True)
+2023-12-04 00:36:27,015 | [INFO] : Model size was changed to 20134 parameters
+2023-12-04 00:36:27,015 | [INFO] : Learning rate is now 0.010000
+2023-12-04 00:36:39,923 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-04 00:36:41,572 | [INFO] : Current model size: 20134 parameters
+2023-12-04 00:36:41,572 | [INFO] : Current training mode: increased
+2023-12-04 00:36:41,580 | [INFO] : deepening layer 4/6: Linear(in_features=10, out_features=10, bias=True)
+2023-12-04 00:36:41,580 | [INFO] : Model size was changed to 20244 parameters
+2023-12-04 00:36:41,580 | [INFO] : Learning rate is now 0.010000
+2023-12-04 00:36:55,057 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-04 00:36:56,717 | [INFO] : Current model size: 20244 parameters
+2023-12-04 00:36:56,718 | [INFO] : Current training mode: increased
+2023-12-04 00:36:56,726 | [INFO] : deepening layer 4/7: Linear(in_features=10, out_features=10, bias=True)
+2023-12-04 00:36:56,726 | [INFO] : Model size was changed to 20354 parameters
+2023-12-04 00:36:56,726 | [INFO] : Learning rate is now 0.010000
+2023-12-04 00:37:10,845 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-04 00:37:12,505 | [INFO] : Current model size: 20354 parameters
+2023-12-04 00:37:12,505 | [INFO] : Current training mode: increased
+2023-12-04 00:37:12,514 | [INFO] : deepening layer 7/8: Linear(in_features=10, out_features=10, bias=True)
+2023-12-04 00:37:12,515 | [INFO] : Model size was changed to 20464 parameters
+2023-12-04 00:37:12,515 | [INFO] : Learning rate is now 0.010000
+2023-12-04 00:37:22,268 | [INFO] : training has run out of time
+2023-12-04 00:37:22,269 | [INFO] : training23 runtime (h:mm:ss): 0:01:10
+2023-12-04 00:37:22,269 | [INFO] : training23 end time: 12/04/2023 12:37:22 AM
+2023-12-04 00:37:22,278 | [INFO] : episode 24/50 finished, objective: -0.6021898776396037

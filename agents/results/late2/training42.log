@@ -1,0 +1,37 @@
+2023-12-04 00:58:24,778 | [INFO] : training42 start time: 12/04/2023 12:58:24 AM
+2023-12-04 00:58:24,782 | [INFO] : Initialized model with weights: results/small_late/weights.pth
+2023-12-04 00:58:24,782 | [INFO] : Current model size: 19914 parameters
+2023-12-04 00:58:24,782 | [INFO] : Current training mode: initial
+2023-12-04 00:58:24,796 | [INFO] : Current model size: 19914 parameters
+2023-12-04 00:58:24,796 | [INFO] : Current training mode: increased
+2023-12-04 00:58:24,804 | [INFO] : deepening layer 1/4: Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1))
+2023-12-04 00:58:24,804 | [INFO] : Model size was changed to 29226 parameters
+2023-12-04 00:58:24,804 | [INFO] : Learning rate is now 0.010000
+2023-12-04 00:58:37,818 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-04 00:58:39,471 | [INFO] : Current model size: 29226 parameters
+2023-12-04 00:58:39,471 | [INFO] : Current training mode: increased
+2023-12-04 00:58:39,479 | [INFO] : deepening layer 2/5: Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+2023-12-04 00:58:39,479 | [INFO] : Model size was changed to 38538 parameters
+2023-12-04 00:58:39,479 | [INFO] : Learning rate is now 0.010000
+2023-12-04 00:58:53,484 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-04 00:58:55,161 | [INFO] : Current model size: 38538 parameters
+2023-12-04 00:58:55,161 | [INFO] : Current training mode: increased
+2023-12-04 00:58:55,170 | [INFO] : deepening layer 2/6: Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+2023-12-04 00:58:55,170 | [INFO] : Model size was changed to 47850 parameters
+2023-12-04 00:58:55,170 | [INFO] : Learning rate is now 0.010000
+2023-12-04 00:59:10,357 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-04 00:59:12,071 | [INFO] : Current model size: 47850 parameters
+2023-12-04 00:59:12,072 | [INFO] : Current training mode: increased
+2023-12-04 00:59:12,081 | [INFO] : deepening layer 2/7: Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+2023-12-04 00:59:12,082 | [INFO] : Model size was changed to 57162 parameters
+2023-12-04 00:59:12,082 | [INFO] : Learning rate is now 0.010000
+2023-12-04 00:59:28,377 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-04 00:59:30,108 | [INFO] : Current model size: 57162 parameters
+2023-12-04 00:59:30,108 | [INFO] : Current training mode: increased
+2023-12-04 00:59:30,119 | [INFO] : deepening layer 3/8: Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+2023-12-04 00:59:30,119 | [INFO] : Model size was changed to 66474 parameters
+2023-12-04 00:59:30,119 | [INFO] : Learning rate is now 0.010000
+2023-12-04 00:59:34,073 | [INFO] : training has run out of time
+2023-12-04 00:59:34,074 | [INFO] : training42 runtime (h:mm:ss): 0:01:10
+2023-12-04 00:59:34,074 | [INFO] : training42 end time: 12/04/2023 12:59:34 AM
+2023-12-04 00:59:34,083 | [INFO] : episode 43/50 finished, objective: -0.6120164589070343

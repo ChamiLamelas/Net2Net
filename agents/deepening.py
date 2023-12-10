@@ -67,6 +67,7 @@ def deepen_block(parent, name, block, add_batch_norm):
     first_layer = block.layers[0]
     new_block = copy.deepcopy(block)
     new_block.layers = nn.Sequential()
+    new_block.original = False 
     if isinstance(first_layer, nn.Conv2d):
         new_block.layers.append(_conv_only_deeper(first_layer))
         if add_batch_norm:

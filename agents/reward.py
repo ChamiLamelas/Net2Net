@@ -4,7 +4,9 @@ import math
 
 
 def acc_to_reward(acc):
-    return math.tan(acc * (math.pi / 2))
+    # DEBUG! 
+    return math.tan(acc * (math.pi / 2)) * 100
+    # return acc 
 
 
 if __name__ == "__main__":

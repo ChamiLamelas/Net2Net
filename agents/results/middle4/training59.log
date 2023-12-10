@@ -1,0 +1,53 @@
+2023-12-03 04:29:13,305 | [INFO] : training start time: 12/03/2023 04:29:13 AM
+2023-12-03 04:29:13,309 | [INFO] : Initialized model with weights: results/small_middle/weights.pth
+2023-12-03 04:29:13,309 | [INFO] : Current model size: 19914 parameters
+2023-12-03 04:29:13,309 | [INFO] : Current training mode: initial
+2023-12-03 04:29:13,327 | [INFO] : Current model size: 19914 parameters
+2023-12-03 04:29:13,328 | [INFO] : Current training mode: increased
+2023-12-03 04:29:13,337 | [INFO] : deepening layer 0/4: Conv2d(3, 32, kernel_size=(3, 3), stride=(1, 1))
+2023-12-03 04:29:13,337 | [INFO] : Model size was changed to 29226 parameters
+2023-12-03 04:29:13,337 | [INFO] : Learning rate is now 0.010000
+2023-12-03 04:29:27,701 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-03 04:29:29,525 | [INFO] : Current model size: 29226 parameters
+2023-12-03 04:29:29,525 | [INFO] : Current training mode: increased
+2023-12-03 04:29:29,534 | [INFO] : deepening layer 0/5: Conv2d(3, 32, kernel_size=(3, 3), stride=(1, 1))
+2023-12-03 04:29:29,535 | [INFO] : Model size was changed to 38538 parameters
+2023-12-03 04:29:29,535 | [INFO] : Learning rate is now 0.010000
+2023-12-03 04:29:45,247 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-03 04:29:47,050 | [INFO] : Current model size: 38538 parameters
+2023-12-03 04:29:47,051 | [INFO] : Current training mode: increased
+2023-12-03 04:29:47,060 | [INFO] : deepening layer 1/6: Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+2023-12-03 04:29:47,060 | [INFO] : Model size was changed to 47850 parameters
+2023-12-03 04:29:47,060 | [INFO] : Learning rate is now 0.010000
+2023-12-03 04:30:03,308 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-03 04:30:05,124 | [INFO] : Current model size: 47850 parameters
+2023-12-03 04:30:05,124 | [INFO] : Current training mode: increased
+2023-12-03 04:30:05,133 | [INFO] : deepening layer 2/7: Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+2023-12-03 04:30:05,134 | [INFO] : Model size was changed to 57162 parameters
+2023-12-03 04:30:05,134 | [INFO] : Learning rate is now 0.010000
+2023-12-03 04:30:22,272 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-03 04:30:24,335 | [INFO] : Current model size: 57162 parameters
+2023-12-03 04:30:24,335 | [INFO] : Current training mode: increased
+2023-12-03 04:30:24,346 | [INFO] : deepening layer 4/8: Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+2023-12-03 04:30:24,346 | [INFO] : Model size was changed to 66474 parameters
+2023-12-03 04:30:24,346 | [INFO] : Learning rate is now 0.010000
+2023-12-03 04:30:42,870 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-03 04:30:44,740 | [INFO] : Current model size: 66474 parameters
+2023-12-03 04:30:44,740 | [INFO] : Current training mode: increased
+2023-12-03 04:31:02,879 | [INFO] : New learning rate: 0.008100000000000001
+2023-12-03 04:31:04,760 | [INFO] : Current model size: 66474 parameters
+2023-12-03 04:31:04,761 | [INFO] : Current training mode: increased
+2023-12-03 04:31:22,716 | [INFO] : New learning rate: 0.007290000000000001
+2023-12-03 04:31:24,569 | [INFO] : Current model size: 66474 parameters
+2023-12-03 04:31:24,569 | [INFO] : Current training mode: increased
+2023-12-03 04:31:42,197 | [INFO] : New learning rate: 0.006561000000000002
+2023-12-03 04:31:44,051 | [INFO] : Current model size: 66474 parameters
+2023-12-03 04:31:44,051 | [INFO] : Current training mode: increased
+2023-12-03 04:32:01,822 | [INFO] : New learning rate: 0.005904900000000002
+2023-12-03 04:32:03,659 | [INFO] : Current model size: 66474 parameters
+2023-12-03 04:32:03,659 | [INFO] : Current training mode: increased
+2023-12-03 04:32:21,291 | [INFO] : New learning rate: 0.005314410000000002
+2023-12-03 04:32:23,120 | [INFO] : Current model size: 66474 parameters
+2023-12-03 04:32:23,120 | [INFO] : Current training mode: increased
+2023-12-03 04:32:32,585 | [INFO] : training has run out of time
+2023-12-03 04:32:32,586 | [INFO] : training runtime (h:mm:ss): 0:03:20

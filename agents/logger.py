@@ -1,6 +1,7 @@
 #!/usr/bin/env python3.8
 
 from datetime import timedelta, datetime
+from collections import defaultdict, Counter
 from pathlib import Path
 from math import ceil
 import inspect
@@ -11,7 +12,6 @@ import sys
 import os
 import csv
 import torch
-from collections import Counter, defaultdict
 
 
 def get_final_metric(path):
@@ -19,7 +19,7 @@ def get_final_metric(path):
         reader = csv.reader(f)
         for row in reader:
             pass
-        return float(row[1])
+        return float(row[-1])
 
 
 def delete_files(*files):
@@ -81,10 +81,11 @@ class MyTimer:
         if self.start_time is None:
             raise MyTimerException("stop( ) called without calling start( )")
         runtime_str = f"{self.task}runtime (h:mm:ss): {nice_seconds_string(time.time() - self.start_time)}"
+        end_str = f"{self.task}end time: {curr_time_est('%m/%d/%Y %I:%M:%S %p')}"
         if self.stream is not None:
-            print(runtime_str, file=self.stream)
+            print(runtime_str, end_str, sep="\n", file=self.stream)
         self.start_time = None
-        return runtime_str
+        return [runtime_str, end_str]
 
 
 class TimedLoggerException(Exception):
@@ -129,7 +130,8 @@ class TimedLogger:
         self.logger.info(self.timer.start(task))
 
     def stop(self):
-        self.logger.info(self.timer.stop())
+        for l in self.timer.stop():
+            self.logger.info(l)
 
     def info(self, message):
         self._check_log_ok()
@@ -153,12 +155,13 @@ class ML_Logger(TimedLogger):
         super().__init__(log_folder, persist)
         self.best_save_metric = None
         self.start_time = None
-        self.counts = defaultdict(Counter)
+        self.counts = None
 
     def start(self, log_file, metrics_file, task=None):
         super().start(log_file, task)
         self.metrics_file = os.path.join(self.log_folder, metrics_file)
         self.start_time = time.time()
+        self.counts = defaultdict(Counter)
 
     def log_metrics(self, metric, granularity, model=None):
         save_key = list(metric.keys())[0]
@@ -169,9 +172,9 @@ class ML_Logger(TimedLogger):
             mode="a+",
             encoding="utf-8",
         ) as f:
-            f.write(f"{save_time},{save_metric}\n")
-        self.counts[granularity][save_key] += 1
-        if granularity == "epoch" and model is not None:
+            f.write(f"{self.counts[save_key][granularity]},{save_time},{save_metric}\n")
+        self.counts[save_key][granularity] += 1
+        if model is not None:
             if self.best_save_metric is None or save_metric > self.best_save_metric:
                 torch.save(
                     model.state_dict(),
@@ -198,3 +201,12 @@ class ML_Logger(TimedLogger):
                 metrics.append(float(row[1]))
 
         return {"times": times, "metrics": metrics}
+
+
+if __name__ == "__main__":
+    logger = ML_Logger()
+    logger.start("test", "test", "test")
+    logger.log_metrics({"acc": 1.0}, "epoch")
+    logger.stop()
+    os.remove("test.log")
+    os.remove("test.epoch.acc")

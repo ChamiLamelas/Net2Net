@@ -1,0 +1,143 @@
+Specified a test folder -- deleting!
+Policy:
+Policy(
+  (encoder): NetworkEncoder(
+    (embedder): Embedding(13, 16)
+    (encoder): LSTM(16, 50, batch_first=True, bidirectional=True)
+  )
+  (decider): Decider2(
+    (lstm): LSTM(100, 16)
+    (linear1): Linear(in_features=24, out_features=128, bias=True)
+    (relu1): ReLU()
+    (linear2): Linear(in_features=128, out_features=128, bias=True)
+    (relu2): ReLU()
+    (linear3): Linear(in_features=128, out_features=5, bias=True)
+    (softmax): Softmax(dim=1)
+  )
+)
+[INFO] : learning start time: 12/09/2023 04:21:55 PM
+==== episode 1/1000 ====
+action = 0 (CORRECT)
+probs = 0.2126 0.1748 0.2129 0.2020 0.1977
+--------
+action = 0 (incorrect)
+probs = 0.2116 0.1719 0.2100 0.2055 0.2011
+--------
+Rewards:
+82.7272
+82.7272
+objective = 128.2940673828125
+==== episode 100/1000 ====
+action = 4 (incorrect)
+probs = 0.2273 0.1608 0.2097 0.1993 0.2029
+--------
+action = 1 (CORRECT)
+probs = 0.2237 0.1580 0.2137 0.1952 0.2093
+--------
+Rewards:
+82.7272
+82.7272
+objective = 142.30514526367188
+==== episode 200/1000 ====
+action = 2 (incorrect)
+probs = 0.2251 0.1630 0.1993 0.2027 0.2099
+--------
+action = 2 (incorrect)
+probs = 0.2169 0.1605 0.2096 0.1999 0.2131
+--------
+Rewards:
+72.6543
+72.6543
+objective = 115.36448669433594
+==== episode 300/1000 ====
+action = 3 (incorrect)
+probs = 0.2304 0.1506 0.1963 0.2123 0.2104
+--------
+action = 0 (incorrect)
+probs = 0.2186 0.1472 0.2076 0.2098 0.2168
+--------
+Rewards:
+72.6543
+72.6543
+objective = 111.53988647460938
+==== episode 400/1000 ====
+action = 3 (incorrect)
+probs = 0.2439 0.1443 0.1956 0.2064 0.2098
+--------
+action = 1 (CORRECT)
+probs = 0.2309 0.1438 0.2053 0.2034 0.2166
+--------
+Rewards:
+82.7272
+82.7272
+objective = 145.4863739013672
+==== episode 500/1000 ====
+action = 0 (CORRECT)
+probs = 0.2436 0.1528 0.1899 0.1962 0.2176
+--------
+action = 1 (CORRECT)
+probs = 0.2260 0.1496 0.2002 0.1964 0.2278
+--------
+Learning rate decayed to 9e-05
+Rewards:
+93.9063
+93.9063
+objective = 155.50900268554688
+==== episode 600/1000 ====
+action = 0 (CORRECT)
+probs = 0.2502 0.1562 0.1935 0.1846 0.2154
+--------
+action = 3 (incorrect)
+probs = 0.2309 0.1595 0.2023 0.1844 0.2229
+--------
+Rewards:
+82.7272
+82.7272
+objective = 127.23123168945312
+==== episode 700/1000 ====
+action = 0 (CORRECT)
+probs = 0.2582 0.1567 0.1873 0.1725 0.2254
+--------
+action = 2 (incorrect)
+probs = 0.2367 0.1623 0.1938 0.1721 0.2351
+--------
+Rewards:
+82.7272
+82.7272
+objective = 123.88520812988281
+==== episode 800/1000 ====
+action = 0 (CORRECT)
+probs = 0.2579 0.1607 0.1877 0.1724 0.2213
+--------
+action = 1 (CORRECT)
+probs = 0.2408 0.1686 0.1910 0.1700 0.2295
+--------
+Rewards:
+93.9063
+93.9063
+objective = 147.20709228515625
+==== episode 900/1000 ====
+action = 0 (CORRECT)
+probs = 0.2637 0.1618 0.1835 0.1571 0.2339
+--------
+action = 1 (CORRECT)
+probs = 0.2433 0.1682 0.1885 0.1575 0.2426
+--------
+Rewards:
+93.9063
+93.9063
+objective = 146.2765655517578
+==== episode 1000/1000 ====
+action = 2 (incorrect)
+probs = 0.2819 0.1561 0.1685 0.1467 0.2469
+--------
+action = 1 (CORRECT)
+probs = 0.2583 0.1648 0.1709 0.1504 0.2555
+--------
+Learning rate decayed to 8.1e-05
+Rewards:
+82.7272
+82.7272
+objective = 148.22528076171875
+[INFO] : learning runtime (h:mm:ss): 0:00:11
+[INFO] : learning end time: 12/09/2023 04:22:06 PM

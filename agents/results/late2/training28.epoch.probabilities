@@ -1,0 +1,10 @@
+0.02555251121520996,tensor([0.2012, 0.2006, 0.1984, 0.2000, 0.1998], device='cuda:0',
+       grad_fn=<ViewBackward0>)
+13.62627100944519,tensor([0.2012, 0.2006, 0.1984, 0.2000, 0.1998], device='cuda:0',
+       grad_fn=<ViewBackward0>)
+27.218137979507446,tensor([0.2012, 0.2006, 0.1984, 0.2000, 0.1998], device='cuda:0',
+       grad_fn=<ViewBackward0>)
+41.93266272544861,tensor([0.1677, 0.1667, 0.1670, 0.1654, 0.1667, 0.1665], device='cuda:0',
+       grad_fn=<ViewBackward0>)
+57.761640787124634,tensor([0.1438, 0.1429, 0.1428, 0.1432, 0.1418, 0.1429, 0.1428],
+       device='cuda:0', grad_fn=<ViewBackward0>)
