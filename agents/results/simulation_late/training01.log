@@ -20,3 +20,28 @@
 2023-12-11 00:46:49,119 | [INFO] : deepening layer 1/3: Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1))
 2023-12-11 00:46:49,120 | [DEBUG] : Model size was changed to 38538 parameters
 2023-12-11 00:46:49,120 | [DEBUG] : Learning rate is now 0.010000
+2023-12-11 00:46:59,890 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-11 00:47:01,680 | [DEBUG] : Current model size: 38538 parameters
+2023-12-11 00:47:01,680 | [DEBUG] : Current training mode: increased
+2023-12-11 00:47:01,684 | [INFO] : no layers were added
+2023-12-11 00:47:01,685 | [DEBUG] : Model size was changed to 38538 parameters
+2023-12-11 00:47:01,685 | [DEBUG] : Learning rate is now 0.010000
+2023-12-11 00:47:04,946 | [INFO] : GPU allocation changing : going down
+2023-12-11 00:47:04,952 | [DEBUG] : Model size was changed to 38538 parameters
+2023-12-11 00:47:04,952 | [DEBUG] : Learning rate is now 0.010000
+2023-12-11 00:47:04,953 | [DEBUG] : KD weight set to 7.5000e-01
+2023-12-11 00:47:04,953 | [DEBUG] : Current model size: 38538 parameters
+2023-12-11 00:47:04,953 | [DEBUG] : Current training mode: decreased
+2023-12-11 00:47:04,953 | [DEBUG] : KD weight decreased to 1.8750e-01
+2023-12-11 00:47:15,494 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-11 00:47:17,208 | [DEBUG] : Current model size: 38538 parameters
+2023-12-11 00:47:17,208 | [DEBUG] : Current training mode: decreased
+2023-12-11 00:47:17,208 | [DEBUG] : KD weight decreased to 4.6875e-02
+2023-12-11 00:47:27,692 | [INFO] : New learning rate: 0.008100000000000001
+2023-12-11 00:47:29,490 | [DEBUG] : Current model size: 38538 parameters
+2023-12-11 00:47:29,490 | [DEBUG] : Current training mode: decreased
+2023-12-11 00:47:29,490 | [DEBUG] : KD weight decreased to 1.1719e-02
+2023-12-11 00:47:34,949 | [INFO] : training has run out of time
+2023-12-11 00:47:34,950 | [INFO] : training01 runtime (h:mm:ss): 0:01:11
+2023-12-11 00:47:34,950 | [INFO] : training01 end time: 12/11/2023 12:47:34 AM
+2023-12-11 00:47:34,950 | [INFO] : episode 2/64 finished, objective: None
