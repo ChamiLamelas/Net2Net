@@ -15,15 +15,12 @@ class NetworkEncoder(nn.Module):
         self.embedder.weight.requires_grad = False
         if vocab.has_embeddings():
             self.embedder.load_state_dict(vocab.get_embeddings())
-        # DEBUG!
         self.encoder = nn.LSTM(
             embedding_size, hidden_size, bidirectional=True, batch_first=True
         )
 
     def forward(self, layers):
         embeddings = self.embedder(layers)
-        # return embeddings
-        # DEBUG!
         return self.encoder(embeddings)[0]
 
 

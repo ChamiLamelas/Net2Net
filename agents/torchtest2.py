@@ -8,7 +8,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.distributions import Categorical
-import copy 
+import copy
 
 parser = argparse.ArgumentParser(description="PyTorch REINFORCE example")
 parser.add_argument(
@@ -37,6 +37,7 @@ args = parser.parse_args()
 torch.manual_seed(args.seed)
 
 time_encoding_len = 8
+lstm_encoding_len = 16
 
 policy_size = 128
 
@@ -47,7 +48,9 @@ class Policy(nn.Module):
     def __init__(self):
         super(Policy, self).__init__()
 
-        self.first = nn.Sequential(nn.Linear(time_encoding_len, policy_size), nn.ReLU())
+        self.first = nn.Sequential(
+            nn.Linear(time_encoding_len + lstm_encoding_len, policy_size), nn.ReLU()
+        )
         self.middle = nn.Sequential(
             *[
                 nn.Sequential(nn.Linear(policy_size, policy_size), nn.ReLU())
@@ -67,7 +70,7 @@ class Policy(nn.Module):
 
 
 policy = Policy()
-optimizer = optim.Adam(policy.parameters(), lr=1e-3)
+optimizer = optim.Adam(policy.parameters(), lr=1e-4)
 learning_rate_scheduler = optim.lr_scheduler.ExponentialLR(optimizer, 0.99)
 eps = np.finfo(np.float32).eps.item()
 
@@ -82,13 +85,13 @@ def select_action(state):
 
 
 def finish_episode():
-    R = 0
+    # R = 0
     policy_loss = []
-    returns = deque()
-    for r in policy.rewards[::-1]:
-        R = r + args.gamma * R
-        returns.appendleft(R)
-    returns = torch.tensor(returns)
+    # returns = deque()
+    # for r in policy.rewards[::-1]:
+    #     R = r + args.gamma * R
+    #     returns.appendleft(R)
+    # returns = torch.tensor(returns)
     returns = torch.tensor(policy.rewards)
     # returns = (returns - returns.mean()) / (returns.std() + eps)
     # print(returns)
@@ -103,7 +106,7 @@ def finish_episode():
     rewards = copy.deepcopy(policy.rewards)
     del policy.rewards[:]
     del policy.saved_log_probs[:]
-    return policy_loss.item(), rewards 
+    return policy_loss.item(), rewards
 
 
 def acc_to_reward(acc):
@@ -120,13 +123,17 @@ def main():
     original_states = [65, 52, 39, 26, 13][-nactions:]
     correct_actions = [0, 1, 2, 3, 4][:nactions]
 
+    lstm = np.random.normal(size=lstm_encoding_len).tolist()
+
     states = list(map(encode_time, original_states))
+    states = list(map(lambda e: np.array(e + lstm), states))
+
     print("=== States ===")
     for os, s in zip(original_states, states):
         print(f"{os} : {s}")
     print()
 
-    for i_episode in range(5000):
+    for i_episode in range(15000):
         all_probs = list()
         actions = list()
         for state in states:
@@ -161,7 +168,7 @@ def main():
                 print(f"{n}: mean={p.mean().item():.4f} std={p.std().item():.4f}")
 
             print("=== Learning Rate ===")
-            print(f"{learning_rate_scheduler.get_last_lr()[0]:.4f}")
+            print(f"{learning_rate_scheduler.get_last_lr()[0]:.4e}")
 
             print("=== Objective ===")
             print(f"{objective:.4f}")
@@ -174,14 +181,15 @@ def main():
         print(f"{original_state} : {action}")
 
 
-def encode_time(time_seconds, period=400, num_dimensions=time_encoding_len):
-    # period is the length of the cycle (e.g., 24 hours in seconds)
+def encode_time(time_seconds, period=400, num_dimensions=8):
     time_encoded = [
         np.sin(2 * np.pi * time_seconds / period * i)
         for i in range(1, num_dimensions + 1)
     ]
-    return np.array(time_encoded)
 
+    time_encoded = (time_encoded - np.mean(time_encoded)) / np.std(time_encoded)
+
+    return time_encoded.tolist()
 
 if __name__ == "__main__":
     main()

@@ -69,7 +69,6 @@ def run(config, run_config, logger):
     agt_logger = copy.deepcopy(logger)
     agt_logger.start("agent", "agent", "learning")
     for ep in range(total_eps):
-        env.scheduler.start()
         agt.init()
         tr = training.Trainer(config, env.scheduler, agt, logger)
         tr.train(f"training{str(ep).zfill(max_digits)}")

@@ -9,7 +9,6 @@ import torch
 
 def params_torch_to_tf_ndarr(torch_layer, attr):
     torch_ndarr = getattr(torch_layer, attr).data.cpu().numpy()
-    # print(torch_ndarr.shape)
     if attr == "bias":
         return torch_ndarr
     elif attr == "weight":

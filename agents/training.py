@@ -13,8 +13,6 @@ import job
 import deepening
 import time
 import logger
-import os
-import sys
 import tracing
 
 
@@ -29,7 +27,7 @@ class Trainer:
         self.update_optimizer(None, False)
         self.T = config.get("T", 2)
         self.start_soft_target_loss_weight = config.get("soft_target_loss_weight", 0.75)
-        self.kd_weight_decay = config.get("kd_weight_decay", 0.5)
+        self.kd_weight_decay = config.get("kd_weight_decay", 0.25)
         self.soft_target_loss_weight = None
         self.mode = "initial"
         self.scheduler = scheduler
@@ -41,7 +39,6 @@ class Trainer:
         self.smaller = list()
         self.epoch = 0
         self.lr_scale = config.get("lr_scale", 1)
-        self.increase_limit = None
         self.min_lr = config.get("min_lr", 1e-8)
 
     def adapt_up(self):
@@ -57,12 +54,10 @@ class Trainer:
         action, probabilities = self.agent.action(
             {
                 "model": self.job.model,
-                "last_epoch_time": self.last_runtime / self.scheduler.running_time,
-                "timeleft": self.scheduler.time_left() / self.scheduler.running_time,
+                "totaltime": self.scheduler.running_time,
+                "timeleft": self.scheduler.time_left(),
             }
         )
-        nchoices = len(tracing.get_all_deepen_blocks(self.job.model)) + 1
-        # action = min(action, nchoices)
         deepening.deepen_model(
             self.job.model,
             self.logger,
@@ -71,7 +66,6 @@ class Trainer:
         self.update_optimizer("up", True)
         self.logger.log_metrics({"action": action}, "epoch")
         self.logger.log_metrics({"probabilities": probabilities}, "epoch")
-        return action, nchoices, probabilities
 
     def train(self, log_file):
         self.logger.start(task=log_file, log_file=log_file, metrics_file=log_file)
@@ -81,52 +75,41 @@ class Trainer:
             self.logger.info(
                 f"Initialized model with weights: {self.config['weights']}"
             )
+        self.scheduler.start()
         while not self.stopped_early:
             self.logger.debug(
                 f"Current model size: {models.count_parameters(self.job.model)} parameters"
             )
             self.logger.debug(f"Current training mode: {self.mode}")
-            if (
-                self.mode == "increased"
-                and len(tracing.get_all_layers(self.job.model)) < self.increase_limit
-            ):
-                action, nchoices, probabilities = self.adapt_up()
+            if self.mode == "increased":
+                self.adapt_up()
             elif self.mode == "decreased":
                 self.soft_target_loss_weight *= self.kd_weight_decay
-            # DEBUG!
+                self.logger.debug(
+                    f"KD weight decreased to {self.soft_target_loss_weight:.4e}"
+                )
             self.train_epoch()
             self.epoch += 1
             if self.allocation == "up":
                 self.mode = "increased"
-                self.increase_limit = len(tracing.get_all_layers(self.job.model)) * 2
             elif self.allocation == "down":
                 teacher = copy.deepcopy(self.job.model)
                 self.job.model = self.smaller[-1]
                 self.update_optimizer("down", True)
                 distillation.deeper_weight_transfer(teacher, self.job.model)
                 self.soft_target_loss_weight = self.start_soft_target_loss_weight
-                self.ce_loss_weight = self.start_ce_loss_weight
+                self.logger.debug(
+                    f"KD weight set to {self.soft_target_loss_weight:.4e}"
+                )
                 self.mode = "decreased"
             if not self.stopped_early and self.allocation == "same":
-                # DEBUG!
-                # test_acc = prediction.predict(
-                #     self.job.model, self.job.testloader, self.agent.device
-                # )
+                test_acc = prediction.predict(
+                    self.job.model, self.job.testloader, self.agent.device
+                )
                 if self.mode == "increased":
-                    # DEBUG!
-                    last_action = action
-                    last_nchoies = nchoices
-                    # print("nchoices=", nchoices, file=sys.stderr)
-                    print("P=", probabilities, file=sys.stderr)
-                    self.agent.record_acc(0.6 if (action == nchoices - 1) else 0.4)
-                    print("R=", 0.6 if (action == nchoices - 1) else 0.4, file=sys.stderr)
-                # DEBUG!
-                # self.logger.log_metrics({"test_acc": test_acc}, "epoch", self.job.model)
-
-        # DEBUG!
-        self.agent.record_acc(
-            0.6 if (last_action == last_nchoies - 1) else 0.4, final=True
-        )
+                    self.agent.save_prob()
+                self.logger.log_metrics({"test_acc": test_acc}, "epoch", self.job.model)
+        self.agent.record_acc(test_acc)
         self.logger.stop()
 
     def update_optimizer(self, scale, log):
@@ -152,17 +135,18 @@ class Trainer:
         total_correct = 0
         total_size = 0
         ti = time.time()
-        for i, (data, target) in tqdm(
-            enumerate(self.job.trainloader),
+        for data, target in tqdm(
+            self.job.trainloader,
             desc=f"training epoch {self.epoch}",
             total=len(self.job.trainloader),
         ):
-        # for data, target in self.job.trainloader:
             self.allocation = self.scheduler.allocation()
             if self.scheduler.time_left() == 0 or self.allocation != "same":
                 if self.allocation == "same":
                     self.stopped_early = True
                     self.logger.info("training has run out of time")
+                else:
+                    self.logger.info(f"GPU allocation changing : going {self.allocation}")
                 break
             data, target = gpu.move(self.agent.device, data, target)
             self.optimizer.zero_grad()

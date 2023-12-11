@@ -19,6 +19,7 @@ class BaseAgent(ABC):
         self.folder = config["runner"]["folder"]
         self.config = config["agent"]
         self.device = gpu.get_device(self.config["device"])
+        self.policy = None
 
     @abstractmethod
     def init(self):
@@ -29,11 +30,19 @@ class BaseAgent(ABC):
         pass
 
     @abstractmethod
-    def record_acc(self, acc, final=False):
+    def save_prob(self):
+        pass
+
+    @abstractmethod
+    def record_acc(self, acc):
         pass
 
     @abstractmethod
     def update(self):
+        pass
+
+    @abstractmethod
+    def save(self):
         pass
 
 
@@ -44,7 +53,6 @@ class Agent(BaseAgent):
         self.gamma = self.config.get("gamma", 0.99)
         self.probabilities = None
         self.rewards = None
-        # self.final_weight = self.config.get("final_weight", 0.9)
         self.policy = self.policy.to(self.device)
         self.optimizer = optim.Adam(
             self.policy.parameters(),
@@ -54,21 +62,18 @@ class Agent(BaseAgent):
         self.learning_rate = optim.lr_scheduler.ExponentialLR(
             self.optimizer, self.learning_rate_decay
         )
+        self.decay_freq = self.config.get("decay_freq", 500)
+        self.episodes = 0
 
     def init(self):
         self.probabilities = list()
         self.saved_probs = 0
         self.rewards = None
-
-    # def remove_unrewarded_probability(self):
-    #     if len(self.probabilities) > (len(self.rewards) - 1):
-    #         self.probabilities.pop(-1)
+        self.episodes += 1
 
     def action(self, state):
         assert self.probabilities is not None, "call init( )"
-        # self.remove_unrewarded_probability()
         probabilities = self.policy(state)
-        # print("P=", [e.item() for e in probabilities], file=sys.stderr)
         selector = Categorical(probabilities)
         action = selector.sample()
         self.probabilities.append(selector.log_prob(action))
@@ -77,9 +82,7 @@ class Agent(BaseAgent):
     def save_prob(self):
         self.saved_probs += 1
 
-    def record_acc(self, acc, final=False):
-        # if final:
-        #     self.remove_unrewarded_probability()
+    def record_acc(self, acc):
         r = reward.acc_to_reward(acc)
         self.rewards = [r] * self.saved_probs
 
@@ -87,50 +90,26 @@ class Agent(BaseAgent):
         return self.saved_probs
 
     def compute_goals(self):
-        Gs = deque()
-        G = 0
-        for r in self.rewards[::-1]:
-            G = r + (self.gamma * G)
-            Gs.appendleft(G)
-        Gs = torch.tensor(Gs)
-        Gs = torch.tensor(self.rewards)
-        # print("G=", [e.item() for e in Gs], file=sys.stderr)
-        # if Gs.shape[0] > 1:
-        #     Gs = (Gs - Gs.mean()) / (Gs.std() + 1e-9)
-        # print("NG=", [e.item() for e in Gs], file=sys.stderr)
-        return Gs
-
-    def transform_rewards(self):
-        pass
-        # print("R=", self.rewards)
-        # self.rewards = list(map(, self.rewards[1:]))
-        # self.rewards = [
-        #     np.dot([1 - self.final_weight, self.final_weight], [self.rewards[-1], r])
-        #     for r in self.rewards[1:-1]
-        # ]
-        # print("TR=", self.rewards)
+        return torch.tensor(self.rewards)
 
     def get_current_lr(self):
         return self.learning_rate.get_last_lr()[0]
 
-    def update(self, decay):
-        self.transform_rewards()
+    def update(self):
         goals = self.compute_goals()
-        # print(goals, file=sys.stderr)
-        # print(self.probabilities, file=sys.stderr)
-        # print([-p * g for p, g in zip(self.probabilities, goals)])
         objective = torch.mean(
             torch.cat([-p * g for p, g in zip(self.probabilities, goals)])
         )
-        # print("PG=", [(-p) * g for p, g in zip(self.probabilities, goals)])
-        # print(list(self.policy.named_parameters()), file=sys.stderr)
         output = objective.item()
         self.optimizer.zero_grad()
         objective.backward()
         self.optimizer.step()
-        if decay and self.get_current_lr() >= 1e-9:
+        if self.episodes % self.decay_freq == 0 and self.get_current_lr() >= 1e-9:
             self.learning_rate.step()
         return output
+
+    def save(self):
+        raise RuntimeError("save using a logger")
 
 
 if __name__ == "__main__":

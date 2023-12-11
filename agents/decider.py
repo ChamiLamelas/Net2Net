@@ -58,7 +58,6 @@ class Decider2(nn.Module):
         self.lstm = nn.LSTM(in_features, decider_lstm_size)
         self.linear1 = nn.Linear(
             decider_lstm_size + time_encoding_size, decider_linear_size
-            # time_encoding_size, decider_linear_size
         )
         self.relu1 = nn.ReLU()
         self.linear2 = nn.Linear(decider_linear_size, decider_linear_size)
@@ -69,18 +68,13 @@ class Decider2(nn.Module):
     def forward(self, input):
         features = input["encodings"]
         features = self.lstm(features)[0][-1]
-        # print(input["other"].size(), features.size())
         features = torch.cat([input["other"], features]).unsqueeze(0)
-        # features = torch.cat([input["other"]]).unsqueeze(0)
-        # features = input["other"][1].reshape((-1, 1))
-        # print(features, file=sys.stderr)
         features = self.linear1(features)
         features = self.relu1(features)
         features = self.linear2(features)
         features = self.relu2(features)
         features = self.linear3(features)
         features = self.softmax(features)
-        # features = features.flatten()
         return features
 
 
@@ -100,5 +94,5 @@ if __name__ == "__main__":
     decider = Decider(5, 16)
     print(decider(input), decider(input).sum(), sep="\n")
 
-    decider2 = Decider2(5, 16, 10)
-    print(decider2(input))
+    # decider2 = Decider2(5, 16, 10)
+    # print(decider2(input))

@@ -12,16 +12,16 @@ import os
 RESULTS = "results"
 PLOTS = "plots"
 
-SMALL_FOLDER = "no_adaptation"
+SMALL_FOLDER = "no_adaptation2"
 
 BASELINE_FOLDERS = [
-    "baseline_early",
-    "baseline_early_middle",
-    "baseline_middle",
-    "baseline_middle_late",
-    "baseline_late",
+    "baseline_early2",
+    "baseline_early_middle2",
+    "baseline_middle2",
+    "baseline_middle_late2",
+    "baseline_late2",
 ]
-AGENT_FOLDERS = ["test_late", "test_late2"]
+AGENT_FOLDERS = ["test_late6"]
 
 EXTENSIONS = {"train": "train_acc", "test": "test_acc"}
 
@@ -152,12 +152,17 @@ def load_objectives(path):
 
 
 def objective_plot():
+    window_size = 50
     for folder in AGENT_FOLDERS:
         folder = os.path.join(RESULTS, folder)
         _, ax = plt.subplots()
         objectives = load_objectives(os.path.join(folder, "agent.episode.objective"))
+        mean_objectives = np.convolve(
+            objectives, np.ones(window_size) / window_size, mode="valid"
+        )
         x = np.arange(len(objectives))
-        ax.plot(x, objectives)
+        ax.plot(x, objectives, label='objective')
+        ax.plot(x[:-window_size+1], mean_objectives, label='running mean')
         make_plot_nice(
             ax,
             "Episode",

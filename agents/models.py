@@ -55,6 +55,7 @@ class FeedForwardNet2(nn.Module):
         x = self.fc2(x)
         return x
 
+
 class FeedForwardNet3(nn.Module):
     def __init__(self):
         super().__init__()
@@ -127,6 +128,25 @@ class ConvNet(nn.Module):
         x = self.conv2(x)
         x = self.pool1(x)
         x = self.conv3(x)
+        x = self.finalpool(x)
+        x = torch.flatten(x, 1)
+        x = self.fc(x)
+        return x
+
+
+class ConvNet2(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = NormalizedConvolutionalNet2NetDeepenBlock(3, 32, 3)
+        self.pool1 = nn.AvgPool2d((2, 2))
+        self.conv2 = NormalizedConvolutionalNet2NetDeepenBlock(32, 32, 3)
+        self.finalpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.fc = FeedForwardNet2NetDeepenBlock(32, 10)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.pool1(x)
+        x = self.conv2(x)
         x = self.finalpool(x)
         x = torch.flatten(x, 1)
         x = self.fc(x)

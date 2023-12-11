@@ -1,6 +1,6 @@
 [runner]
 seed = 42
-total_episodes = 1000
+total_episodes = 15000
 folder = "test_late6"
 agent = "Agent"
 
@@ -24,5 +24,5 @@ embedding_size = 16
 max_actions = 5
 decider_lstm_size = 16
 decider_linear_size = 128
-learning_rate_decay = 0.9
+learning_rate_decay = 0.99
 time_encoding_size = 8

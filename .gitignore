@@ -6,6 +6,8 @@ test.json
 data/
 *.pt
 agents/screenlog.*
+*.stderr
+*test.pkl
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

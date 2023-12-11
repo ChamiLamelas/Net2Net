@@ -83,7 +83,7 @@ def run(config, run_config, logger):
     agt_logger = copy.deepcopy(logger)
     agt_logger.start("agent", "agent", "learning")
     base_model = job.Job(config).model
-    nactions = 2
+    nactions = 5
     correct_actions = [0, 1, 2, 3, 4][:nactions]
     time_lefts = [65, 52, 39, 26, 13][-nactions:]
     for ep in range(total_eps):
@@ -114,6 +114,11 @@ def run(config, run_config, logger):
         else:
             obj = agt.update(False)
         if should_log(ep, log_freq):
+            print("Weights:", file=sys.stderr)
+            for n, p in agt.policy.named_parameters():
+                print(f"{n}: {p.mean()} {p.std()}", file=sys.stderr)
+            print(file=sys.stderr)
+
             print("Rewards:", file=sys.stderr)
             for r in agt.rewards:
                 print(f"{r:.4f}", file=sys.stderr)

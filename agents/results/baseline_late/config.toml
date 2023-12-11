@@ -5,8 +5,9 @@ folder = "baseline_late"
 agent = "RandomAgent"
 
 [scheduler]
-running_time = 60
-gpu_changes = [{ time = 0, change = "up" }]
+running_time = 400
+gpu_changes = [{ time = 340, change = "up" }]
+start_time = 340
 
 [trainer]
 weights = "results/small_late/weights.pth"
