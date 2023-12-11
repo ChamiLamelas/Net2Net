@@ -163,7 +163,15 @@ class ML_Logger(TimedLogger):
         self.start_time = time.time()
         self.counts = defaultdict(Counter)
 
-    def log_metrics(self, metric, granularity, model=None):
+    def should_save(self, save_metric, bigger_better):
+        if self.best_save_metric is None:
+            return True
+        if bigger_better:
+            return save_metric > self.best_save_metric
+        else:
+            return save_metric < self.best_save_metric
+
+    def log_metrics(self, metric, granularity, model=None, bigger_better=True):
         save_key = list(metric.keys())[0]
         save_metric = list(metric.values())[0]
         save_time = time.time() - self.start_time
@@ -175,13 +183,18 @@ class ML_Logger(TimedLogger):
             f.write(f"{self.counts[save_key][granularity]},{save_time},{save_metric}\n")
         self.counts[save_key][granularity] += 1
         if model is not None:
-            if self.best_save_metric is None or save_metric > self.best_save_metric:
+            if self.should_save(save_metric, bigger_better):
                 torch.save(
                     model.state_dict(),
                     self.metrics_file + ".bestmodel.pt",
                 )
                 self.best_save_metric = save_metric
             torch.save(model.state_dict(), self.metrics_file + ".finalmodel.pt")
+
+    def permanentize_model(self):
+        os.rename(
+            self.metrics_file + ".bestmodel.pt", self.metrics_file + ".bestmodel.pth"
+        )
 
     @staticmethod
     def load_metrics(log_folder, metrics_file, metric, granularity):

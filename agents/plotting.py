@@ -21,7 +21,18 @@ BASELINE_FOLDERS = [
     "baseline_middle_late2",
     "baseline_late2",
 ]
-AGENT_FOLDERS = ["test_late6"]
+
+AGENT_FOLDERS = [
+    "simulation_early_learn",
+    "simulation_middle_learn",
+    "simulation_late_learn",
+    "simulation_early_to_middle_learn",
+    "simulation_early_to_late_learn",
+    "simulation_middle_to_early_learn",
+    "simulation_middle_to_late_learn",
+    "simulation_late_to_early_learn",
+    "simulation_late_to_middle_learn",
+]
 
 EXTENSIONS = {"train": "train_acc", "test": "test_acc"}
 
@@ -161,8 +172,8 @@ def objective_plot():
             objectives, np.ones(window_size) / window_size, mode="valid"
         )
         x = np.arange(len(objectives))
-        ax.plot(x, objectives, label='objective')
-        ax.plot(x[:-window_size+1], mean_objectives, label='running mean')
+        ax.plot(x, objectives, label="objective")
+        ax.plot(x[: -window_size + 1], mean_objectives, label="running mean")
         make_plot_nice(
             ax,
             "Episode",

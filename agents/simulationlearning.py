@@ -31,10 +31,16 @@ def file(f):
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("configfile", type=file, help="configuration file")
+    parser.add_argument(
+        "--showstderr",
+        default=False,
+        type=bool,
+        help="show stderr or send it to file (default to file)",
+    )
     return parser.parse_args()
 
 
-def setup_folder(config, configfile):
+def setup_folder(config, configfile, showstderr):
     test_dir = config["folder"].startswith("test")
     config["folder"] = os.path.join(RESULTS, config["folder"])
     if os.path.isdir(config["folder"]):
@@ -52,7 +58,11 @@ def setup_folder(config, configfile):
             config["desc"]
         )
     shutil.copyfile(configfile, os.path.join(config["folder"], "config.toml"))
-    return logger
+    old_stderr = sys.stderr
+    if not showstderr:
+        stderr_file = config["folder"].rstrip("/") + ".stderr"
+        sys.stderr = open(stderr_file, "w+")
+    return logger, old_stderr
 
 
 def loadconfig(args):
@@ -115,9 +125,11 @@ def run(config, run_config, logger):
             for r in agt.rewards:
                 print(f"{r:.4f}", file=sys.stderr)
             print(f"objective = {obj}", file=sys.stderr)
-        agt_logger.log_metrics({"objective": obj}, "episode", agt.policy)
+        agt_logger.log_metrics(
+            {"objective": obj}, "episode", agt.policy, bigger_better=False
+        )
     agt_logger.stop()
-    print("\n".join(f"{k} {v}" for (k, v) in sim.get_acc_ranking()), file=sys.stderr)
+    agt_logger.permanentize_model()
 
 
 def main():
@@ -126,8 +138,9 @@ def main():
     config = loadconfig(args)
     runner_config = config["runner"]
     seed.set_seed(runner_config["seed"])
-    logger = setup_folder(runner_config, args.configfile)
+    logger, old_stderr = setup_folder(runner_config, args.configfile, args.showstderr)
     run(config, runner_config, logger)
+    sys.stderr = old_stderr
 
 
 if __name__ == "__main__":

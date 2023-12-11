@@ -1,4 +1,6 @@
 import pickle
+import toml
+import os
 
 
 class Simulation:
@@ -8,6 +10,7 @@ class Simulation:
             self.data = pickle.load(f)
         self.num_actions = len(list(self.data.keys())[0])
         self.placeholder = [0] * self.num_actions
+
 
     def get_time_left(self, actions):
         assert len(actions) < self.num_actions

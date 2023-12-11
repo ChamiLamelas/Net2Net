@@ -1,0 +1,67 @@
+2023-12-11 12:43:28,623 | [INFO] : training35 start time: 12/11/2023 12:43:28 PM
+2023-12-11 12:43:28,629 | [INFO] : Initialized model with weights: results/small_middle_late2/weights.pth
+2023-12-11 12:43:28,629 | [DEBUG] : Current model size: 10602 parameters
+2023-12-11 12:43:28,629 | [DEBUG] : Current training mode: initial
+2023-12-11 12:43:28,643 | [INFO] : GPU allocation changing : going up
+2023-12-11 12:43:28,644 | [DEBUG] : Current model size: 10602 parameters
+2023-12-11 12:43:28,644 | [DEBUG] : Current training mode: increased
+2023-12-11 12:43:28,647 | [INFO] : deepening layer 2/3: Linear(in_features=32, out_features=10, bias=True)
+2023-12-11 12:43:28,647 | [DEBUG] : Model size was changed to 10712 parameters
+2023-12-11 12:43:28,647 | [DEBUG] : Learning rate is now 0.010000
+2023-12-11 12:43:39,182 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-11 12:43:41,150 | [DEBUG] : Current model size: 10712 parameters
+2023-12-11 12:43:41,150 | [DEBUG] : Current training mode: increased
+2023-12-11 12:43:41,154 | [INFO] : deepening layer 0/3: Conv2d(3, 32, kernel_size=(3, 3), stride=(1, 1))
+2023-12-11 12:43:41,155 | [DEBUG] : Model size was changed to 20024 parameters
+2023-12-11 12:43:41,155 | [DEBUG] : Learning rate is now 0.010000
+2023-12-11 12:43:51,753 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-11 12:43:53,737 | [DEBUG] : Current model size: 20024 parameters
+2023-12-11 12:43:53,737 | [DEBUG] : Current training mode: increased
+2023-12-11 12:43:53,740 | [INFO] : no layers were added
+2023-12-11 12:43:53,741 | [DEBUG] : Model size was changed to 20024 parameters
+2023-12-11 12:43:53,741 | [DEBUG] : Learning rate is now 0.010000
+2023-12-11 12:44:04,268 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-11 12:44:06,172 | [DEBUG] : Current model size: 20024 parameters
+2023-12-11 12:44:06,172 | [DEBUG] : Current training mode: increased
+2023-12-11 12:44:06,175 | [INFO] : no layers were added
+2023-12-11 12:44:06,176 | [DEBUG] : Model size was changed to 20024 parameters
+2023-12-11 12:44:06,176 | [DEBUG] : Learning rate is now 0.010000
+2023-12-11 12:44:08,630 | [INFO] : GPU allocation changing : going down
+2023-12-11 12:44:08,634 | [DEBUG] : Model size was changed to 20024 parameters
+2023-12-11 12:44:08,634 | [DEBUG] : Learning rate is now 0.010000
+2023-12-11 12:44:08,635 | [DEBUG] : KD weight set to 7.5000e-01
+2023-12-11 12:44:08,635 | [DEBUG] : Current model size: 20024 parameters
+2023-12-11 12:44:08,635 | [DEBUG] : Current training mode: decreased
+2023-12-11 12:44:08,635 | [DEBUG] : KD weight decreased to 1.8750e-01
+2023-12-11 12:44:19,182 | [INFO] : New learning rate: 0.009000000000000001
+2023-12-11 12:44:21,048 | [DEBUG] : Current model size: 20024 parameters
+2023-12-11 12:44:21,048 | [DEBUG] : Current training mode: decreased
+2023-12-11 12:44:21,048 | [DEBUG] : KD weight decreased to 4.6875e-02
+2023-12-11 12:44:31,672 | [INFO] : New learning rate: 0.008100000000000001
+2023-12-11 12:44:33,570 | [DEBUG] : Current model size: 20024 parameters
+2023-12-11 12:44:33,570 | [DEBUG] : Current training mode: decreased
+2023-12-11 12:44:33,571 | [DEBUG] : KD weight decreased to 1.1719e-02
+2023-12-11 12:44:44,143 | [INFO] : New learning rate: 0.007290000000000001
+2023-12-11 12:44:45,946 | [DEBUG] : Current model size: 20024 parameters
+2023-12-11 12:44:45,946 | [DEBUG] : Current training mode: decreased
+2023-12-11 12:44:45,946 | [DEBUG] : KD weight decreased to 2.9297e-03
+2023-12-11 12:44:56,522 | [INFO] : New learning rate: 0.006561000000000002
+2023-12-11 12:44:58,478 | [DEBUG] : Current model size: 20024 parameters
+2023-12-11 12:44:58,479 | [DEBUG] : Current training mode: decreased
+2023-12-11 12:44:58,479 | [DEBUG] : KD weight decreased to 7.3242e-04
+2023-12-11 12:45:08,979 | [INFO] : New learning rate: 0.005904900000000002
+2023-12-11 12:45:10,952 | [DEBUG] : Current model size: 20024 parameters
+2023-12-11 12:45:10,952 | [DEBUG] : Current training mode: decreased
+2023-12-11 12:45:10,952 | [DEBUG] : KD weight decreased to 1.8311e-04
+2023-12-11 12:45:21,284 | [INFO] : New learning rate: 0.005314410000000002
+2023-12-11 12:45:23,082 | [DEBUG] : Current model size: 20024 parameters
+2023-12-11 12:45:23,083 | [DEBUG] : Current training mode: decreased
+2023-12-11 12:45:23,083 | [DEBUG] : KD weight decreased to 4.5776e-05
+2023-12-11 12:45:33,296 | [INFO] : New learning rate: 0.004782969000000002
+2023-12-11 12:45:35,104 | [DEBUG] : Current model size: 20024 parameters
+2023-12-11 12:45:35,104 | [DEBUG] : Current training mode: decreased
+2023-12-11 12:45:35,104 | [DEBUG] : KD weight decreased to 1.1444e-05
+2023-12-11 12:45:38,634 | [INFO] : training has run out of time
+2023-12-11 12:45:38,635 | [INFO] : training35 runtime (h:mm:ss): 0:02:11
+2023-12-11 12:45:38,635 | [INFO] : training35 end time: 12/11/2023 12:45:38 PM
+2023-12-11 12:45:38,636 | [INFO] : episode 36/64 finished, objective: None

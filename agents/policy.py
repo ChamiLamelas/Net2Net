@@ -31,8 +31,8 @@ class Policy(nn.Module):
 
     def forward(self, state):
         all_encodings = self.encoder(self.vocab.id(state["model"]).to(self.device))
-        decision_matrix = decider.make_decider_matrix(state["model"]).to(self.device)
-        decide_encodings = torch.matmul(decision_matrix, all_encodings)
+        # decision_matrix = decider.make_decider_matrix(state["model"]).to(self.device)
+        # decide_encodings = torch.matmul(decision_matrix, all_encodings)
         other_features = (
             torch.from_numpy(
                 timeencoding.encode_time(
@@ -43,7 +43,7 @@ class Policy(nn.Module):
             .to(self.device)
         )
         probabilities = self.decider(
-            {"encodings": decide_encodings, "other": other_features}
+            {"encodings": all_encodings, "other": other_features}
         )
         return probabilities
 

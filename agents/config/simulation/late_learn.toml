@@ -1,6 +1,6 @@
 [runner]
 seed = 42
-total_episodes = 15000
+total_episodes = 4000
 folder = "simulation_late_learn"
 agent = "Agent"
 

@@ -10,6 +10,7 @@ import itertools
 from collections import defaultdict
 import pickle
 import simulation
+import os 
 
 
 class RandomAgent(agent.BaseAgent):
@@ -79,6 +80,8 @@ class SimulationAgent(agent.BaseAgent):
         self.action_set_size = self.config["action_set_size"]
         self.num_actions = self.config["num_actions"]
         self.save_file = self.config["save_file"]
+        if os.path.isfile(self.save_file):
+            raise RuntimeError(f"{self.save_file} exists!")
         actions = list(range(self.action_set_size))
         iterables = [actions] * self.num_actions
         self.action_sequences = list(itertools.product(*iterables))

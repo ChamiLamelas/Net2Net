@@ -11,6 +11,8 @@ from torch.distributions import Categorical
 from abc import ABC, abstractmethod
 import torch
 import sys
+import os
+import toml
 
 
 class BaseAgent(ABC):
@@ -50,6 +52,8 @@ class Agent(BaseAgent):
     def __init__(self, config):
         super().__init__(config)
         self.policy = policy.Policy(self.config, self.device)
+        if "policyfile" in self.config:
+            self.policy.load_state_dict(torch.load(self.config["policyfile"]))
         self.gamma = self.config.get("gamma", 0.99)
         self.probabilities = None
         self.rewards = None
@@ -64,6 +68,7 @@ class Agent(BaseAgent):
         )
         self.decay_freq = self.config.get("decay_freq", 500)
         self.episodes = 0
+        self.saved_probs = None
 
     def init(self):
         self.probabilities = list()
@@ -72,11 +77,11 @@ class Agent(BaseAgent):
         self.episodes += 1
 
     def action(self, state):
-        assert self.probabilities is not None, "call init( )"
         probabilities = self.policy(state)
         selector = Categorical(probabilities)
         action = selector.sample()
-        self.probabilities.append(selector.log_prob(action))
+        if self.probabilities is not None:
+            self.probabilities.append(selector.log_prob(action))
         return action.item(), probabilities.flatten().tolist()
 
     def save_prob(self):
