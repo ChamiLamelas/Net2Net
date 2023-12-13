@@ -1,0 +1,21 @@
+[runner]
+seed = 42
+total_episodes = 10
+folder = "baseline_middle_late2"
+agent = "RandomAgent"
+
+[scheduler]
+running_time = 400
+gpu_changes = [{ time = 270, change = "up" }, { time = 310, change = "down" }]
+start_time = 270
+
+[trainer]
+weights = "results/small_middle_late2/weights.pth"
+runtimes = "results/small_middle_late2/runtimes"
+
+[job]
+model = "ConvNet2"
+dataset = "cifar10"
+
+[agent]
+device = 0

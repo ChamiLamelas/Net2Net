@@ -8,6 +8,8 @@ data/
 agents/screenlog.*
 *.stderr
 *test.pkl
+agents/test.py
+agents/test.png
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

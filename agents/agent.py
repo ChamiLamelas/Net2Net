@@ -66,9 +66,15 @@ class Agent(BaseAgent):
         self.learning_rate = optim.lr_scheduler.ExponentialLR(
             self.optimizer, self.learning_rate_decay
         )
-        self.decay_freq = self.config.get("decay_freq", 500)
+        self.lr_decay_freq = self.config.get("lr_decay_freq", 500)
+        self.temp_decay_freq = self.config.get("temp_decay_freq", 1)
+        self.temp_decay_rate = self.config.get("temp_decay_rate", 0.9)
         self.episodes = 0
         self.saved_probs = None
+        self.eval_mode = False
+
+    def eval(self):
+        self.eval_mode = True
 
     def init(self):
         self.probabilities = list()
@@ -78,9 +84,11 @@ class Agent(BaseAgent):
 
     def action(self, state):
         probabilities = self.policy(state)
-        selector = Categorical(probabilities)
-        action = selector.sample()
-        if self.probabilities is not None:
+        if self.eval_mode:
+            action = torch.argmax(probabilities.flatten())
+        else:
+            selector = Categorical(probabilities)
+            action = selector.sample()
             self.probabilities.append(selector.log_prob(action))
         return action.item(), probabilities.flatten().tolist()
 
@@ -100,6 +108,9 @@ class Agent(BaseAgent):
     def get_current_lr(self):
         return self.learning_rate.get_last_lr()[0]
 
+    def change_temperature(self):
+        self.policy.temperature = max(self.policy.temperature * self.temp_decay_rate, 1)
+
     def update(self):
         goals = self.compute_goals()
         objective = torch.mean(
@@ -109,8 +120,10 @@ class Agent(BaseAgent):
         self.optimizer.zero_grad()
         objective.backward()
         self.optimizer.step()
-        if self.episodes % self.decay_freq == 0 and self.get_current_lr() >= 1e-9:
+        if self.episodes % self.lr_decay_freq == 0 and self.get_current_lr() >= 1e-9:
             self.learning_rate.step()
+        if self.episodes % self.temp_decay_freq == 0 and self.policy.temperature > 1:
+            self.change_temperature()
         return output
 
     def save(self):

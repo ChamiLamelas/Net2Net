@@ -27,7 +27,9 @@ class Policy(nn.Module):
             self.time_encoding_size,
             config["max_actions"],
         )
+        self.softmax = nn.Softmax(dim=1)
         self.device = device
+        self.temperature = config.get("temperature", 1)
 
     def forward(self, state):
         all_encodings = self.encoder(self.vocab.id(state["model"]).to(self.device))
@@ -45,15 +47,41 @@ class Policy(nn.Module):
         probabilities = self.decider(
             {"encodings": all_encodings, "other": other_features}
         )
-        return probabilities
 
-    def save_embeddings(self):
-        self.vocab.save(self.encoder.embedder.state_dict())
+        if self.temperature > 1:
+            probabilities = self.softmax(probabilities / self.temperature)
+        return probabilities
 
 
 if __name__ == "__main__":
-    # p = Policy(
-    #     {"hidden_size": 50, "embedding_size": 16, "vocab": "models"}, gpu.get_device()
-    # ).to(gpu.get_device())
-    # print(p({"model": models.ConvNet(), "last_epoch_time": 0.1, "timeleft": 0.5}))
-    pass
+    p = Policy(
+        {
+            "vocab": "models",
+            "hidden_size": 50,
+            "embedding_size": 16,
+            "time_encoding_size": 8,
+            "decider_lstm_size": 16,
+            "decider_linear_size": 128,
+            "max_actions": 4,
+            "temperature": 1000,
+        },
+        gpu.get_device(),
+    ).to(gpu.get_device())
+
+    s = {"model": models.ConvNet2(), "timeleft": 13, "totaltime": 400}
+
+    print(p(s))
+
+    p.change_temperature(100)
+
+    print(p(s))
+
+    p.change_temperature(10)
+
+    print(p(s))
+
+    p.change_temperature(1)
+
+    print(p(s))
+
+    

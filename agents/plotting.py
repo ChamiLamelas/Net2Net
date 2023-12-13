@@ -26,13 +26,69 @@ AGENT_FOLDERS = [
     "simulation_early_learn",
     "simulation_middle_learn",
     "simulation_late_learn",
-    "simulation_early_to_middle_learn",
-    "simulation_early_to_late_learn",
-    "simulation_middle_to_early_learn",
-    "simulation_middle_to_late_learn",
-    "simulation_late_to_early_learn",
-    "simulation_late_to_middle_learn",
+    # "simulation_middle_to_late_learn1",
 ]
+
+GROUPED_AGENT_FOLDERS = {
+    "early_to_middle_explorations": {
+        "folders": [
+            "simulation_early_to_middle_learn1",
+            "simulation_early_to_middle_learn10",
+            "simulation_early_to_middle_learn100",
+        ],
+        "comparison": "compare_exploration",
+    },
+    "early_to_late_explorations": {
+        "folders": [
+            "simulation_early_to_late_learn1",
+            "simulation_early_to_late_learn10",
+            "simulation_early_to_late_learn100",
+        ],
+        "comparison": "compare_exploration",
+    },
+    "middle_to_early_explorations": {
+        "folders": [
+            "simulation_middle_to_early_learn1",
+            "simulation_middle_to_early_learn10",
+            "simulation_middle_to_early_learn100",
+        ],
+        "comparison": "compare_exploration",
+    },
+    "middle_to_late_explorations": {
+        "folders": [
+            "simulation_middle_to_late_learn1",
+            "simulation_middle_to_late_learn10",
+            "simulation_middle_to_late_learn100",
+        ],
+        "comparison": "compare_exploration",
+    },
+    "late_to_early_explorations": {
+        "folders": [
+            "simulation_late_to_early_learn1",
+            "simulation_late_to_early_learn10",
+            "simulation_late_to_early_learn100",
+        ],
+        "comparison": "compare_exploration",
+    },
+    "late_to_middle_explorations": {
+        "folders": [
+            "simulation_late_to_middle_learn1",
+            "simulation_late_to_middle_learn10",
+            "simulation_late_to_middle_learn100",
+        ],
+        "comparison": "compare_exploration",
+    },
+    "middle_transfer": {
+        "folders": [
+            "simulation_middle_learn",
+            "simulation_early_to_middle_learn10",
+        ],
+        "comparison": "transfer",
+        "threshold": 5,
+        "jumpstart_pos": (5000, 200),
+        "time_to_threshold_pos": (3000, 20),
+    },
+}
 
 EXTENSIONS = {"train": "train_acc", "test": "test_acc"}
 
@@ -77,7 +133,7 @@ def make_plot_nice(
     ax.set_xlabel(xlabel, fontsize=fontsize)
     ax.set_ylabel(ylabel, fontsize=fontsize)
     ax.set_ylim([ymin, ymax])
-    ax.grid()
+    # ax.grid()
 
 
 def _get_final_accs(folder):
@@ -185,10 +241,95 @@ def objective_plot():
         save(f"objective_{os.path.basename(folder)}.png")
 
 
+def get_name(folder, comparison):
+    ending_digits = folder[folder.index("learn") + len("learn") :]
+    if len(ending_digits) == 0:
+        if comparison == "compare_exploration" or comparison == "transfer":
+            return "scratch"
+        elif comparison == "compare_scenarios":
+            folder = folder[len("simulation_") :]
+            return folder[: folder.index("_")]
+        else:
+            raise RuntimeError(f"invalid comparison option {comparison}")
+    if comparison == "transfer":
+        return "transfer"
+    return f"T = {ending_digits}"
+
+
+def draw_arrow(ax, label, arrow_start, arrow_end, label_pos):
+    arrow_properties = dict(facecolor="black", edgecolor="black", arrowstyle="<->")
+    ax.annotate("", xy=arrow_start, xytext=arrow_end, arrowprops=arrow_properties)
+    ax.annotate(label, xy=label_pos, fontsize=16)
+
+
+def get_threshold_pt(objs, threshold):
+    for i, o in enumerate(objs):
+        if o <= threshold:
+            return i
+    raise RuntimeError("never passed threshold!")
+
+
+def grouped_objective_plot():
+    window_size = 50
+    for groupname, groupinfo in GROUPED_AGENT_FOLDERS.items():
+        _, ax = plt.subplots()
+        ymax = 0
+        starts = list()
+        thresholds = list()
+        for folder in groupinfo["folders"]:
+            name = get_name(folder, groupinfo["comparison"])
+            folder = os.path.join(RESULTS, folder)
+            objectives = load_objectives(
+                os.path.join(folder, "agent.episode.objective")
+            )
+            x = np.arange(len(objectives))
+            mean_objectives = np.convolve(
+                objectives, np.ones(window_size) / window_size, mode="valid"
+            )
+            ax.plot(x[: -window_size + 1], mean_objectives, label=name)
+            ymax = max(ymax, np.max(mean_objectives))
+            if "threshold" in groupinfo:
+                starts.append(mean_objectives[0])
+                thresholds.append(
+                    get_threshold_pt(mean_objectives, groupinfo["threshold"])
+                )
+        if len(groupinfo["folders"]) == 2:
+            ax.axhline(
+                groupinfo["threshold"],
+                label="threshold",
+                color="black",
+                linestyle="dashed",
+            )
+            draw_arrow(
+                ax,
+                "Jumpstart",
+                (1, starts[0]),
+                (1, starts[1]),
+                groupinfo["jumpstart_pos"],
+            )
+            draw_arrow(
+                ax,
+                "Time to Threshold",
+                (thresholds[0], groupinfo["threshold"] + 5),
+                (thresholds[1], groupinfo["threshold"] + 5),
+                groupinfo["time_to_threshold_pos"],
+            )
+        make_plot_nice(
+            ax,
+            "Episode",
+            "Objective",
+            0,
+            ymax,
+            legendcol=1,
+        )
+        save(f"objective_{groupname}.png")
+
+
 def main():
     random_plot()
-    agent_plot()
+    # agent_plot()
     objective_plot()
+    grouped_objective_plot()
 
 
 if __name__ == "__main__":

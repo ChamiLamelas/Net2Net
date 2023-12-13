@@ -32,9 +32,11 @@ def main():
     agt.policy.load_state_dict(
         torch.load(os.path.join(args.folder, "agent.bestmodel.pth"))
     )
+    agt.eval()
 
-    print("=== Policy ===")
-    print(agt.policy)
+    # print("=== Policy ===")
+    # print(agt.policy)
+    print(f"=== Folder ===\n{args.folder}")
 
     model = job.Job(config).model
     action_set_size = len(tracing.get_all_deepen_blocks(model)) + 1

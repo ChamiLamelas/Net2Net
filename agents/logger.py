@@ -164,6 +164,7 @@ class ML_Logger(TimedLogger):
         self.counts = defaultdict(Counter)
 
     def should_save(self, save_metric, bigger_better):
+        # print(f"{self.best_save_metric} {save_metric}")
         if self.best_save_metric is None:
             return True
         if bigger_better:
