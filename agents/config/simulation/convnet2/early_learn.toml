@@ -1,11 +1,11 @@
 [runner]
 seed = 42
-total_episodes = 50000
-folder = "simulation_early_learn"
+total_episodes = 75000
+folder = "simulation_early_learn2"
 agent = "Agent"
 
 [simulation]
-datafile = "results/simulation_early/data.pkl"
+datafile = "../results/simulation_early2/data.pkl"
 
 [job]
 model = "ConvNet2"
@@ -21,5 +21,5 @@ embedding_size = 16
 max_actions = 4
 decider_lstm_size = 16
 decider_linear_size = 128
-learning_rate_decay = 0.9
+learning_rate_decay = 0.99
 time_encoding_size = 8

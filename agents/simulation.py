@@ -5,12 +5,14 @@ import os
 
 class Simulation:
     def __init__(self, config):
-        file = config["simulation"]["datafile"]
+        if "simulation" in config:
+            file = config["simulation"]["datafile"]
+        else:
+            file = config["agent"]["save_file"]
         with open(file, "rb") as f:
             self.data = pickle.load(f)
         self.num_actions = len(list(self.data.keys())[0])
         self.placeholder = [0] * self.num_actions
-
 
     def get_time_left(self, actions):
         assert len(actions) < self.num_actions

@@ -12,5 +12,5 @@ model = "ConvNet3"
 dataset = "cifar10"
 
 [agent]
-device = 1
+device = 0
 

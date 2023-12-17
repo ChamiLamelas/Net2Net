@@ -42,15 +42,6 @@ class Trainer:
         self.min_lr = config.get("min_lr", 1e-8)
 
     def adapt_up(self):
-        backup = copy.deepcopy(self.job.model)
-        if len(self.smaller) == 0 or models.count_parameters(
-            self.job.model
-        ) > models.count_parameters(self.smaller[-1]):
-            self.smaller.append(backup)
-        elif models.count_parameters(self.job.model) == models.count_parameters(
-            self.smaller[-1]
-        ):
-            self.smaller[-1] = backup
         action, probabilities = self.agent.action(
             {
                 "model": self.job.model,
@@ -92,6 +83,7 @@ class Trainer:
             self.epoch += 1
             if self.allocation == "up":
                 self.mode = "increased"
+                self.smaller.append(copy.deepcopy(self.job.model))
             elif self.allocation == "down":
                 teacher = copy.deepcopy(self.job.model)
                 self.job.model = self.smaller[-1]

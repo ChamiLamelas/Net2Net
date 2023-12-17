@@ -14,7 +14,7 @@ import seed
 import torch
 import copy
 
-RESULTS = "results"
+RESULTS = os.path.join("..", "results")
 
 
 def file(f):

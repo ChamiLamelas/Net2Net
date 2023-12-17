@@ -13,6 +13,9 @@ class Scheduler:
         self.start_time = None
         self.change = None
 
+    def time_budget(self):
+        return self.running_time
+
     def start(self):
         self.start_time = time.time() - self.start_offset
         self.change = 0

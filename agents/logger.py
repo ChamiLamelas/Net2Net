@@ -190,12 +190,22 @@ class ML_Logger(TimedLogger):
                     self.metrics_file + ".bestmodel.pt",
                 )
                 self.best_save_metric = save_metric
+            # print("SAVING...", file=sys.stderr)
             torch.save(model.state_dict(), self.metrics_file + ".finalmodel.pt")
 
-    def permanentize_model(self):
-        os.rename(
-            self.metrics_file + ".bestmodel.pt", self.metrics_file + ".bestmodel.pth"
-        )
+    def permanentize_model(self, model="best"):
+        if model not in {"best", "final", "both"}:
+            raise RuntimeError(f"invalid model {model}")
+        elif model == "best" or model == "both":
+            os.rename(
+                self.metrics_file + ".bestmodel.pt",
+                self.metrics_file + ".bestmodel.pth",
+            )
+        elif model == "final" or model == "both":
+            os.rename(
+                self.metrics_file + ".finalmodel.pt",
+                self.metrics_file + ".finalmodel.pth",
+            )
 
     @staticmethod
     def load_metrics(log_folder, metrics_file, metric, granularity):

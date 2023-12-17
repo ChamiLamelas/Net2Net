@@ -67,7 +67,7 @@ def deepen_block(parent, name, block, add_batch_norm):
     first_layer = block.layers[0]
     new_block = copy.deepcopy(block)
     new_block.layers = nn.Sequential()
-    new_block.original = False 
+    new_block.original = False
     if isinstance(first_layer, nn.Conv2d):
         new_block.layers.append(_conv_only_deeper(first_layer))
         if add_batch_norm:
@@ -94,3 +94,24 @@ def deepen_model(model, logger=None, index=None, add_batch_norm=True):
             logger.info(
                 f"deepening layer {index}/{len(blocks)}: {models.get_str_rep(block)}"
             )
+
+
+if __name__ == "__main__":
+    base = models.ConvNet2()
+    print(f"base ({models.count_parameters(base)} parameters):\n{base}")
+
+    m = copy.deepcopy(base)
+    deepen_model(m, index=0)
+    print(f"0 ({models.count_parameters(m)} parameters):\n{m}")
+
+    m = copy.deepcopy(base)
+    deepen_model(m, index=1)
+    print(f"1 ({models.count_parameters(m)} parameters):\n{m}")
+
+    m = copy.deepcopy(base)
+    deepen_model(m, index=2)
+    print(f"2 ({models.count_parameters(m)} parameters):\n{m}")
+
+    m = copy.deepcopy(base)
+    deepen_model(m, index=3)
+    print(f"3 ({models.count_parameters(m)} parameters):\n{m}")

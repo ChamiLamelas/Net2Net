@@ -8,9 +8,17 @@ import numpy as np
 import csv
 import logger
 import os
+import toml
+import agent
+import simulation
+import torch
+import tracing
+import job
+import deepening
+import random
 
-RESULTS = "results"
-PLOTS = "plots"
+RESULTS = os.path.join("..", "results")
+PLOTS = os.path.join("..", "plots")
 
 SMALL_FOLDER = "no_adaptation2"
 
@@ -23,11 +31,25 @@ BASELINE_FOLDERS = [
 ]
 
 AGENT_FOLDERS = [
-    "simulation_early_learn",
-    "simulation_middle_learn",
-    "simulation_late_learn",
+    "simulation_early_learn2",
+    "simulation_middle_learn2",
+    "simulation_late_learn2",
     # "simulation_middle_to_late_learn1",
 ]
+
+ACC_AGENT_FOLDERS = {
+    "time_stages": {
+        "agentfolder": "simulation_early_to_middle_to_late_learn1",
+        "folders": [
+            "simulation_early",
+            "simulation_early_middle",
+            "simulation_middle",
+            "simulation_middle_late",
+            "simulation_late",
+        ],
+        "names": ["E", "E-M", "M", "M-L", "L"],
+    }
+}
 
 GROUPED_AGENT_FOLDERS = {
     "early_to_middle_explorations": {
@@ -325,11 +347,95 @@ def grouped_objective_plot():
         save(f"objective_{groupname}.png")
 
 
+def acc_plot():
+    for groupname, groupinfo in ACC_AGENT_FOLDERS.items():
+        folder = groupinfo["agentfolder"]
+
+        print(f"=== Folder ===\n{folder}")
+
+        folder = os.path.join(RESULTS, folder)
+        config = toml.load(os.path.join(folder, "config.toml"))
+
+        agt = agent.Agent(config)
+        agt.policy.load_state_dict(
+            torch.load(os.path.join(folder, "agent.finalmodel.pth"))
+        )
+        agt.eval()
+
+        model = job.Job(config).model
+        action_set_size = len(tracing.get_all_deepen_blocks(model)) + 1
+
+        _, ax = plt.subplots()
+        no_adaptations = list()
+        baselines = list()
+        agents = list()
+        bests = list()
+
+        for name, folder in zip(groupinfo["names"], groupinfo["folders"]):
+            folder = os.path.join(RESULTS, folder)
+            config = toml.load(os.path.join(folder, "config.toml"))
+            sim = simulation.Simulation(config)
+
+            actions = list()
+            for _ in range(sim.get_num_actions()):
+                action, _ = agt.action(
+                    {
+                        "totaltime": sim.get_total_time(),
+                        "timeleft": sim.get_time_left(actions),
+                        "model": model,
+                    }
+                )
+                deepening.deepen_model(model, index=action)
+                actions.append(action)
+
+            all_rankings = sim.get_acc_ranking()
+
+            actions = tuple(actions)
+
+            no_adaptations.append(
+                sim.get_acc(tuple([action_set_size - 1] * sim.get_num_actions()))
+            )
+
+            bests.append(all_rankings[0][1])
+
+            baselines.append(np.mean(random.sample([e[1] for e in all_rankings], k=10)))
+
+            agents.append(sim.get_acc(actions))
+
+            print(
+                f"{name}\t: agent : {' '.join(map(str, actions))} ({agents[-1]:.4f}) best : {' '.join(map(str, all_rankings[0][0]))} ({bests[-1]:.4f})"
+            )
+
+        no_adaptation = np.mean(no_adaptations)
+
+        ax.axhline(
+            no_adaptation, color="black", linestyle="dashed", label="no adaptation"
+        )
+
+        xs = np.arange(len(baselines))
+        ax.set_xticks(xs)
+        ax.set_xticklabels(groupinfo["names"])
+        ax.scatter(xs, baselines, label="baseline")
+        ax.scatter(xs, agents, label="agent")
+        ax.scatter(xs, bests, label="best")
+
+        make_plot_nice(
+            ax,
+            "Stage",
+            "Accuracy",
+            0,
+            1,
+            legendcol=2,
+        )
+        save(f"acc_{groupname}.png")
+
+
 def main():
-    random_plot()
+    # random_plot()
     # agent_plot()
     objective_plot()
-    grouped_objective_plot()
+    # grouped_objective_plot()
+    # acc_plot()
 
 
 if __name__ == "__main__":

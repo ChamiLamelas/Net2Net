@@ -1,11 +1,11 @@
 [runner]
 seed = 42
-total_episodes = 25000
-folder = "simulation_middle_learn"
+total_episodes = 20000
+folder = "simulation_middle_learn2"
 agent = "Agent"
 
 [simulation]
-datafile = "results/simulation_middle/data.pkl"
+datafile = "../results/simulation_middle2/data.pkl"
 
 [job]
 model = "ConvNet2"

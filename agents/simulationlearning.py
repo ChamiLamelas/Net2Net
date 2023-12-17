@@ -19,7 +19,7 @@ import deepening
 import sys
 import simulation
 
-RESULTS = "results"
+RESULTS = os.path.join("..", "results")
 
 
 def file(f):
@@ -129,7 +129,7 @@ def run(config, run_config, logger):
             {"objective": obj}, "episode", agt.policy, bigger_better=False
         )
     agt_logger.stop()
-    agt_logger.permanentize_model()
+    agt_logger.permanentize_model("final")
 
 
 def main():

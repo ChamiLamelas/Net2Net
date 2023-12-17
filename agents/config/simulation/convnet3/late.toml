@@ -1,13 +1,13 @@
 [runner]
 seed = 42
 total_episodes = 64
-folder = "simulation_late3"
+folder = "simulation_late3_v2"
 agent = "SimulationAgent"
 save = true 
 
 [scheduler]
 running_time = 400
-gpu_changes = [{ time = 330, change = "up" }, { time = 370, change = "down" }]
+gpu_changes = [{ time = 330, change = "up" }]
 start_time = 330
 
 [trainer]
@@ -19,7 +19,7 @@ model = "ConvNet3"
 dataset = "cifar10"
 
 [agent]
-device = 1
+device = 0
 action_set_size = 4
 num_actions = 3
-save_file = "results/simulation_late3/data.pkl"
+save_file = "results/simulation_late3_v2/data.pkl"

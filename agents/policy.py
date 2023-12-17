@@ -48,7 +48,7 @@ class Policy(nn.Module):
             {"encodings": all_encodings, "other": other_features}
         )
 
-        if self.temperature > 1:
+        if self.training and self.temperature > 1:
             probabilities = self.softmax(probabilities / self.temperature)
         return probabilities
 

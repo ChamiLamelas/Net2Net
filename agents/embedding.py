@@ -4,14 +4,11 @@ import torch.nn as nn
 import torch
 import sys
 import os
-
-sys.path.append(os.path.join("..", "src"))
-
 import tracing
 import models
 import pickle
 
-VOCABS = "vocabs"
+VOCABS = os.path.join("..", "vocabs")
 IDS = ".ids.pkl"
 EMBEDDINGS = ".embeddings.pkl"
 NONE_LAYER_ID = 0
@@ -37,7 +34,7 @@ class Vocabulary:
                 self.embeddings = torch.load(f)
 
     def init_from_models(self, models):
-        self.ids = {"none-layer": NONE_LAYER_ID}
+        self.ids = dict() # {"none-layer": NONE_LAYER_ID}
         for model in models:
             for layer in tracing.get_all_layers(model):
                 key = str(layer)
@@ -71,7 +68,7 @@ class Vocabulary:
 
 
 if __name__ == "__main__":
-    vocab = Vocabulary("test", [models.ConvNet()])
+    vocab = Vocabulary("test", [models.ConvNet2()])
     print(vocab.has_embeddings())
 
     embedder = nn.Embedding(vocab.size(), 4)

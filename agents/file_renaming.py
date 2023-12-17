@@ -5,7 +5,7 @@ import os
 
 
 def result_folder(folder):
-    folder = os.path.join("results", folder)
+    folder = os.path.join("..", "results", folder)
     if os.path.isdir(folder):
         return folder
     raise argparse.ArgumentTypeError(f"{folder} does not exist")

@@ -73,8 +73,13 @@ class Agent(BaseAgent):
         self.saved_probs = None
         self.eval_mode = False
 
+    def train(self):
+        self.eval_mode = False 
+        self.policy.train()
+
     def eval(self):
         self.eval_mode = True
+        self.policy.eval()
 
     def init(self):
         self.probabilities = list()
